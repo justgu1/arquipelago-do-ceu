@@ -1,6 +1,4 @@
-// Folha de pedidos do Meshy: lista o que falta, mostra o custo e o saldo e, só com aprovação explícita, gera.
-//   node gerar.mjs --lista [--md]
-//   node gerar.mjs --gerar --prioridade=A --aprovado=<créditos do total> --saida=<pasta fora do repositório>
+// Folha de pedidos do Meshy: --lista mostra custo e saldo; --gerar só roda com --aprovado=<total> e --saida=<pasta fora do repositório>.
 // A chave vem de MESHY_API_KEY e nunca é escrita em arquivo nem em log.
 import fs from "node:fs";
 import path from "node:path";

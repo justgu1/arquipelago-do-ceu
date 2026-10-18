@@ -82,16 +82,28 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		AddChild(Creature);
 		AddChild(barrier);
 
-		var model = Lobby.LoadModel("boneco");
-		if (model is not null)
-		{
-			AddChild(model);
-			Lobby.FitToHeight(model, CreatureHeight, Vector3.Zero);
-			creatureModel = model;
-		}
+		Creature.Reacted += kind => creatureModel?.React(kind);
 	}
 
-	Node3D? creatureModel;
+	CreatureModel? creatureModel;
+	string? shownCreature;
+
+	// Os modelos da torre, na ordem em que aparecem de Sala em Sala; sem eles vale o Boneco.
+	public IReadOnlyList<string> CreatureSet { get; set; } = [];
+
+	void ShowCreatureModel(int roomId)
+	{
+		var name = CreatureSet.Count > 0 ? CreatureSet[roomId % CreatureSet.Count] : "boneco";
+		if (name == shownCreature) return;
+		if (creatureModel is not null) RemoveChild(creatureModel.Node);
+		creatureModel?.Node.QueueFree();
+		shownCreature = name;
+		creatureModel = CreatureModel.Load(name) ?? CreatureModel.Load("boneco");
+		if (creatureModel is null) return;
+		creatureModel.ReduceMotion = ReduceMotion;
+		AddChild(creatureModel.Node);
+		creatureModel.Fit();
+	}
 	IReadOnlyList<MeshInstance3D> walls = [];
 
 	// Onde a criança está no chão da Sala; as paredes na frente dela ou da criatura ficam transparentes.
@@ -99,6 +111,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 
 	public override void _Process(double delta)
 	{
+		creatureModel?.Tick(delta);
 		var seen = new List<Vector3>();
 		if (PlayerAt?.Invoke() is { } at) seen.Add(new Vector3(at.X, 1f, at.Y));
 		if (Creature.Visible) seen.Add(Creature.Center + new Vector3(0f, 0.8f, 0f));
@@ -132,7 +145,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	public void ShowTarget(bool fight, bool puzzle)
 	{
 		Creature.Visible = fight;
-		if (creatureModel is not null) creatureModel.Visible = fight && !puzzle;
+		if (creatureModel is not null) creatureModel.Node.Visible = fight && !puzzle;
 		barrier.Visible = fight && puzzle;
 	}
 
@@ -152,6 +165,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		(shownFloor, currentId, spot) = (key, roomId, here.Spot);
 
 		var kind = floor.Rooms[roomId].Kind;
+		ShowCreatureModel(roomId);
 		var walkable = new HashSet<HexCell>(here.Cells.Select(Local));
 		var blocked = new HashSet<HexCell>();
 		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);

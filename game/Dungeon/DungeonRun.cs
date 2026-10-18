@@ -95,7 +95,7 @@ public partial class DungeonRun : Node
 	{
 		AddChild(world);
 		world.Camera.MakeCurrent();
-		world.Name = "Dungeon"; world.PlayerAt = () => player.GroundPosition;
+		world.Name = "Dungeon"; world.CreatureSet = CreaturesOf(ctx.Discipline); world.PlayerAt = () => player.GroundPosition;
 
 		player = new Player(world.Grid, world.Camera, world.HeightAt);
 		ctx.ConfigurePlayer(player);
