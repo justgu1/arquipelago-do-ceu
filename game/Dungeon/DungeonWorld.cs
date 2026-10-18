@@ -203,7 +203,9 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		Grid.Reset(walkable, blocked);
 		walls = RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
 
-		AddSign($"{kind.Name}", new Vector3(0f, kind.HasChallenge ? 5.6f : 2.4f, 0f), 56);
+		// Com escada na Sala o nome sobe, para os textos não ficarem um em cima do outro.
+		var hasStairs = kind.Stairs == RoomStairs.Up || stairsDown || deepStairs;
+		AddSign($"{kind.Name}", new Vector3(0f, kind.HasChallenge ? 5.6f : hasStairs ? 4.6f : 2.4f, 0f), 56);
 		if (note is not null) AddSign(note, new Vector3(0f, 3.4f, 0f), 34);
 		if (kind.Stairs == RoomStairs.Up || stairsDown) AddStairs(stairsDown);
 		if (kind.Restores) AddFountain(cleared.Contains(roomId));
@@ -315,7 +317,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	void AddStairs(bool down)
 	{
 		var material = new StandardMaterial3D { AlbedoColor = FloorMap.ColorOf(RoomTypes.Exit), Roughness = 0.8f };
-		if (down) AddSign("Escada para baixo", new Vector3(0f, 3.4f, 0f), 40);
+		if (down) AddSign("Escada para baixo", new Vector3(0f, 3.3f, 0f), 40);
 		if (RoomProps.Add(room, "cenario/escada-pedra", 1.1f, Vector3.Zero, Mathf.Pi / 4f) is not null) return;
 		for (var step = 0; step < 4; step++)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.8f - step * 0.3f, 0.25f, 1.8f - step * 0.3f) }, MaterialOverride = material, Position = new Vector3(0f, 0.15f + step * 0.25f, 0f) });
@@ -327,12 +329,12 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var at = new Vector3(DeepStairsSpot.X, 0f, DeepStairsSpot.Y);
 		if (RoomProps.Add(room, "cenario/escada-pedra", 0.8f, at, Mathf.Pi / 4f) is not null)
 		{
-			AddSign("Escada lateral\nAndares profundos", at + new Vector3(0f, 1.9f, 0f), 36);
+			AddSign("Andares profundos", at + new Vector3(0f, 1.5f, 0f), 34);
 			return;
 		}
 		for (var step = 0; step < 3; step++)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.2f - step * 0.3f, 0.2f, 1.2f - step * 0.3f) }, MaterialOverride = material, Position = at + new Vector3(0f, 0.1f + step * 0.2f, 0f) });
-		AddSign("Escada lateral\nAndares profundos", at + new Vector3(0f, 1.9f, 0f), 36);
+		AddSign("Andares profundos", at + new Vector3(0f, 1.5f, 0f), 34);
 	}
 
 	void AddSign(string text, Vector3 at, int size)

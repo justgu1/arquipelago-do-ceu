@@ -191,6 +191,10 @@ public partial class CombatHud
 				handled = layer.TypedText.Length > 0;
 				layer.Submit();
 				break;
+			case Key.W or Key.A or Key.S or Key.D:
+				// Andar tem prioridade: essas quatro teclas movem o Personagem, e a letra se escreve desenhando.
+				handled = false;
+				break;
 			default:
 				handled = key.Unicode != 0 && layer.Type((char)key.Unicode);
 				break;

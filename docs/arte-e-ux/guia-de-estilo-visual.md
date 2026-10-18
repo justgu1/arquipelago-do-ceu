@@ -127,6 +127,22 @@ A otimização é requisito: o jogo roda em PC e em tablets Android de gama méd
 - O *remesh* da Meshy (5 créditos) levou o mesmo modelo para **3.671 triângulos** com o visual praticamente idêntico, **mas** devolveu 3 texturas PNG (2048, 2048 e 4096 pixels, 8 MB no total). Só a cor base é usada; o resto se descarta.
 - Portanto: gerar com `should_remesh` e `target_polycount` já no limite da tabela, e **medir os triângulos do arquivo** antes de aceitar. Uma verificação automática de triângulos dos modelos na CI é recomendada quando houver modelos no repositório.
 
+### Escala no jogo (altura em unidades do mundo; o Personagem tem cerca de 1,5)
+
+Todo modelo é reescalado pela altura quando entra no jogo, então o arquivo pode vir de qualquer tamanho. O que vale é esta tabela, para pessoa, animal e objeto ficarem em proporção:
+
+| Tipo | Mínimo | Máximo | Exemplos |
+| --- | --- | --- | --- |
+| Personagem e NPC | 1,5 | 1,8 | Personagem, Guia |
+| Criatura | 0,8 | 1,5 | pato 1,0; coruja 1,1; autômatos 1,2 a 1,4 |
+| Objeto de chão | 0,5 | 1,2 | fonte 1,0; caixote; pilha de livros |
+| Objeto de mão ou item | 0,2 | 0,5 | orbe, medalhão, placa de letra |
+| Porta e portal | 1,8 | 2,8 | porta-arco 1,6 (a subir); portal 2,0 a 2,8 |
+| Escada | 0,8 | 1,2 | escada principal 1,1; lateral 0,8 |
+| Torre | 4 | 6 | torres do Lobby 5 |
+
+A criatura nunca passa do Personagem nem fica menor que um objeto de chão. Em código, a altura de cada criatura está em `CreatureModel` (com mínimo e máximo), e a dos objetos da Sala em `RoomProps`.
+
 ## 9. Animação, física e efeitos
 
 Tudo aqui é **proposta** para o MVP. A regra geral é a mesma da seção 8: o que o motor faz de graça não se gera em modelo.
