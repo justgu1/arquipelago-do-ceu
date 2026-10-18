@@ -1,0 +1,265 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Modelos do Arquipélago</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  /* Layout: visualizador grande à esquerda, lista de modelos com a régua do orçamento à direita. */
+  :root {
+    --bg: #f5f2fa;
+    --surface: #ffffff;
+    --ink: #1f1830;
+    --muted: #6b6280;
+    --line: #ddd6ea;
+    --accent: #7a44d1;
+    --accent-ink: #ffffff;
+    --ok: #1b7f4f;
+    --over: #b4400c;
+    --stage-a: #efe9fb;
+    --stage-b: #d9cdf3;
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #150f20; --surface: #1f1730; --ink: #f1ecfa; --muted: #a89dbd; --line: #352a4d;
+      --accent: #a27bef; --accent-ink: #150f20; --ok: #4cd08a; --over: #ff9d5c;
+      --stage-a: #2a1f42; --stage-b: #181025; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #150f20; --surface: #1f1730; --ink: #f1ecfa; --muted: #a89dbd; --line: #352a4d;
+    --accent: #a27bef; --accent-ink: #150f20; --ok: #4cd08a; --over: #ff9d5c;
+    --stage-a: #2a1f42; --stage-b: #181025; color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 24px 40px; }
+  .wrap { max-width: 1100px; margin-inline: auto; display: grid; gap: 20px; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: clamp(1.7rem, 4vw, 2.3rem); line-height: 1.1; margin: 0; text-wrap: balance; }
+  .lead { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+  .layout { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+  .stage { position: relative; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: linear-gradient(160deg, var(--stage-a), var(--stage-b)); }
+  model-viewer { width: 100%; height: min(62vh, 560px); min-height: 340px; display: block; --poster-color: transparent; background: transparent; }
+  .loading { position: absolute; inset: auto 12px 12px 12px; display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 13px; }
+  .loading[hidden] { display: none; }
+  .bar { flex: 1; height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: var(--surface); }
+  button { font: inherit; cursor: pointer; }
+  .btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 8px 14px; font-weight: 600; }
+  .btn:hover { border-color: var(--accent); }
+  .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .hint { margin-left: auto; align-self: center; color: var(--muted); font-size: 13px; }
+
+  .list { display: grid; gap: 10px; }
+  .group-title { font-family: var(--display); font-size: 0.95rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 10px 0 0; }
+  .group-title:first-child { margin-top: 0; }
+  .item { text-align: left; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+  .item[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+  .item-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .name { font-family: var(--display); font-weight: 800; font-size: 1.1rem; line-height: 1.2; }
+  .tris { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .meter { position: relative; height: 10px; border-radius: 10px; background: var(--line); }
+  .meter .fill { position: absolute; inset: 0 auto 0 0; border-radius: 10px; background: var(--ok); }
+  .meter.over .fill { background: var(--over); }
+  .meter .limit { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+  .status { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .tag { font-weight: 700; }
+  .tag.ok { color: var(--ok); }
+  .tag.over { color: var(--over); }
+
+  .notes { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 14px 16px; }
+  .notes h2 { font-family: var(--display); font-size: 1.05rem; margin: 0 0 4px; }
+  .notes p { margin: 0; color: var(--muted); max-width: 70ch; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+  .fact { border-top: 2px solid var(--line); padding-top: 6px; }
+  .fact b { display: block; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+  .fact span { color: var(--muted); font-size: 13px; }
+  .foot { color: var(--muted); font-size: 13px; }
+</style>
+
+<main class="wrap">
+  <header>
+    <h1>Modelos do Arquipélago</h1>
+    <p class="lead">Os modelos 3D do jogo, gerados no Meshy a partir das folhas aprovadas (os do primeiro teste e a leva nova de criaturas, cenário, obstáculos e itens), com a contagem real de triângulos contra o orçamento do guia de estilo. Arraste para girar, role para aproximar.</p>
+  </header>
+
+  <div class="layout">
+    <section aria-label="Visualizador">
+      <div class="stage">
+        <model-viewer id="mv" autoplay camera-controls touch-action="pan-y" shadow-intensity="1" exposure="1.05" interaction-prompt="none" camera-orbit="35deg 76deg auto" alt="Modelo 3D selecionado"></model-viewer>
+        <div class="loading" id="loading" hidden><span id="loadingText">Carregando modelo</span><span class="bar"><i id="loadingBar"></i></span></div>
+      </div>
+      <div class="tools">
+        <button class="btn" id="spin" type="button" aria-pressed="false">Girar sozinho</button>
+        <button class="btn" id="reset" type="button">Reiniciar câmera</button>
+        <span class="hint">O modelo mostra só a cor base, como no jogo.</span>
+      </div>
+    </section>
+
+    <section class="list" id="list" aria-label="Modelos"></section>
+  </div>
+
+  <section class="notes" aria-live="polite">
+    <h2 id="notesTitle"></h2>
+    <p id="notesText"></p>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <p class="foot">Limites de triângulos: proposta do guia de estilo visual, a confirmar em tablet real.</p>
+</main>
+
+<script>
+  var MODELS = [
+    { group: "Personagem", file: "modelos/personagem-andando.glb.wasm", name: "Personagem andando", tris: 3671, limit: 3500, size: "8,3 MB", tex: "3 texturas (só a cor base será usada)", bones: 24,
+      note: "Corpo base reduzido pelo remesh e com o rig automático da Meshy: 24 ossos, com nomes parecidos com os do Mixamo, e a animação de andar (1 segundo, em laço). A de correr também veio. O rosto está pintado na textura, o que serve para testar a ideia e fica sem customização por enquanto." },
+    { group: "Lobby", file: "modelos/boneco.glb.wasm", name: "Boneco de treino", tris: 2529, limit: 2500, size: "3,6 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "O alvo da Área de treino, com carinha feliz e remendos coloridos. Substitui a primeira versão, que lembrava um boneco assustador." },
+    { group: "Lobby", file: "modelos/guia.glb.wasm", name: "Guia", tris: 3132, limit: 3000, size: "2,8 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "O NPC que orienta a criança e fala por voz sintética. A aparência ainda é uma sugestão, não está decidida nos documentos." },
+    { group: "Lobby", file: "modelos/portal.glb.wasm", name: "Portal de fast travel", tris: 1469, limit: 1500, size: "1,4 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "Arco de pedra com o redemoinho de luz. Gerado no modelo lite, a metade do preço." },
+    { group: "Lobby", file: "modelos/atril.glb.wasm", name: "Atril do Álbum", tris: 796, limit: 800, size: "1,8 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "O atril com o livro aberto, onde fica o Álbum de criaturas. Modelo lite." },
+    { group: "Lobby", file: "modelos/arvores.glb.wasm", name: "Grupo de árvores", tris: 420, limit: 600, size: "1,3 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "Três árvores num só modelo, no estilo faceteado do lite. Serve de cenário e de teste do visual de fundo." },
+    { group: "Torres", file: "modelos/torre-numeros.glb.wasm", name: "Torre dos Números", tris: 5851, limit: 6000, size: "3,3 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "Roxo e dourado, com relógio sem algarismos, engrenagens e cristal. Os anéis e os medalhões que giram em volta serão peças separadas, com os algarismos desenhados pelo jogo." },
+    { group: "Torres", file: "modelos/torre-letras.glb.wasm", name: "Torre das Letras", tris: 5849, limit: 6000, size: "3,3 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "Verde e azul-céu, com um livro aberto no topo e pergaminhos pela parede. As peças de madeira com letras e sílabas que giram em volta virão separadas." },
+    { group: "Criaturas", file: "modelos/coruja.glb.wasm", name: "Coruja mecânica (Números)", tris: 2580, limit: 2500, size: "2,1 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "Tem a placa lisa no peito, onde o jogo escreve o número. Para testar a mecânica do Matemático." },
+    { group: "Criaturas", file: "modelos/pato.glb.wasm", name: "Pato (Letras)", tris: 2615, limit: 2500, size: "2,0 MB", tex: "1 textura de 2048 px (só cor)",
+      note: "A criatura é a própria palavra a escrever, sem etiqueta nem letra no corpo. Para testar a mecânica do Escriba (PA-TO)." },
+    { group: "Criaturas novas (Números)", file: "modelos/novos/automato-base.glb.wasm", name: "Autômato base", tris: 2606, limit: 2500, size: "414 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Autômato de latão com a placa lisa para o número, uma engrenagem na cabeça e um olho só." },
+    { group: "Criaturas novas (Números)", file: "modelos/novos/automato-pesado.glb.wasm", name: "Autômato pesado", tris: 2591, limit: 2500, size: "413 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Versão gordinha, com a placa quadrada e um relógio sem algarismos na barriga." },
+    { group: "Criaturas novas (Números)", file: "modelos/novos/automato-voador.glb.wasm", name: "Autômato voador", tris: 2595, limit: 2500, size: "262 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Versão que flutua, com hélice no alto e a placa pendurada no corpo." },
+    { group: "Criaturas novas (Letras)", file: "modelos/novos/papel-fantasma.glb.wasm", name: "Papel fantasma", tris: 2598, limit: 2500, size: "250 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Criatura de papel amassado com letras desbotadas em volta e a etiqueta em branco no peito." },
+    { group: "Criaturas novas (Letras)", file: "modelos/novos/livro-com-pernas.glb.wasm", name: "Livro com pernas", tris: 2536, limit: 2500, size: "296 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Um livro fechado com perninhas e olhos grandes na capa." },
+    { group: "Criaturas novas (Letras)", file: "modelos/novos/pergaminho.glb.wasm", name: "Pergaminho", tris: 2595, limit: 2500, size: "342 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Pergaminho enrolado de pé, com hastes de madeira, olhos curiosos e sorriso. Refeito na segunda rodada." },
+    { group: "Criaturas novas (Números)", file: "modelos/novos/automato-cristal.glb.wasm", name: "Autômato cristal", tris: 2579, limit: 2500, size: "427 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Versão com ombreiras de cristal azul e placa hexagonal." },
+    { group: "Criaturas novas (Letras)", file: "modelos/novos/tinta-roxa.glb.wasm", name: "Tinta roxa", tris: 2620, limit: 2500, size: "172 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Gota de tinta roxa, tímida, com letras desbotadas por dentro." },
+    { group: "Cenário novo", file: "modelos/novos/porta-arco.glb.wasm", name: "Porta-arco", tris: 1018, limit: 1000, size: "256 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Duas colunas de pedra e uma verga: a porta física das Salas, sem folha." },
+    { group: "Cenário novo", file: "modelos/novos/escada-pedra.glb.wasm", name: "Escada de pedra", tris: 1090, limit: 1200, size: "277 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Escada curta de cinco degraus, com uma runa brilhante no último." },
+    { group: "Cenário novo", file: "modelos/novos/fonte-descanso.glb.wasm", name: "Fonte do Descanso", tris: 1038, limit: 1000, size: "252 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Fonte de pedra com água azul e uma almofada: o Descanso." },
+    { group: "Cenário novo", file: "modelos/novos/parede-baixa.glb.wasm", name: "Parede baixa", tris: 204, limit: 200, size: "241 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Trecho de muro com ameias. Saiu como um bloco quadrado vazado; serve de teste, e o jogo ainda usa a parede simples." },
+    { group: "Cenário novo", file: "modelos/novos/pilar-torre.glb.wasm", name: "Pilar da torre", tris: 258, limit: 250, size: "204 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Pilar curto de pedra com tampa arredondada." },
+    { group: "Obstáculos", file: "modelos/novos/caixote-madeira.glb.wasm", name: "Caixote de madeira", tris: 400, limit: 400, size: "162 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Caixote de madeira com cantos de latão e uma engrenagem estampada." },
+    { group: "Obstáculos", file: "modelos/novos/pilha-de-livros.glb.wasm", name: "Pilha de livros", tris: 472, limit: 500, size: "287 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Pilha alta e torta de livros coloridos." },
+    { group: "Obstáculos", file: "modelos/novos/pilha-de-engrenagens.glb.wasm", name: "Pilha de engrenagens", tris: 509, limit: 500, size: "140 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Anéis laranja que lembram engrenagens empilhadas. Só aceitável; pode ser refeita." },
+    { group: "Itens", file: "modelos/novos/orbe-de-numero.glb.wasm", name: "Orbe de número", tris: 297, limit: 300, size: "45 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Orbe dourado brilhante, de face em branco, para o jogo escrever o número." },
+    { group: "Itens", file: "modelos/novos/medalhao-engrenagem.glb.wasm", name: "Medalhão de engrenagem", tris: 261, limit: 300, size: "139 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Medalhão de engrenagem dourada com correntinha: o Item de troca." },
+    { group: "Itens", file: "modelos/novos/placa-de-letra.glb.wasm", name: "Placa de letra", tris: 306, limit: 300, size: "143 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Placa de madeira com borda dourada, face em branco para a letra." },
+    { group: "Cenário novo", file: "modelos/novos/pedestal-mestre.glb.wasm", name: "Pedestal do Mestre", tris: 1534, limit: 1500, size: "270 KB", tex: "1 textura de 1024 px (só cor)",
+      note: "Plataforma redonda com três degraus e um anel brilhante, para o Desafio mestre." }
+  ];
+
+  var mv = document.getElementById("mv");
+  var list = document.getElementById("list");
+  var loading = document.getElementById("loading");
+  var bar = document.getElementById("loadingBar");
+  var spin = document.getElementById("spin");
+  var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var current = 0;
+
+  function fmt(n) { return n.toLocaleString("pt-BR"); }
+  function pct(m) { return Math.round((m.tris / m.limit - 1) * 100); }
+
+  function renderList() {
+    list.innerHTML = "";
+    var lastGroup = "";
+    MODELS.forEach(function (m, i) {
+      if (m.group !== lastGroup) {
+        lastGroup = m.group;
+        var h = document.createElement("h2");
+        h.className = "group-title";
+        h.textContent = m.group;
+        list.appendChild(h);
+      }
+      var over = m.tris > m.limit;
+      var fill = Math.min(m.tris / (m.limit * 1.25), 1) * 100;
+      var mark = (1 / 1.25) * 100;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "item";
+      b.id = "item-" + m.id;
+      b.setAttribute("aria-pressed", i === current ? "true" : "false");
+      b.innerHTML =
+        '<span class="item-top"><span class="name">' + m.name + '</span><span class="tris">' + fmt(m.tris) + ' triângulos</span></span>' +
+        '<span class="meter' + (over ? " over" : "") + '" aria-hidden="true"><span class="fill" style="width:' + fill + '%"></span><span class="limit" style="left:' + mark + '%"></span></span>' +
+        '<span class="status"><span>Limite ' + fmt(m.limit) + '</span><span class="tag ' + (over ? "over" : "ok") + '">' +
+        (over ? (pct(m) > 0 ? pct(m) + "% acima do limite" : "acima do limite") : "dentro do limite") + '</span></span>';
+      b.addEventListener("click", function () { select(i); });
+      list.appendChild(b);
+    });
+  }
+
+  function renderNotes(m) {
+    document.getElementById("notesTitle").textContent = m.name;
+    document.getElementById("notesText").textContent = m.note;
+    document.getElementById("facts").innerHTML =
+      '<div class="fact"><b>' + fmt(m.tris) + '</b><span>triângulos</span></div>' +
+      '<div class="fact"><b>' + fmt(m.limit) + '</b><span>limite proposto</span></div>' +
+      '<div class="fact"><b>' + m.size + '</b><span>arquivo</span></div>' +
+      '<div class="fact"><b>' + m.tex + '</b><span>texturas</span></div>' +
+      (m.bones ? '<div class="fact"><b>' + m.bones + '</b><span>ossos no rig</span></div>' : "");
+  }
+
+  function select(i) {
+    current = i;
+    var m = MODELS[i];
+    loading.hidden = false;
+    document.getElementById("loadingText").textContent = "Carregando " + m.name;
+    bar.style.width = "0";
+    mv.setAttribute("src", m.file);
+    mv.setAttribute("alt", m.name);
+    renderList();
+    renderNotes(m);
+  }
+
+  mv.addEventListener("progress", function (e) { bar.style.width = Math.round((e.detail.totalProgress || 0) * 100) + "%"; });
+  mv.addEventListener("load", function () { loading.hidden = true; });
+  mv.addEventListener("error", function () {
+    loading.hidden = false;
+    document.getElementById("loadingText").textContent = "Não foi possível abrir este modelo.";
+    bar.style.width = "0";
+  });
+
+  spin.addEventListener("click", function () {
+    var on = spin.getAttribute("aria-pressed") !== "true";
+    spin.setAttribute("aria-pressed", on ? "true" : "false");
+    if (on) mv.setAttribute("auto-rotate", ""); else mv.removeAttribute("auto-rotate");
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    mv.cameraOrbit = "35deg 76deg auto";
+    mv.fieldOfView = "auto";
+    mv.jumpCameraToGoal();
+  });
+
+  if (!reducedMotion) { spin.setAttribute("aria-pressed", "true"); mv.setAttribute("auto-rotate", ""); }
+  select(0);
+</script>
+
+</body></html>
