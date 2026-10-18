@@ -13,7 +13,9 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v =
 // Tabela de preços do Meshy (docs.meshy.ai/en/api/pricing): prévia da malha 20 + textura 10; a malha já sai reduzida ao alvo, sem remesh à parte.
 const CUSTO = { previa: 20, textura: 10 };
 const custoDe = (p) => CUSTO.previa + CUSTO.textura;
-const escolhidos = () => dados.pedidos.filter((p) => !args.prioridade || p.prioridade === args.prioridade);
+// Com --saida, o que já foi baixado não entra de novo: uma segunda rodada não cobra duas vezes.
+const jaBaixado = (p) => args.saida && fs.existsSync(path.join(args.saida, `${p.arquivo}.glb`));
+const escolhidos = () => dados.pedidos.filter((p) => (!args.prioridade || p.prioridade === args.prioridade) && (!args.so || p.arquivo === args.so) && !jaBaixado(p));
 const total = (lista) => lista.reduce((soma, p) => soma + custoDe(p), 0);
 
 const api = "https://api.meshy.ai/openapi";

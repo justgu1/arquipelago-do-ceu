@@ -2,16 +2,15 @@
 
 O que falta modelar além do que já está em `game/assets/modelos/`. A fonte dos dados é [`tools/meshy/pedidos.json`](../../../tools/meshy/pedidos.json); esta tabela sai de `node tools/meshy/gerar.mjs --lista --md`.
 
-**Nada foi gerado.** A geração só roda depois de o usuário aprovar a lista e o custo, e o script recusa rodar sem `--aprovado=<total>`.
+**Gerado em 18/10/2026**, depois de o usuário aprovar a lista e o custo (o script recusa rodar sem `--aprovado=<total>`). O totem de Fast travel saiu da lista porque o `portal.glb` já existe.
 
 ## Custo
 
 Tabela de preços do Meshy (docs.meshy.ai/en/api/pricing, conferida em 18/10/2026): prévia da malha 20 créditos e textura 2K 10 créditos, ou seja, **30 créditos por modelo**. A malha já sai reduzida ao alvo de triângulos (`should_remesh` + `target_polycount`), sem pagar o remesh à parte. Nenhum modelo leva rig nem animação: o movimento das criaturas é feito no Godot, como diz o guia de estilo.
 
-- Prioridade A: 15 modelos, **450 créditos**.
-- Prioridade B: 6 modelos, 180 créditos.
-- Tudo: 21 modelos, **630 créditos**.
-- Saldo conferido (somente leitura) em 18/10/2026: **717 créditos** mensais, que renovam em 11/11/2026. Gastando tudo sobram 87; só a A, 267.
+- Prioridade A: 14 modelos; B: 6; total de 20 modelos, **600 créditos** pelo preço de tabela.
+- Saldo antes: 717; depois: **127** (gastaram-se 590).
+- Nota de qualidade: pilha-de-engrenagens, parede-baixa e pergaminho saíram fora do pedido e precisam ser refeitos (30 créditos cada).
 
 ## Como entram no jogo
 
@@ -34,7 +33,6 @@ Tabela de preços do Meshy (docs.meshy.ai/en/api/pricing, conferida em 18/10/202
 | B | `criaturas/tinta-roxa.glb` | Criatura (Letras) | 2500 | 1 hexágono | nenhum no modelo (movimento feito no Godot) | 30 | cute round soft ink blob creature in light purple with a few faded letters inside, big shy eyes, no mouth |
 | A | `cenario/porta-arco.glb` | Cenário | 1000 | 1 hexágono de largura, 2 de altura | nenhum no modelo (movimento feito no Godot) | 30 | game door frame: two thick stone pillars and a lintel forming an open arch, a plain open passage between them, small carved gear on top, no door leaf, front view |
 | A | `cenario/escada-pedra.glb` | Cenário | 1200 | 1 hexágono | nenhum no modelo (movimento feito no Godot) | 30 | short stone staircase of five wide steps on a hexagonal base, chunky rounded steps, a small glowing rune on the top step |
-| A | `cenario/totem-fast-travel.glb` | Cenário | 800 | 1 hexágono | nenhum no modelo (movimento feito no Godot) | 30 | travel totem: a stone column on a round base topped with a floating glowing teal crystal, small carved arch pattern on the column |
 | A | `cenario/fonte-descanso.glb` | Cenário | 1000 | 1 hexágono | nenhum no modelo (movimento feito no Godot) | 30 | small cozy stone fountain with calm glowing blue water and a little cushion beside it, round base, welcoming |
 | A | `cenario/parede-baixa.glb` | Cenário | 200 | 1 hexágono de comprimento, meio de altura | nenhum no modelo (movimento feito no Godot) | 30 | low castle wall segment with a battlement notch on top, chunky rounded stone, straight, short, tileable on both ends |
 | A | `cenario/pilar-torre.glb` | Cenário | 250 | meio hexágono de largura, 1,5 de altura | nenhum no modelo (movimento feito no Godot) | 30 | short chunky stone pillar with a small rounded cap, slightly weathered, hand-painted, front view |
