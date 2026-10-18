@@ -9,8 +9,8 @@ O que falta modelar além do que já está em `game/assets/modelos/`. A fonte do
 Tabela de preços do Meshy (docs.meshy.ai/en/api/pricing, conferida em 18/10/2026): prévia da malha 20 créditos e textura 2K 10 créditos, ou seja, **30 créditos por modelo**. A malha já sai reduzida ao alvo de triângulos (`should_remesh` + `target_polycount`), sem pagar o remesh à parte. Nenhum modelo leva rig nem animação: o movimento das criaturas é feito no Godot, como diz o guia de estilo.
 
 - Prioridade A: 14 modelos; B: 6; total de 20 modelos, **600 créditos** pelo preço de tabela.
-- Saldo antes: 717; depois: **127** (gastaram-se 590).
-- Nota de qualidade: pilha-de-engrenagens, parede-baixa e pergaminho saíram fora do pedido e precisam ser refeitos (30 créditos cada).
+- Saldo antes: 717; depois da primeira rodada: 127.
+- Os 3 que saíram fora do pedido foram refeitos em 18/10/2026 (90 créditos; saldo final 37). O pergaminho ficou bom; a parede baixa (bloco quadrado vazado) e a pilha de engrenagens (anéis) são só aceitáveis e podem ser refeitas se incomodarem.
 
 ## Como entram no jogo
 
