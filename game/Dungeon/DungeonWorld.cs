@@ -271,10 +271,13 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var material = new StandardMaterial3D { AlbedoColor = tint, Roughness = 0.8f };
 		var along = way.LengthSquared() > 0.0001f ? way.Normalized() : Vector3.Forward;
 		var side = new Vector3(-along.Z, 0f, along.X) * 0.8f;
-		foreach (var offset in new[] { side, -side })
-			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.28f, PillarHeight, 0.28f) }, MaterialOverride = material, Position = door.Ground + offset + new Vector3(0f, PillarHeight / 2f, 0f) });
 		var across = Mathf.Atan2(side.X, side.Z) - Mathf.Pi / 2f;
-		room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.9f, 0.26f, 0.3f) }, MaterialOverride = material, Position = door.Ground + new Vector3(0f, PillarHeight + 0.1f, 0f), Rotation = new Vector3(0f, across, 0f) });
+		if (RoomProps.Add(room, "cenario/porta-arco", 1.6f, door.Ground, Mathf.Atan2(along.X, along.Z)) is null)
+		{
+			foreach (var offset in new[] { side, -side })
+				room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.28f, PillarHeight, 0.28f) }, MaterialOverride = material, Position = door.Ground + offset + new Vector3(0f, PillarHeight / 2f, 0f) });
+			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.9f, 0.26f, 0.3f) }, MaterialOverride = material, Position = door.Ground + new Vector3(0f, PillarHeight + 0.1f, 0f), Rotation = new Vector3(0f, across, 0f) });
+		}
 		if (door.Locked)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.5f, PillarHeight - 0.1f, 0.18f) }, MaterialOverride = material, Position = door.Ground + new Vector3(0f, PillarHeight / 2f, 0f), Rotation = new Vector3(0f, across, 0f) });
 		AddSign(door.Label, door.Ground + new Vector3(0f, PillarHeight + 0.95f, 0f), 40);
@@ -284,6 +287,11 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	// O totem de viagem do Fast travel: uma coluna com um cristal brilhante, e o nome em cima. Greybox, até a arte definitiva.
 	void AddTotem()
 	{
+		if (RoomProps.Add(room, "portal", 2f, Vector3.Zero, Mathf.Pi / 4f) is not null)
+		{
+			AddSign("Totem de viagem", new Vector3(0f, 3.5f, 0f), 34);
+			return;
+		}
 		var stone = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#8C84A6"), Roughness = 0.9f };
 		var glow = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#4DD0C4"), EmissionEnabled = true, Emission = Color.FromHtml("#4DD0C4"), EmissionEnergyMultiplier = 1.6f };
 		room.AddChild(new MeshInstance3D { Mesh = new CylinderMesh { TopRadius = 0.5f, BottomRadius = 0.75f, Height = 0.4f }, MaterialOverride = stone, Position = new Vector3(0f, 0.2f, 0f) });
@@ -294,6 +302,11 @@ public partial class DungeonWorld : Node3D, ICombatStage
 
 	void AddFountain(bool used)
 	{
+		if (RoomProps.Add(room, "cenario/fonte-descanso", 1f, Vector3.Zero) is { } fountain)
+		{
+			if (used) RoomProps.Dim(fountain);
+			return;
+		}
 		var water = new StandardMaterial3D { AlbedoColor = used ? Color.FromHtml("#7E7A99") : Color.FromHtml("#BA9BEA"), Roughness = 0.4f };
 		room.AddChild(new MeshInstance3D { Mesh = new CylinderMesh { TopRadius = 1.1f, BottomRadius = 1.2f, Height = 0.5f }, MaterialOverride = water, Position = new Vector3(0f, 0.25f, 0f) });
 		room.AddChild(new MeshInstance3D { Mesh = new SphereMesh { Radius = 0.45f, Height = 0.9f }, MaterialOverride = water, Position = new Vector3(0f, 0.9f, 0f) });
@@ -303,6 +316,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	{
 		var material = new StandardMaterial3D { AlbedoColor = FloorMap.ColorOf(RoomTypes.Exit), Roughness = 0.8f };
 		if (down) AddSign("Escada para baixo", new Vector3(0f, 3.4f, 0f), 40);
+		if (RoomProps.Add(room, "cenario/escada-pedra", 1.1f, Vector3.Zero, Mathf.Pi / 4f) is not null) return;
 		for (var step = 0; step < 4; step++)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.8f - step * 0.3f, 0.25f, 1.8f - step * 0.3f) }, MaterialOverride = material, Position = new Vector3(0f, 0.15f + step * 0.25f, 0f) });
 	}
@@ -311,6 +325,11 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	{
 		var material = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#6F5BB0"), Roughness = 0.8f };
 		var at = new Vector3(DeepStairsSpot.X, 0f, DeepStairsSpot.Y);
+		if (RoomProps.Add(room, "cenario/escada-pedra", 0.8f, at, Mathf.Pi / 4f) is not null)
+		{
+			AddSign("Escada lateral\nAndares profundos", at + new Vector3(0f, 1.9f, 0f), 36);
+			return;
+		}
 		for (var step = 0; step < 3; step++)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.2f - step * 0.3f, 0.2f, 1.2f - step * 0.3f) }, MaterialOverride = material, Position = at + new Vector3(0f, 0.1f + step * 0.2f, 0f) });
 		AddSign("Escada lateral\nAndares profundos", at + new Vector3(0f, 1.9f, 0f), 36);
