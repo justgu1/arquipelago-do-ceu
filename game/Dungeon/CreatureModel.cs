@@ -41,14 +41,14 @@ public sealed class CreatureModel
 		since = 0;
 	}
 
-	public void Tick(double delta)
+	public void Tick(double delta, Vector3 anchor)
 	{
 		clock += delta;
 		since += delta;
 		if (ReduceMotion)
 		{
 			model.Scale = baseScale;
-			model.Position = Vector3.Zero;
+			model.Position = anchor;
 			model.Rotation = Vector3.Zero;
 			return;
 		}
@@ -64,7 +64,7 @@ public sealed class CreatureModel
 		else if (live && reaction == "prank") turn = 0.2f * Mathf.Sin(t * 4f * Mathf.Pi) * (1f - t);
 		else if (live && reaction == "freed") (lift, turn) = (0.6f * Mathf.Sin(t * Mathf.Pi), Mathf.Tau * t);
 		model.Scale = new Vector3(baseScale.X / Mathf.Sqrt(squash), baseScale.Y * squash, baseScale.Z / Mathf.Sqrt(squash));
-		model.Position = new Vector3(sway, lift, 0f);
+		model.Position = anchor + new Vector3(sway, lift, 0f);
 		model.Rotation = new Vector3(0f, turn, 0f);
 	}
 }

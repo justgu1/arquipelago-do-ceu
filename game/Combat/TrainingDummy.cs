@@ -87,6 +87,9 @@ public partial class TrainingDummy : Node3D
 
 	public bool ReduceMotion { get; set; }
 
+	// Quanto o corpo andou desde casa: o modelo 3D da Dungeon anda junto.
+	public Vector3 BodyOffset => body.Position;
+
 	// O meio do corpo, para o clique escolher o Boneco e o raio chegar nele.
 	public Vector3 Center => center + body.Position;
 

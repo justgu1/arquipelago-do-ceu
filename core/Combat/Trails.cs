@@ -9,7 +9,8 @@ namespace ArquipelagoDoCeu.Combat;
 // O primeiro ponto é o início numerado e a direção do primeiro trecho é a seta.
 public sealed record TrailStroke(IReadOnlyList<Vector2> Points);
 
-public sealed record GlyphTrail(string Glyph, IReadOnlyList<TrailStroke> Strokes);
+// `Alternatives` são outros jeitos de escrever o mesmo glifo (o 8 de uma volta só): valem para reconhecer, mas o pontilhado segue `Strokes`.
+public sealed record GlyphTrail(string Glyph, IReadOnlyList<TrailStroke> Strokes, IReadOnlyList<IReadOnlyList<TrailStroke>>? Alternatives = null);
 
 // Um traço já na área de desenho, em pixels, e quais dos pontos-guia (a partir de `FirstDot`) ele guarda.
 public sealed record TrailPath(IReadOnlyList<Vector2> Points, int FirstDot, int DotCount);
@@ -117,7 +118,7 @@ public sealed class TraceTrails
 		{
 			var strokes = glyph.Strokes.Select(s => new TrailStroke([.. s.Select(p => new Vector2((float)p[0], (float)p[1]))])).ToList();
 			if (strokes.Any(s => Length(s) < MinStrokeLength)) return Result<TraceTrails>.Fail($"A trilha de '{glyph.Glyph}' tem um traço curto demais.");
-			if (!trails.TryAdd(glyph.Glyph.ToUpperInvariant(), new GlyphTrail(glyph.Glyph.ToUpperInvariant(), strokes))) return Result<TraceTrails>.Fail($"A trilha de '{glyph.Glyph}' está repetida.");
+			if (!trails.TryAdd(glyph.Glyph.ToUpperInvariant(), new GlyphTrail(glyph.Glyph.ToUpperInvariant(), strokes, [.. (glyph.AlsoDrawnAs ?? []).Select(a => (IReadOnlyList<TrailStroke>)[.. a.Select(s => new TrailStroke([.. s.Select(p => new Vector2((float)p[0], (float)p[1]))]))])]))) return Result<TraceTrails>.Fail($"A trilha de '{glyph.Glyph}' está repetida.");
 		}
 		return Result<TraceTrails>.Ok(new TraceTrails(trails));
 	}
@@ -139,7 +140,7 @@ public sealed class TraceTrails
 	static string FirstError(EvaluationResults results) =>
 		(results.Details ?? []).SelectMany(d => (d.Errors ?? new Dictionary<string, string>()).Select(e => $"{d.InstanceLocation}: {e.Value}")).FirstOrDefault() ?? "formato inesperado";
 
-	sealed record GlyphDto(string Glyph, double[][][] Strokes);
+	sealed record GlyphDto(string Glyph, double[][][] Strokes, double[][][][]? AlsoDrawnAs = null);
 
 	sealed record FileDto(GlyphDto[] Glyphs);
 }

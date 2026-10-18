@@ -111,7 +111,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 
 	public override void _Process(double delta)
 	{
-		creatureModel?.Tick(delta);
+		creatureModel?.Tick(delta, Creature.BodyOffset);
 		var seen = new List<Vector3>();
 		if (PlayerAt?.Invoke() is { } at) seen.Add(new Vector3(at.X, 1f, at.Y));
 		if (Creature.Visible) seen.Add(Creature.Center + new Vector3(0f, 0.8f, 0f));

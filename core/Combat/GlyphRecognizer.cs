@@ -25,7 +25,8 @@ public sealed class GlyphRecognizer
 		this.rules = rules;
 		foreach (var glyph in trails.Glyphs)
 		{
-			var variants = Variants([.. trails.Find(glyph)!.Strokes.Select(s => s.Points)]);
+			var trail = trails.Find(glyph)!;
+			var variants = new[] { trail.Strokes }.Concat(trail.Alternatives ?? []).SelectMany(set => Variants([.. set.Select(s => s.Points)])).ToList();
 			if (variants.Count > 0) templates[glyph] = variants;
 		}
 	}
