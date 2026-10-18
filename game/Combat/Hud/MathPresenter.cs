@@ -21,7 +21,11 @@ sealed class MathPresenter(TrainingBattle battle, CombatRules rules, CreatureWor
 	public string? PieceDrawing(int piece) =>
 		Answering ? piece.ToString(CultureInfo.InvariantCulture) : piece < HandSize ? battle.Bag.Hand[piece]?.ToString(CultureInfo.InvariantCulture) : rules.Operators[piece - HandSize];
 
-	public string? Request => battle.Ask == MathAsk.Answer ? $"{battle.Question} = ?" : $"Faça {battle.StartingShield}";
+	// O pedido e, embaixo, o que a criança já pôs na conta: as peças ficam à vista esperando o resto.
+	public string? Request => (battle.Ask == MathAsk.Answer ? $"{battle.Question} = ?" : $"Faça {battle.StartingShield}") + (Composing ? $"\n{Placed}" : "");
+
+	// O que a criança já pôs na conta, para o balão mostrar.
+	string Placed => Answering ? string.Concat(digits) : string.Join(" ", battle.Staff.Tokens);
 
 	public string DrawAllowed => DrawnMath.Allowed(battle.Ask, rules.MathLevel);
 

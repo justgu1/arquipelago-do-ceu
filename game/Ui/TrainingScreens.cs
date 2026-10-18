@@ -88,9 +88,11 @@ public partial class EnergyView : PanelContainer
 {
 	readonly EnergyDots dots = new();
 	readonly Label label = new();
-	Button leave;
+	readonly Label coins = new() { Visible = false };
+	readonly TextureRect coinIcon = new() { Visible = false, CustomMinimumSize = new Vector2(22, 22), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, SizeFlagsVertical = SizeFlags.ShrinkCenter };
 
-	public EnergyView(string leaveText = "Sair do treino")
+	// Sem texto de saída não há botão: na Dungeon o caminho de volta é o totem de Fast travel e o menu.
+	public EnergyView(string? leaveText = "Sair do treino")
 	{
 		MouseFilter = MouseFilterEnum.Stop;
 		AddThemeStyleboxOverride("panel", UiKit.Surface());
@@ -101,9 +103,17 @@ public partial class EnergyView : PanelContainer
 		label.AddThemeColorOverride("font_color", UiKit.TextColor);
 		row.AddChild(label);
 		row.AddChild(dots);
-		leave = UiKit.BigButton(leaveText, () => LeaveRequested?.Invoke(), 230);
-		leave.FocusMode = FocusModeEnum.None;
-		row.AddChild(leave);
+		coinIcon.Texture = Icons.For("coin", 22);
+		coins.AddThemeFontSizeOverride("font_size", 18);
+		coins.AddThemeColorOverride("font_color", UiKit.TextColor);
+		row.AddChild(coinIcon);
+		row.AddChild(coins);
+		if (leaveText is not null)
+		{
+			var leave = UiKit.BigButton(leaveText, () => LeaveRequested?.Invoke(), 230);
+			leave.FocusMode = FocusModeEnum.None;
+			row.AddChild(leave);
+		}
 		AddChild(row);
 
 		SetAnchorsAndOffsetsPreset(LayoutPreset.TopLeft, LayoutPresetMode.Minsize);
@@ -113,6 +123,14 @@ public partial class EnergyView : PanelContainer
 	}
 
 	public event Action? LeaveRequested;
+
+	// O saldo de moedas, bem pequeno, ao lado dos raios.
+	public void SetCoins(int balance)
+	{
+		coins.Text = balance.ToString(System.Globalization.CultureInfo.InvariantCulture);
+		coins.Visible = true;
+		coinIcon.Visible = true;
+	}
 
 	public void Set(int current, int max)
 	{

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ArquipelagoDoCeu.Combat;
 using ArquipelagoDoCeu.Rules;
 using ArquipelagoDoCeu.Voice;
@@ -90,7 +91,7 @@ public partial class CombatHud : OverlayScreen
 	// Perde o alvo sem responder: as peças voltam para a mão e o desenho some.
 	public void Abandon()
 	{
-		pending = null;
+		pending.Clear();
 		layer?.Clear();
 		presenter.Cancel();
 		Requested?.Invoke(null);
@@ -195,7 +196,7 @@ public partial class CombatHud : OverlayScreen
 			var button = BookStyle.Button(piece.Dots > 0 ? $"{piece.Label}\n " : piece.Label, () => Choose(index), $"Piece_{i}", PieceSize);
 			button.CustomMinimumSize = new Vector2(PieceSize, PieceSize);
 			button.AddThemeFontSizeOverride("font_size", 26);
-			button.Disabled = !piece.Enabled || !ready || presenter.Resolved;
+			button.Disabled = !piece.Enabled || !ready || presenter.Resolved || pending.Any(p => p.Piece == index);
 			button.TooltipText = piece.Name;
 			button.FocusMode = FocusModeEnum.None;
 			// A peça escondida fica no lugar, esmaecida e com "?", para as outras não pularem de posição.
@@ -286,7 +287,7 @@ public partial class CombatHud : OverlayScreen
 
 	void Undo()
 	{
-		if (pending is not null)
+		if (pending.Count > 0)
 		{
 			DropPending();
 			return;

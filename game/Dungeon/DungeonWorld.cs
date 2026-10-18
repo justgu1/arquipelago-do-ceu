@@ -54,6 +54,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		if (expedition.CanEnterDeep) list.Add(new Interactable("stairs-deep", DeepStairsSpot));
 		if (expedition.CanReturnToProgression) list.Add(new Interactable("progression", FountainSpot));
 		if (expedition.Current.Kind.Restores) list.Add(new Interactable("rest", FountainSpot));
+		if (expedition.Current.Kind.SavesPoint) list.Add(new Interactable("totem", FountainSpot));
 		return list;
 	}
 
@@ -175,6 +176,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		if (note is not null) AddSign(note, new Vector3(0f, 3.4f, 0f), 34);
 		if (kind.Stairs == RoomStairs.Up || stairsDown) AddStairs(stairsDown);
 		if (kind.Restores) AddFountain(cleared.Contains(roomId));
+		if (kind.SavesPoint) AddTotem();
 		if (deepStairs) AddDeepStairs();
 		return shift;
 	}
@@ -248,6 +250,17 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	}
 
 	// O Descanso é uma fonte no centro da Sala; ela escurece depois de usada.
+	// O totem de viagem do Fast travel: uma coluna com um cristal brilhante, e o nome em cima. Greybox, até a arte definitiva.
+	void AddTotem()
+	{
+		var stone = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#8C84A6"), Roughness = 0.9f };
+		var glow = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#4DD0C4"), EmissionEnabled = true, Emission = Color.FromHtml("#4DD0C4"), EmissionEnergyMultiplier = 1.6f };
+		room.AddChild(new MeshInstance3D { Mesh = new CylinderMesh { TopRadius = 0.5f, BottomRadius = 0.75f, Height = 0.4f }, MaterialOverride = stone, Position = new Vector3(0f, 0.2f, 0f) });
+		room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.45f, 1.7f, 0.45f) }, MaterialOverride = stone, Position = new Vector3(0f, 1.25f, 0f) });
+		room.AddChild(new MeshInstance3D { Mesh = new PrismMesh { Size = new Vector3(0.7f, 0.9f, 0.7f) }, MaterialOverride = glow, Position = new Vector3(0f, 2.5f, 0f) });
+		AddSign("Totem de viagem", new Vector3(0f, 3.5f, 0f), 34);
+	}
+
 	void AddFountain(bool used)
 	{
 		var water = new StandardMaterial3D { AlbedoColor = used ? Color.FromHtml("#7E7A99") : Color.FromHtml("#BA9BEA"), Roughness = 0.4f };

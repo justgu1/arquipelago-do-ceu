@@ -67,6 +67,13 @@ public partial class DevDriver : Node
 	public Button? Button(string text) =>
 		GetTree().Root.FindChildren("*", "Button", true, false).Cast<Button>().FirstOrDefault(b => b.Text == text && b.IsVisibleInTree());
 
+	// Volta ao Lobby de dentro da Dungeon: pelo botão da tela de Nível concluído ou, se não houver, pelo Menu.
+	public async Task PressLeave()
+	{
+		if (Button("Voltar ao Lobby") is null) await Press("Menu");
+		await Press("Voltar ao Lobby");
+	}
+
 	public async Task Press(string text)
 	{
 		var button = Button(text);

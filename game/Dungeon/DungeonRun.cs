@@ -55,7 +55,7 @@ public partial class DungeonRun : Node
 		exploration = new DungeonExploration(ctx);
 		expedition = Expedition.Start(floors, plan, seed, ctx.Version, new Energy(ctx.Rules.MaxEnergy + ctx.ExtraEnergy), ctx.HasTradeItem,
 			ctx.StartFloor, ctx.AtFastTravel, ctx.Shortcut, exploration.Get);
-		hud = new DungeonHud(ctx, expedition) { Speed = () => player?.SpeedMultiplier ?? 1f };
+		hud = new DungeonHud(ctx, expedition);
 		narration = new DungeonNarration(ctx, expedition);
 		rewards = new DungeonRewards(ctx, () => InShortcut, hud.ShowCoins);
 	}
@@ -113,7 +113,7 @@ public partial class DungeonRun : Node
 
 		AddChild(hud);
 		hud.InteractPressed += Activate;
-		hud.LeaveRequested += () => Leave("");
+		hud.MenuRequested += OpenMenu;
 		hud.MapSpeechRequested += () => Say(narration.MapSpeech(IsFloorDone()));
 		hud.MapOpenRequested += OpenMap;
 		hud.RoomPointed += room => Say(narration.RoomSpeech(room));
@@ -301,14 +301,14 @@ public partial class DungeonRun : Node
 	{
 		if (left) return;
 		if (@event.IsActionPressed(Controls.Map)) OpenMap();
+		else if (@event.IsActionPressed("ui_cancel")) OpenMenu();
 		else if (@event.IsActionPressed(Controls.Interact)) Activate();
 	}
 
 	void Activate()
 	{
 		if (left || !enabled || target is null) return;
-		if (target == "rest") { Rest(); return; }
-
+		if (target is "rest" or "totem") { if (target == "rest") Rest(); else Leave(""); return; }
 		if (InShortcut)
 		{
 			Say("Termine o Atalho ou volte ao Lobby.");
