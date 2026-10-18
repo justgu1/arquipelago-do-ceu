@@ -13,13 +13,12 @@ public static class RoomWalls
 	const float PillarHeight = 1.5f;
 	const float Edge = 1f;
 	const float Apothem = 0.866f;
-	const float HideRadius = 1.1f;
+	const float HideRadius = 1.6f;
 
 	// Uma parede em cada lado de hexágono do chão que dá para o vazio; os corredores e as portas ficam abertos.
 	public static IReadOnlyList<MeshInstance3D> Add(Node3D parent, IReadOnlyDictionary<HexCell, float> floor, IReadOnlySet<HexCell> open)
 	{
 		var pieces = new List<MeshInstance3D>();
-		var stone = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#7A7390"), Roughness = 0.95f };
 		var pillars = new HashSet<(int, int)>();
 		foreach (var (cell, height) in floor)
 		{
@@ -30,15 +29,18 @@ public static class RoomWalls
 				var mid = new Vector3(center.X + way.X * Apothem, height, center.Y + way.Y * Apothem);
 				var along = new Vector3(-way.Y, 0f, way.X);
 				var angle = Mathf.Atan2(along.X, along.Z) - Mathf.Pi / 2f;
-				pieces.Add(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(Edge, WallHeight, 0.2f) }, MaterialOverride = stone, Position = mid + new Vector3(0f, WallHeight / 2f, 0f), Rotation = new Vector3(0f, angle, 0f) });
+				pieces.Add(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(Edge, WallHeight, 0.2f) }, MaterialOverride = Stone(), Position = mid + new Vector3(0f, WallHeight / 2f, 0f), Rotation = new Vector3(0f, angle, 0f) });
 				foreach (var end in new[] { mid + along * (Edge / 2f), mid - along * (Edge / 2f) })
 					if (pillars.Add((Mathf.RoundToInt(end.X * 20f), Mathf.RoundToInt(end.Z * 20f))))
-						pieces.Add(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.34f, PillarHeight, 0.34f) }, MaterialOverride = stone, Position = end + new Vector3(0f, PillarHeight / 2f, 0f) });
+						pieces.Add(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.34f, PillarHeight, 0.34f) }, MaterialOverride = Stone(), Position = end + new Vector3(0f, PillarHeight / 2f, 0f) });
 			}
 		}
 		foreach (var piece in pieces) parent.AddChild(piece);
 		return pieces;
 	}
+
+	// Cada peça tem o seu material: o fade de uma não pode mexer nas outras.
+	static StandardMaterial3D Stone() => new() { AlbedoColor = Color.FromHtml("#7A7390"), Roughness = 0.95f, Transparency = BaseMaterial3D.TransparencyEnum.Alpha };
 
 	// Só as peças que escondem alguém (na linha de visão da câmera, entre ela e a criança ou a criatura) somem; as outras voltam.
 	public static void Fade(IReadOnlyList<MeshInstance3D> pieces, Vector3 forward, IReadOnlyList<Vector3> seen, float delta)
@@ -47,7 +49,10 @@ public static class RoomWalls
 		{
 			if (!GodotObject.IsInstanceValid(piece)) continue;
 			var hides = seen.Any(target => Hides(piece.Position, target, forward));
-			piece.Transparency = Mathf.MoveToward(piece.Transparency, hides ? 0.9f : 0f, delta * 8f);
+			if (piece.MaterialOverride is not StandardMaterial3D material) continue;
+			var color = material.AlbedoColor;
+			color.A = Mathf.MoveToward(color.A, hides ? 0.05f : 1f, delta * 8f);
+			material.AlbedoColor = color;
 		}
 	}
 

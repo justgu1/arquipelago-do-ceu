@@ -196,7 +196,7 @@ public partial class CombatHud : OverlayScreen
 			var button = BookStyle.Button(piece.Dots > 0 ? $"{piece.Label}\n " : piece.Label, () => Choose(index), $"Piece_{i}", PieceSize);
 			button.CustomMinimumSize = new Vector2(PieceSize, PieceSize);
 			button.AddThemeFontSizeOverride("font_size", 26);
-			button.Disabled = !piece.Enabled || !ready || presenter.Resolved || pending.Any(p => p.Piece == index);
+			button.Disabled = !presenter.CanQueue(pending.ConvertAll(p => p.Piece), index) || !ready || presenter.Resolved || pending.Any(p => p.Piece == index);
 			button.TooltipText = piece.Name;
 			button.FocusMode = FocusModeEnum.None;
 			// A peça escondida fica no lugar, esmaecida e com "?", para as outras não pularem de posição.
@@ -236,7 +236,7 @@ public partial class CombatHud : OverlayScreen
 			Tell(presenter.ResolvedText);
 			return;
 		}
-		if (presenter.Pieces[index] is not { Enabled: true }) return;
+		if (!presenter.CanQueue(pending.ConvertAll(p => p.Piece), index)) return;
 
 		voice.Say(presenter.Announce(index), interrupt: true);
 		if (layer is not null && presenter.PieceDrawing(index) is { } drawing)
