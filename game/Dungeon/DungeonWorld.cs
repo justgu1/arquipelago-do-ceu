@@ -92,6 +92,18 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	}
 
 	Node3D? creatureModel;
+	IReadOnlyList<MeshInstance3D> walls = [];
+
+	// Onde a criança está no chão da Sala; as paredes na frente dela ou da criatura ficam transparentes.
+	public System.Func<System.Numerics.Vector2>? PlayerAt { get; set; }
+
+	public override void _Process(double delta)
+	{
+		var seen = new List<Vector3>();
+		if (PlayerAt?.Invoke() is { } at) seen.Add(new Vector3(at.X, 1f, at.Y));
+		if (Creature.Visible) seen.Add(Creature.Center + new Vector3(0f, 0.8f, 0f));
+		RoomWalls.Fade(walls, -Camera.GlobalTransform.Basis.Z, seen, (float)delta);
+	}
 	readonly MeshInstance3D barrier = new()
 	{
 		Mesh = new BoxMesh { Size = new Vector3(3.4f, 2.2f, 0.4f) },
@@ -175,7 +187,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			entries[neighbor] = new System.Numerics.Vector2(entry.X, entry.Z);
 		}
 		Grid.Reset(walkable, blocked);
-		RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
+		walls = RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
 
 		AddSign($"{kind.Name}", new Vector3(0f, kind.HasChallenge ? 5.6f : 2.4f, 0f), 56);
 		if (note is not null) AddSign(note, new Vector3(0f, 3.4f, 0f), 34);

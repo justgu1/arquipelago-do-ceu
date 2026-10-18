@@ -20,8 +20,8 @@ public partial class FreeDrawLayer : Control
 	const float ArrowSize = 12f;
 	// O pontilhado fica acima da HUD, no meio da cena.
 	const float GuideWidth = 0.5f;
-	const float GuideHeight = 0.4f;
-	const float GuideCenterY = 0.38f;
+	const float GuideHeight = 0.3f;
+	const float GuideCenterY = 0.66f;
 
 	static readonly Color Ink = Color.FromHtml("#F2B632");
 	static readonly Color InkEdge = Color.FromHtml("#3D2C25");
