@@ -9,7 +9,7 @@ namespace ArquipelagoDoCeu;
 public partial class InventoryScreen : OverlayScreen
 {
 	const float DollWidth = 340f;
-	const float DollHeight = 440f;
+	const float DollHeight = 500f;
 
 	readonly InventoryHost host;
 	readonly GearTab gearTab;
@@ -128,8 +128,10 @@ public partial class InventoryScreen : OverlayScreen
 		doll.AddChild(tag);
 		gearTab.Slots.Position = new Vector2(0, 30);
 		doll.AddChild(gearTab.Slots);
-		attributes.Position = new Vector2(8, DollHeight - 34);
-		attributes.Size = new Vector2(DollWidth - 16, 28);
+		attributes.Position = new Vector2(8, DollHeight - 56);
+		attributes.Size = new Vector2(DollWidth - 16, 50);
+		attributes.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+		attributes.VerticalAlignment = VerticalAlignment.Center;
 		attributes.HorizontalAlignment = HorizontalAlignment.Center;
 		doll.AddChild(attributes);
 		gearTab.Updated += RefreshAttributes;
