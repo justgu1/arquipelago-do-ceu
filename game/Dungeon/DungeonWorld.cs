@@ -142,6 +142,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var kind = floor.Rooms[roomId].Kind;
 		var walkable = new HashSet<HexCell>(here.Cells.Select(Local));
 		var blocked = new HashSet<HexCell>();
+		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
+		var corridors = new HashSet<HexCell>();
 		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId));
 
 		foreach (var neighbor in floor.Neighbors(roomId).OrderBy(n => n))
@@ -164,13 +166,16 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			}
 
 			walkable.UnionWith(cells);
+			corridors.UnionWith(cells);
 			if (!CorridorKit.Add(room, cells)) RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false);
 			walkable.UnionWith(other.Cells.Select(Local));
 			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor));
+			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
 			var entry = GroundOf(Local(other.Cells.First(c => c.DistanceTo(layout.CorridorBetween(roomId, neighbor)![^1]) == 1)));
 			entries[neighbor] = new System.Numerics.Vector2(entry.X, entry.Z);
 		}
 		Grid.Reset(walkable, blocked);
+		RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
 
 		AddSign($"{kind.Name}", new Vector3(0f, kind.HasChallenge ? 5.6f : 2.4f, 0f), 56);
 		if (note is not null) AddSign(note, new Vector3(0f, 3.4f, 0f), 34);

@@ -308,13 +308,13 @@ public partial class DungeonRun : Node
 	void Activate()
 	{
 		if (left || !enabled || target is null) return;
-		if (target is "rest" or "totem") { if (target == "rest") Rest(); else Leave(""); return; }
+		if (target == "rest") { Rest(); return; }
+		if (target == "totem") { Leave(""); return; }
 		if (InShortcut)
 		{
 			Say("Termine o Atalho ou volte ao Lobby.");
 			return;
 		}
-
 		if (target == "stairs") { ChangeFloor(expedition.Ascend); return; }
 		if (target == "stairs-deep") { ChangeFloor(expedition.EnterDeep, "Andar profundo! Aqui os Andares não têm fim: ganhe moedas e Maestria, e volte quando quiser."); return; }
 		if (target == "progression") { ChangeFloor(expedition.ReturnToProgression, "De volta à Progressão."); return; }
