@@ -16,6 +16,8 @@ public partial class CombatHud
 	readonly List<(int Piece, string Drawing)> pending = [];
 	const int ButtonSize = 56;
 	bool hintShown;
+	bool writing;
+	Button? writeButton;
 
 	// O que a criatura diz em voz e em texto (o balão dela) e o pedido que ela mostra, ou nulo para voltar ao normal.
 	public event Action<string>? Said;
@@ -48,7 +50,8 @@ public partial class CombatHud
 		bag.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		bar.SizeFlagsVertical = SizeFlags.ShrinkEnd;
 		bar.AddChild(bag);
-		Button[] buttons = [undo, BookStyle.Button("Dica", AskHint, "Hint", ButtonSize), BookStyle.Button("Ouvir", () => ReadRequested?.Invoke(), "Read", ButtonSize), BookStyle.Button("Soltar alvo", Abandon, "Release", ButtonSize)];
+		if (presenter.TypesLetters) writeButton = BookStyle.Button(WriteLabel, () => SetWriting(!writing), "Write", ButtonSize);
+		Button[] buttons = [.. new[] { writeButton }.OfType<Button>(), undo, BookStyle.Button("Dica", AskHint, "Hint", ButtonSize), BookStyle.Button("Ouvir", () => ReadRequested?.Invoke(), "Read", ButtonSize), BookStyle.Button("Soltar alvo", Abandon, "Release", ButtonSize)];
 		foreach (var button in buttons)
 		{
 			button.SizeFlagsVertical = SizeFlags.ShrinkCenter;
@@ -60,6 +63,22 @@ public partial class CombatHud
 		bar.OffsetBottom = -Margin;
 		bar.GrowVertical = GrowDirection.Begin;
 		return bar;
+	}
+
+	public bool Writing => writing;
+
+	string WriteLabel => writing ? "Andar [Esc]" : "Escrever [Enter]";
+
+	// Com letras, o teclado só escreve depois de escolher escrever (como na forca); sem isso, WASD anda.
+	void SetWriting(bool on)
+	{
+		if (!presenter.TypesLetters || on == writing) return;
+		writing = on;
+		Controls.TypingPanels += on ? 1 : -1;
+		layer?.SetWriting(on, presenter.GuideText?.Length ?? 0);
+		if (!on) layer?.Clear();
+		if (writeButton is not null) writeButton.Text = WriteLabel;
+		if (on) Notice("Escreva com o teclado. Esc volta a andar.");
 	}
 
 	// Um aviso curto: no balão da criatura e em voz.
@@ -88,6 +107,7 @@ public partial class CombatHud
 		var text = hintShown ? presenter.HintGuide ?? presenter.GuideText : presenter.GuideText;
 		var shown = text is not null && (hintShown || presenter.GuideAlways);
 		layer.SetGuide(text ?? "", shown);
+		layer.SetSlots(text?.Length ?? 0);
 	}
 
 	// Tocar na peça mostra o pontilhado dela no centro; a peça entra na conta quando a criança o contorna.
@@ -181,6 +201,13 @@ public partial class CombatHud
 	{
 		if (layer is null) return;
 		bool handled;
+		if (presenter.TypesLetters && !writing)
+		{
+			if (key.PhysicalKeycode is not (Key.Enter or Key.KpEnter)) return;
+			SetWriting(true);
+			GetViewport().SetInputAsHandled();
+			return;
+		}
 		switch (key.PhysicalKeycode)
 		{
 			case Key.Backspace:
@@ -190,10 +217,6 @@ public partial class CombatHud
 			case Key.Enter or Key.KpEnter:
 				handled = layer.TypedText.Length > 0;
 				layer.Submit();
-				break;
-			case Key.W or Key.A or Key.S or Key.D:
-				// Andar tem prioridade: essas quatro teclas movem o Personagem, e a letra se escreve desenhando.
-				handled = false;
 				break;
 			default:
 				handled = key.Unicode != 0 && layer.Type((char)key.Unicode);

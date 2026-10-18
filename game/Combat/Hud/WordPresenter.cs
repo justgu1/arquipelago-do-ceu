@@ -60,7 +60,7 @@ sealed class WordPresenter(WordBattle battle, Action<WordResult> checkedWord, bo
 
 	public bool TypesLetters => true;
 
-	public string KeyHelp => "Desenhe as letras na tela, ou digite. Backspace apaga. Para andar, use as setas.";
+	public string KeyHelp => "Desenhe as letras na tela, ou aperte Enter para escrever com o teclado (Esc volta a andar com WASD).";
 
 	public string? ExtraLabel => null;
 

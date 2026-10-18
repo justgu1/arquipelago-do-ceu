@@ -51,14 +51,9 @@ public partial class CombatHud : OverlayScreen
 
 	public event Action? ReadRequested;
 
-	public override void _EnterTree()
-	{
-		if (presenter.TypesLetters) Controls.TypingPanels++;
-	}
-
 	public override void _ExitTree()
 	{
-		if (presenter.TypesLetters) Controls.TypingPanels--;
+		SetWriting(false);
 		base._ExitTree();
 	}
 
@@ -348,7 +343,8 @@ public partial class CombatHud : OverlayScreen
 	{
 		if (!@event.IsActionPressed("ui_cancel")) return;
 		GetViewport().SetInputAsHandled();
-		if (layer?.IsActive == true) layer.Clear();
+		if (writing) SetWriting(false);
+		else if (layer?.IsActive == true) layer.Clear();
 		else Abandon();
 	}
 }

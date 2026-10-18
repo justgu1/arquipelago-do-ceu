@@ -35,6 +35,8 @@ public partial class FreeDrawLayer : Control
 	readonly float idleSeconds;
 	readonly Func<string> allowed;
 	string typed = "";
+	bool writing;
+	int slots;
 	float typedIdle;
 	bool wasActive;
 	string guideText = "";
@@ -77,6 +79,21 @@ public partial class FreeDrawLayer : Control
 		guideText = text;
 		guideShown = shown;
 		guide = null;
+		QueueRedraw();
+	}
+
+	// O modo escrever, como na forca: as casinhas aparecem e o teclado escreve nelas; fora dele o teclado anda.
+	public void SetWriting(bool on, int slotCount)
+	{
+		writing = on;
+		slots = slotCount;
+		QueueRedraw();
+	}
+
+	public void SetSlots(int slotCount)
+	{
+		if (slots == slotCount) return;
+		slots = slotCount;
 		QueueRedraw();
 	}
 
@@ -204,10 +221,37 @@ public partial class FreeDrawLayer : Control
 			DrawPolyline(points, InkEdge, InkWidth + 6f, antialiased: true);
 			DrawPolyline(points, Ink, InkWidth, antialiased: true);
 		}
-		if (typed.Length == 0) return;
+		if (writing) DrawSlots();
+		else if (typed.Length > 0) DrawTyped();
+	}
+
+	void DrawTyped()
+	{
 		var font = ThemeDB.FallbackFont;
 		var size = font.GetStringSize(typed, HorizontalAlignment.Left, -1, 96);
 		DrawString(font, (Size - size) / 2f + new Vector2(0f, size.Y * 0.75f), typed, HorizontalAlignment.Left, -1, 96, Typed);
+	}
+
+	// Uma casinha por letra esperada (ao menos a próxima, vazia e em destaque), com as letras já escritas dentro.
+	void DrawSlots()
+	{
+		var count = Math.Max(Math.Max(slots, typed.Length + 1), 1);
+		const float box = 78f;
+		const float gap = 10f;
+		var font = ThemeDB.FallbackFont;
+		var left = (Size.X - (count * box + (count - 1) * gap)) / 2f;
+		var top = Size.Y * 0.62f;
+		for (var i = 0; i < count; i++)
+		{
+			var rect = new Rect2(left + i * (box + gap), top, box, box * 1.2f);
+			var next = i == typed.Length;
+			DrawRect(rect, new Color(0.96f, 0.92f, 0.8f, next ? 0.95f : 0.75f));
+			DrawRect(rect, next ? Ink : InkEdge, false, next ? 5f : 3f);
+			if (i >= typed.Length) continue;
+			var letter = typed[i].ToString();
+			var size = font.GetStringSize(letter, HorizontalAlignment.Left, -1, 64);
+			DrawString(font, rect.Position + new Vector2((rect.Size.X - size.X) / 2f, rect.Size.Y * 0.72f), letter, HorizontalAlignment.Left, -1, 64, InkEdge);
+		}
 	}
 
 	// A mesma referência da pesca: sem moldura, bolinhas no caminho e o início pulsando.
