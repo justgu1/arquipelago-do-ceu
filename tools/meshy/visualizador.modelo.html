@@ -39,10 +39,17 @@
   .lead { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
   .layout { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: start; }
   @media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
-  /* No computador o visualizador fica parado no alto e só a lista rola. */
+  /* No computador a página não rola: o visualizador fica parado e só a lista de modelos tem barra de rolagem. */
   @media (min-width: 861px) {
-    .layout > section[aria-label="Visualizador"] { position: sticky; top: 12px; }
-    .list { max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; align-content: start; }
+    html, body { height: 100%; }
+    body { overflow: hidden; box-sizing: border-box; padding-block: 12px; }
+    .wrap { height: 100%; grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 12px; }
+    .lead, .foot { display: none; }
+    .layout { min-height: 0; align-items: stretch; }
+    .layout > section[aria-label="Visualizador"] { min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+    .stage { flex: 1; min-height: 0; }
+    model-viewer { height: 100%; min-height: 240px; }
+    .list { min-height: 0; overflow-y: auto; padding-right: 6px; align-content: start; }
   }
 
   .stage { position: relative; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: linear-gradient(160deg, var(--stage-a), var(--stage-b)); }
