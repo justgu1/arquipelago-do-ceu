@@ -44,7 +44,8 @@ public sealed record DungeonContext(
 	Action? OpenInventory = null,
 	Func<int>? NewInventoryItems = null,
 	Action? ExpeditionCompleted = null,
-	BattleMechanics? Mechanics = null)
+	BattleMechanics? Mechanics = null,
+	Action? OpenSettings = null)
 {
 	// Muda quando o gerador muda de jeito, para os Andares antigos não valerem para os novos (ADR 0003).
 	// A 2 sorteia a forma de cada Sala (ADR 0008); a 3 aproxima as Salas. Andares salvos numa versão antiga seguem nela.

@@ -60,6 +60,9 @@ public interface ICombatPresenter
 	// O que a criança desenha para esta peça da mochila (o número, o sinal, a sílaba), ou nulo quando a peça entra direto.
 	string? PieceDrawing(int piece) => null;
 
+	// Se `piece` ainda cabe depois das peças já escolhidas e à espera do traço (`queued`), para escolher várias de uma vez.
+	bool CanQueue(IReadOnlyList<int> queued, int piece) => Pieces[piece].Enabled;
+
 	// O pedido curto que a criatura mostra no balão dela; nulo deixa a legenda de sempre.
 	string? Request => null;
 

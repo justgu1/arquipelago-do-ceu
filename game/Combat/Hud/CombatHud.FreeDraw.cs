@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ArquipelagoDoCeu.Combat;
 using ArquipelagoDoCeu.Rules;
 using Godot;
@@ -10,8 +12,8 @@ namespace ArquipelagoDoCeu;
 public partial class CombatHud
 {
 	FreeDrawLayer? layer;
-	// A peça da mochila que a criança escolheu e ainda vai contornar no pontilhado: (índice, o que desenhar).
-	(int Piece, string Drawing)? pending;
+	// As peças da mochila que a criança escolheu e ainda vai contornar no pontilhado, na ordem: (índice, o que desenhar).
+	readonly List<(int Piece, string Drawing)> pending = [];
 	const int ButtonSize = 56;
 	bool hintShown;
 
@@ -78,9 +80,9 @@ public partial class CombatHud
 	void RefreshGuide()
 	{
 		if (layer is null) return;
-		if (pending is { } waiting)
+		if (pending.Count > 0)
 		{
-			layer.SetGuide(waiting.Drawing, true);
+			layer.SetGuide(string.Concat(pending.Select(p => p.Drawing)), true);
 			return;
 		}
 		var text = hintShown ? presenter.HintGuide ?? presenter.GuideText : presenter.GuideText;
@@ -89,19 +91,24 @@ public partial class CombatHud
 	}
 
 	// Tocar na peça mostra o pontilhado dela no centro; a peça entra na conta quando a criança o contorna.
+	// Escolher mais peças antes de contornar põe todas na fila: o pontilhado mostra as peças juntas, na ordem, para desenhar de uma vez.
 	void AskToTrace(int piece, string drawing)
 	{
-		pending = (piece, drawing);
+		if (pending.Any(p => p.Piece == piece)) return;
+		pending.Add((piece, drawing));
 		layer!.Clear();
 		RefreshGuide();
+		RefreshPieces();
 		Notice("Siga o pontilhado.");
 	}
 
+	// Apagar tira a última peça da fila, e o pontilhado das outras continua.
 	void DropPending()
 	{
-		pending = null;
+		if (pending.Count > 0) pending.RemoveAt(pending.Count - 1);
 		layer?.Clear();
 		RefreshGuide();
+		RefreshPieces();
 	}
 
 	void OnRead(TextGuess guess)
@@ -130,9 +137,9 @@ public partial class CombatHud
 				Notice("Fiquei na dúvida. Tente de novo.");
 				return;
 		}
-		if (pending is { } waiting)
+		if (pending.Count > 0)
 		{
-			TraceChecked(waiting, guess.Text);
+			TraceChecked(guess.Text);
 			return;
 		}
 		if (presenter.Write(guess.Text, out var refusal))
@@ -145,15 +152,27 @@ public partial class CombatHud
 	}
 
 	// A peça escolhida foi desenhada: se bate, entra na conta; se não, a criança tenta de novo, sem custo.
-	void TraceChecked((int Piece, string Drawing) waiting, string drawn)
+	// Vale desenhar todas de uma vez ou só as primeiras: as peças que bateram entram na conta, e as outras seguem esperando.
+	void TraceChecked(string drawn)
 	{
-		if (!string.Equals(drawn, waiting.Drawing, StringComparison.OrdinalIgnoreCase))
+		var matched = Enumerable.Range(1, pending.Count).Reverse().FirstOrDefault(k => string.Equals(drawn, string.Concat(pending.Take(k).Select(p => p.Drawing)), StringComparison.OrdinalIgnoreCase));
+		if (matched == 0)
 		{
 			Notice("Quase! Siga o pontilhado.");
 			return;
 		}
-		pending = null;
-		presenter.Place(waiting.Piece);
+		var placing = pending.Take(matched).ToList();
+		pending.RemoveRange(0, matched);
+		foreach (var (piece, _) in placing)
+		{
+			if (presenter.Pieces[piece] is not { Enabled: true })
+			{
+				pending.Clear();
+				Notice("Essa peça não cabe aí. Escolha outra.");
+				break;
+			}
+			presenter.Place(piece);
+		}
 		AfterPlace();
 	}
 

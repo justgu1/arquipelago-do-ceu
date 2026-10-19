@@ -30,7 +30,7 @@ static partial class DungeonScenarios
 		d.Expect(letters.Expedition.Current.Kind == RoomTypes.Epic, "o Atalho começa direto no Desafio épico");
 		for (var i = 0; i < 3; i++) { PilotPort.WinRoom(letters); await d.Wait(0.4); }
 		d.Expect(progress.Levels.EpicDone(profile, new LevelKey("portugues", 1)) && progress.Levels.HasItem(profile, new LevelKey("portugues", 1)), "o Atalho concluiu a Torre das Letras e deu o Item");
-		await d.Press("Voltar ao Lobby");
+		await d.PressLeave();
 		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "voltou ao Lobby");
 
@@ -69,7 +69,7 @@ static partial class DungeonScenarios
 		PilotPort.WinRoom(math);
 		await d.Wait(0.5);
 		d.Expect(progress.Levels.EpicDone(profile, new LevelKey("matematica", 1)), "o épico concluiu a Torre dos Números");
-		await d.Press("Voltar ao Lobby");
+		await d.PressLeave();
 		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "voltou ao Lobby");
 
