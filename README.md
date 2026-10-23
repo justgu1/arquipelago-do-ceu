@@ -71,7 +71,7 @@ dotnet test game.tests
 
 Para editar no Godot, abra a pasta `game/` pelo gerenciador de projetos. A cena inicial, `Main`, monta o Lobby, o Personagem do Perfil, as telas de Perfil, Personagem e configurações, o treino contra o Boneco, o Inventário (equipamentos e Cosméticos) e o HUD no tema Livro. As duas torres são Dungeons jogáveis em greybox: a criança entra pela porta da torre na beira da ilha (a Torre dos Números e a Torre das Letras), anda de Sala em Sala pelas portas (E ou o botão), luta, abre Puzzles, descansa, acha o Fast travel, ganha o Item de troca, passa o Marco, vence o Desafio épico e, com as duas torres concluídas, enfrenta o Desafio mestre no portal roxo do Lobby. Cada Andar guarda o que a criança explorou (a escada vale nos dois sentidos), o mapa mostra névoa e cadeado, e completar um Andar rende um Cosmético no Álbum. Para abrir o jogo com um comando: `.\tools\run.cmd`. Para rodar os portões de qualidade da CI (formatação, análise estática, testes com cobertura, comentários e commits): `tools\qualidade.cmd`.
 
-Controles no Lobby: WASD ou setas (relativo à tela), Shift corre, roda do mouse, pinça ou Page Up e Page Down para o zoom (Home reinicia), F8 compara a capa, F9 abre a prática de pesca (modo de teste), clique do mouse ou toque no chão para ir até lá (o caminho contorna árvores e lagoa). Perto do Álbum ou do portal aparece um botão (ou a tecla E) para usar o objeto. Em Configurações dá para mudar tamanho do texto, voz, redução de animações, fonte para dislexia, Modo calmo e as dicas de controle; tudo é gravado no save.
+Controles no Lobby: WASD ou setas (relativo à tela), Shift corre, roda do mouse, pinça ou Page Up e Page Down para o zoom (Home reinicia), F8 compara a capa, clique do mouse ou toque no chão para ir até lá (o caminho contorna árvores e lagoa). Perto do Álbum ou do portal aparece um botão (ou a tecla E) para usar o objeto. Em Configurações dá para mudar tamanho do texto, voz, redução de animações, fonte para dislexia, Modo calmo e as dicas de controle; tudo é gravado no save.
 
 ### Piloto de desenvolvimento
 
@@ -81,7 +81,7 @@ O `DevDriver` percorre o jogo como uma criança faria (clica, digita, segura tec
 & $env:GODOT --path game -- --driver=movimento --saida=C:\caminho\da\pasta
 ```
 
-Cenários: `criar`, `escolher`, `personagem`, `movimento`, `mouse`, `lobby`, `album`, `portal`, `tecla`, `config`, `animacao` (imprime no console se a animação de andar está ligada), `camera`, `efeitos`, `boneco`, `boneco-dislexia`, `erro`, `energia`, `bolha`, `calmo`, `treino-nivel`, `nome`, `nome-erro`, `nivel2-matematica`, `nivel2-escrita`, `nivel3-frase`, `andar` (desenha o Plano de um Nível), `torre`, `torre-salas`, `torre-letras`, `torre-itens`, `torre-epico`, `torre-atalho`, `torre-atalho-erro`, `torre-fast-travel`, `torre-derrota`, `torre-profunda` (os Andares profundos) e `mestre` (as torres e o Desafio mestre). Em build de depuração, `--seed-do-mundo=N` fixa a seed dos Andares e `--sem-voz` desliga a voz. `--pull-qa` roda o QA da pesca (ver `docs/tecnico/teste-pesca-neon.md`). `--reduzir-animacoes` liga a redução de animações e `--nivel=N` libera os Níveis até N no treino. O piloto trabalha numa cópia do save do usuário, então não mexe nos seus Perfis.
+Cenários: `criar`, `escolher`, `personagem`, `movimento`, `mouse`, `lobby`, `album`, `portal`, `tecla`, `config`, `animacao` (imprime no console se a animação de andar está ligada), `camera`, `efeitos`, `boneco`, `boneco-dislexia`, `erro`, `energia`, `bolha`, `calmo`, `treino-nivel`, `nome`, `nome-erro`, `nivel2-matematica`, `nivel2-escrita`, `nivel3-frase`, `andar` (desenha o Plano de um Nível), `torre`, `torre-salas`, `torre-letras`, `torre-itens`, `torre-epico`, `torre-atalho`, `torre-atalho-erro`, `torre-fast-travel`, `torre-derrota`, `torre-profunda` (os Andares profundos) e `mestre` (as torres e o Desafio mestre). Em build de depuração, `--seed-do-mundo=N` fixa a seed dos Andares e `--sem-voz` desliga a voz. `--reduzir-animacoes` liga a redução de animações e `--nivel=N` libera os Níveis até N no treino. O piloto trabalha numa cópia do save do usuário, então não mexe nos seus Perfis.
 
 ### Teste de ponta a ponta do Nível 1
 
@@ -108,7 +108,3 @@ $save = "$env:TEMP\e2e-save.json"; Remove-Item $save, "$save.snapshot" -ErrorAct
 | Torre dos Números | Torre das Letras | Lobby |
 | --- | --- | --- |
 | ![Torre dos Números](mockups/torre-dos-numeros.png) | ![Torre das Letras](mockups/torre-das-letras.png) | ![Lobby](mockups/lobby.png) |
-
-## Entrega de pesca e personagens
-
-Veja [como testar o estado aprovado, F9, pesca BOA e desenho neon](docs/tecnico/teste-pesca-neon.md), incluindo preparação de checkout limpo e uso de save temporário.

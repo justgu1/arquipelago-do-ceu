@@ -254,7 +254,6 @@ public partial class FreeDrawLayer : Control
 		}
 	}
 
-	// A mesma referência da pesca: sem moldura, bolinhas no caminho e o início pulsando.
 	void DrawGuide()
 	{
 		var area = new Vector2(Size.X * GuideWidth, Size.Y * GuideHeight);

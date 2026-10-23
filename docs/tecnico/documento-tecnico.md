@@ -23,7 +23,7 @@ O Godot com C# não exporta para navegador. Como navegador não é alvo, isso n�
 | Rooms | Cenas de sala feitas à mão, com pontos de encaixe para pontes e desafios |
 | Missions | Carrega missões em JSON e executa as mecânicas (compor, comparar, sequência, sílabas, frases) |
 | Characters | Personagem personalizável do Perfil (um corpo e um rig; rosto por atlas de texturas, pele e cabelo por material, cabelo e acessórios presos a ossos), Papéis (Matemático e Escriba), habilidades destravadas por conceito e Cosméticos |
-| Equipment | `core/Equipment`: `GearCatalog` (equipamentos em dados), `GearLibrary` (biblioteca ordenada e comparação do que muda), `InventoryService` (Cosméticos vestidos, o que já foi visto e o guia no Perfil) e `EquipmentLooks` (a aparência do conjunto). No Godot: o Inventário (`game/Inventory`), o dock (`Dock`), o HUD do Lobby (`LobbyHud`), `EquipmentVisuals` (equipamento e Cosméticos procedurais), `DynamicCape` e a pesca de teste (`Main.PullTest`, F9, não grava progresso) |
+| Equipment | `core/Equipment`: `GearCatalog` (equipamentos em dados), `GearLibrary` (biblioteca ordenada e comparação do que muda), `InventoryService` (Cosméticos vestidos, o que já foi visto e o guia no Perfil) e `EquipmentLooks` (a aparência do conjunto). No Godot: o Inventário (`game/Inventory`), o dock (`Dock`), o HUD do Lobby (`LobbyHud`), `EquipmentVisuals` (equipamento e Cosméticos procedurais) e `DynamicCape` |
 | Adaptive | Regra de dificuldade por conceito e caixas de repetição espaçada (Leitner), calculadas no próprio jogo, sem precisar do backend |
 | Accessibility | TTS, legendas, tamanho de texto, remoção de tempo, redução de animações |
 | Net | Login opcional, sincronização e fila de telemetria que espera conexão |

@@ -74,7 +74,7 @@ dotnet_diagnostic.S2234.severity = none
 dotnet_diagnostic.S6966.severity = none
 
 # Legado do experimento do #97, com várias instruções por linha: sai ou é reescrito no #172.
-[{game/Dev/PullTest/**.cs,game/Main.PullTest.cs,game/Ui/JourneyHud.cs,game/Ui/JourneyStyle.cs,game/Ui/EquipmentWorkshop.cs,game/Ui/EquipmentPreview.cs}]
+[{game/Ui/JourneyHud.cs,game/Ui/JourneyStyle.cs,game/Ui/EquipmentWorkshop.cs,game/Ui/EquipmentPreview.cs}]
 dotnet_analyzer_diagnostic.severity = suggestion
 dotnet_diagnostic.CA1002.severity = none
 dotnet_diagnostic.CA1725.severity = none
