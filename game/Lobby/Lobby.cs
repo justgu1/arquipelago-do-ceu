@@ -71,7 +71,7 @@ public partial class Lobby : Node3D, ICombatStage
 		AddLamps();
 	}
 
-	// Hexágono "flat-top": vértices à esquerda e à direita, como nos mockups.
+	// Hexágono "flat-top": vértices à esquerda e à direita.
 	public static Vector3 HexToWorld(int q, int r) =>
 		new(HexGrid.ToWorld(new HexCell(q, r)).X, 0f, HexGrid.ToWorld(new HexCell(q, r)).Y);
 

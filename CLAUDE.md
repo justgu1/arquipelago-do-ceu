@@ -18,7 +18,6 @@ Idioma: português do Brasil nos documentos, textos do jogo e commits. Identific
 - `docs/arte-e-ux/referencias/` e `docs/arte-e-ux/folhas/`: imagens de referência aprovadas e folhas de assets.
 - `docs/agents/`: documentação para a IA (fluxo de desenvolvimento, skills, issue tracker, domínio e o pipeline de arte em `docs/agents/arte/`). **Só aqui, no CLAUDE.md e em `.claude/` se fala de ferramentas e de como o projeto é feito** (Blender, MCP, Meshy, skills); o resto de `docs/`, o README e o CREDITS falam só do jogo e da API.
 - `docs/apresentacao/apresentacao.md`: resumo do jogo.
-- `mockups/`: telas de referência da Torre dos Números, Torre das Letras e Lobby.
 
 ## Decisões principais
 

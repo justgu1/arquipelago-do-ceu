@@ -61,31 +61,11 @@ O Lobby é uma ilha principal ampla; cada torre e o Mercador têm ilha própria,
 
 ### HUD enxuto, Inventário e mapa
 
-Mockup de referência: `mockups/hud-papel.html` (nomes, ícones e valores são exemplos).
-
 - **HUD enxuto:** só o que se usa agora. Na Dungeon, a placa do centro (Nível, Andar e objetivo), o mapa pequeno e o card do avatar com Maestria e Energia; no Lobby, Maestria e o lápis de Editar. A bolsa só aparece em combate e na Área de treino.
 - **Dock** (canto inferior esquerdo): botão do Inventário, com o selo "novo" sempre em texto, e o nome do Papel.
 - **Inventário:** o Personagem equipado em caixinhas (Capacete, Armadura, Acessório), a biblioteca com os vestidos primeiro, comparação só do que muda e prévia em tempo real. A aba Cosméticos não mostra atributos. Quem não tem a Maestria vê o cadeado e o número.
 - **Mapa em tela cheia:** toque no mapa pequeno ou tecla M escurece a cena, pausa o jogo e mostra o Andar com legenda em ícone e texto (Você, Vencida, Portal, Não vista) e o botão Voltar. Não abre em combate. Com "reduzir animações" a folha aparece direto.
 - **Moedas:** o HUD não mostra o saldo; o aviso "+3 moedas" é curto e some sozinho.
-
-## Telas principais
-
-As três cenas abaixo são telas de referência, com modelos provisórios só para marcar o lugar. Os personagens finais entram depois.
-
-**Torre dos Números (combate do Matemático).** A criatura pede 8 e o Matemático já lançou o 5. A criança escolhe o 3 na bolsa. Duas criaturas esperam na névoa ao fundo.
-
-![Torre dos Números](../../mockups/torre-dos-numeros.png)
-
-**Torre das Letras (combate do Escriba).** A criatura mostra um gato. O Escriba já conjurou GA e a criança escolhe TO. A tecla F abre o modo de falar o nome.
-
-![Torre das Letras](../../mockups/torre-das-letras.png)
-
-**Lobby.** O Portal da Memória mostra quantas cartas faltam revisar, o Álbum mostra 14 de 40 criaturas e a Expedição leva à próxima torre. O menu de baixo troca a bolsa por quatro destinos.
-
-![Lobby](../../mockups/lobby.png)
-
-Ainda faltam o Álbum aberto, a carta do Portal da Memória, a tela de energia zerada e a área do responsável.
 
 ## Acessibilidade, modo calmo e entrada
 

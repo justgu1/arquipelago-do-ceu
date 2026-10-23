@@ -19,7 +19,6 @@ docs/
   tecnico/       arquitetura, Godot/C#, geração procedural, conteúdo e cliente de rede (o backend é outro repositório)
   arte-e-ux/     direção de arte, HUD e acessibilidade
   apresentacao/  resumo do jogo
-mockups/         telas de referência em 3D
 ```
 
 ## Ambiente
@@ -85,8 +84,3 @@ $save = "$env:TEMP\e2e-save.json"; Remove-Item $save, "$save.snapshot" -ErrorAct
 & $env:GODOT --headless --path game -- --driver=e2e-2 --save=$save
 ```
 
-## Telas de referência
-
-| Torre dos Números | Torre das Letras | Lobby |
-| --- | --- | --- |
-| ![Torre dos Números](mockups/torre-dos-numeros.png) | ![Torre das Letras](mockups/torre-das-letras.png) | ![Lobby](mockups/lobby.png) |

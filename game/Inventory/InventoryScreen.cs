@@ -4,7 +4,7 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// O Inventário, como no mockup: o Personagem equipado ao centro das caixinhas, a biblioteca em grade e o painel de comparação,
+// O Inventário: o Personagem equipado ao centro das caixinhas, a biblioteca em grade e o painel de comparação,
 // com as abas Inventário e Cosméticos e o chip do Papel. Esc fecha.
 public partial class InventoryScreen : OverlayScreen
 {

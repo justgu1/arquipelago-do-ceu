@@ -35,7 +35,7 @@ Cor viva, nunca pastel. O erro mais comum das primeiras folhas foi o chão sair 
 
 ## 3. Chão hexagonal (decidido)
 
-O chão do Lobby e das salas é de **hexágonos**, como nos mockups. O padrão de **forma** é a folha `18-chao-hexagonal-lobby-b` (peças lisas e simples, que se encaixam numa grade) e o de **cor e vida** é a `30-chao-hexagonal-vivo`, que é a mesma folha repintada com as cores da seção 1.
+O chão do Lobby e das salas é de **hexágonos**. O padrão de **forma** é a folha `18-chao-hexagonal-lobby-b` (peças lisas e simples, que se encaixam numa grade) e o de **cor e vida** é a `30-chao-hexagonal-vivo`, que é a mesma folha repintada com as cores da seção 1.
 
 - Um prisma hexagonal por tile, com topo e uma lateral de terra ou rocha visível.
 - Variantes: grama lisa, grama com flores, caminho (reto, curva, T, ponta), água, borda de penhasco com rocha embaixo, ponte, poço de pedra.

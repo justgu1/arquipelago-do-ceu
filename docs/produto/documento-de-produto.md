@@ -248,7 +248,7 @@ Depois do Lobby, as duas torres ficaram jogáveis, sem arte nem tema definitivos
 O primeiro marco entregável foi o Lobby funcional, ainda sem Dungeons jogáveis. Prova a base técnica (Godot C#, cena 3D isométrica, entrada, salvamento, CI e build Windows), o contrato de conteúdo e o combate real, jogado contra o Boneco de treino.
 
 - Criar e editar o Perfil e o Personagem (apelido, cores, características, acessórios). Todo Perfil começa no Nível 1.
-- Cena 3D caminhável, em greybox seguindo `mockups/lobby.png`; os assets CC0 entram depois, em ticket próprio.
+- Cena 3D caminhável.
 - Cinco ilhas com torres ao redor: Matemática e Português com placa "em construção", Ciências, História e Geografia com placa "em breve".
 - NPC Guia, que fala por voz sintética.
 - Área de treino com Boneco de treino: **o mesmo combate real das Dungeons** (desenho livre que ataca no fim do traço, tempo que desacelera, golpe perfeito, travessuras no erro, dicas, Modo calmo), contra um Boneco que não lança nem custa Energia (decisão do #189). Usa **tudo o que já existir**: as Mecânicas de Matemática (compor número, desenhando a conta) e de Português (formar palavras com sílabas, com o Escriba), com Desafios sorteados conforme a dificuldade escolhida, lidos de Missões em JSON validadas pelo schema.

@@ -35,7 +35,7 @@ public partial class CombatHud
 		layer.ActiveChanged += _ => NotifyComposing();
 	}
 
-	// Como no mockup: a mochila fica sempre à vista, numa fileira baixa embaixo, com os botões pequenos ao lado. O pedido e os recados
+	// A mochila fica sempre à vista, numa fileira baixa embaixo, com os botões pequenos ao lado. O pedido e os recados
 	// ficam no balão da criatura. A criança escolhe entre atacar na hora (as peças) e desenhar.
 	Control BuildCompactBar()
 	{
