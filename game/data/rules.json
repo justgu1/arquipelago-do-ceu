@@ -421,7 +421,7 @@
         "id": "guia",
         "name": "Guia",
         "prompt": "Falar com o Guia",
-        "model": "guia",
+        "model": "guia-reconstruido-v05",
         "lines": [
           "Olá! Eu sou o Guia do Arquipélago do Céu.",
           "Aqui no Lobby você pode se arrumar, olhar o Álbum e viajar pelo portal.",

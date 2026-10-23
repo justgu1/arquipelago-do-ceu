@@ -185,7 +185,7 @@ public partial class Lobby : Node3D, ICombatStage
 			if (item.Id != "boneco") list.Add(new Interactable(item.Id, new System.Numerics.Vector2(ground.X, ground.Z)));
 			var height = item.Id switch { "portal" => PortalHeight, "guia" => GuideHeight, "boneco" => DummyHeight, _ => LecternHeight };
 			var top = height;
-			if (LoadModel(item.Id == "guia" ? "guia-reconstruido-v05" : item.Model) is { } model)
+			if (LoadModel(item.Model) is { } model)
 			{
 				AddChild(model);
 				top = FitToHeight(model, height, ground);
