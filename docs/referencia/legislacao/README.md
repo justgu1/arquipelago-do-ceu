@@ -1,11 +1,11 @@
 # Legislação de alfabetização (referência)
 
-Textos que o usuário colou ou enviou em 2026-10-12, depois que os sites do MEC bloquearam o acesso automático. **Não conferi com o Diário Oficial nem com o Planalto**: confie na forma, não na letra, até alguém conferir.
+Textos das normas que importam ao jogo. Os recebidos em 12/10/2026 **não foram conferidos com o Diário Oficial nem com o Planalto**: confie na forma, não na letra, até alguém conferir. O ECA Digital vem do texto compilado do Planalto, de 23/10/2026.
 
 | Arquivo | Norma | Situação |
 | --- | --- | --- |
 | [lei-15247-2025.md](lei-15247-2025.md) | Lei nº 15.247/2025, Compromisso Nacional Criança Alfabetizada | Em vigor (texto integral) |
-| [decreto-11556-2023.md](decreto-11556-2023.md) | Decreto nº 11.556/2023, mesmo Compromisso | Revogou a PNA. Não verifiquei se segue em vigor depois da Lei |
+| [decreto-11556-2023.md](decreto-11556-2023.md) | Decreto nº 11.556/2023, mesmo Compromisso | Revogou a PNA. Não verificado se segue em vigor depois da Lei |
 | [decreto-9765-2019-pna.md](decreto-9765-2019-pna.md) | Decreto nº 9.765/2019, Política Nacional de Alfabetização | **Revogado** em 2023. Só histórico |
 | [lei-15211-2025-eca-digital.md](lei-15211-2025-eca-digital.md) | Lei nº 15.211/2025, Estatuto Digital da Criança e do Adolescente (ECA Digital) | Em vigor desde 17/03/2026 (texto compilado e o que importa ao jogo) |
 | [nota-tecnica-7-2026.md](nota-tecnica-7-2026.md) | Nota Técnica MEC nº 7/2026 (Selo 2025) | Administrativa, sem efeito pedagógico |
@@ -20,4 +20,4 @@ Textos que o usuário colou ou enviou em 2026-10-12, depois que os sites do MEC 
 
 ## O que ainda falta
 
-O RENABE, o documento do Inep, o PNAIC e o Plano de Trabalho foram enviados depois e estão resumidos em [alfabetizacao/README.md](../alfabetizacao/README.md). Não li o Caderno da PNA, o Decreto 12.191/2024, a Resolução CNE/CEB nº 1/2022 em fonte primária nem a versão final do documento do Inep (o que existe é preliminar).
+O RENABE, o documento do Inep, o PNAIC e o Plano de Trabalho estão resumidos em [alfabetizacao/README.md](../alfabetizacao/README.md). Não foram lidos o Caderno da PNA, o Decreto 12.191/2024, a Resolução CNE/CEB nº 1/2022 em fonte primária nem a versão final do documento do Inep (o que existe é preliminar).

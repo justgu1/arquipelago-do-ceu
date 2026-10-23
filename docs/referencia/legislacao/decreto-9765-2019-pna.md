@@ -2,7 +2,7 @@
 
 > **Revogado** pelo art. 37 do Decreto nº 11.556, de 12 de junho de 2023 (ver [decreto-11556-2023.md](decreto-11556-2023.md)). Guardado aqui só como referência histórica: é onde estão as definições e os "seis componentes essenciais" que a literatura de alfabetização brasileira de 2019 a 2023 cita. **Não é política vigente.**
 >
-> Transcrição dos artigos 1º a 9º do texto colado pelo usuário em 2026-10-12 (fonte declarada: Senado, legis.senado.leg.br; não conferi). Os artigos 10 a 14 (coordenação do MEC, adesão voluntária, assistência técnica e financeira, dotações e vigência) ficam fora da transcrição. A grafia "Constitução" é do texto recebido.
+> Transcrição dos artigos 1º a 9º do texto recebido em 12/10/2026 (fonte declarada: Senado, legis.senado.leg.br; não conferido). Os artigos 10 a 14 (coordenação do MEC, adesão voluntária, assistência técnica e financeira, dotações e vigência) ficam fora da transcrição. A grafia "Constitução" é do texto recebido.
 
 DECRETO Nº 9.765, DE 11 DE ABRIL DE 2019. Institui a Política Nacional de Alfabetização.
 

@@ -1,6 +1,6 @@
 # Documentos de alfabetização lidos (RENABE, padrão do Inep, PNAIC, Plano de Trabalho)
 
-PDFs que o usuário baixou em 2026-10-12 (pasta Downloads dele). **Não estão no repositório** (o RENABE tem 14 MB e não conferi a licença de reprodução). Aqui ficam só o que são, o que li e o que concluí. Hash SHA-256 (16 primeiros caracteres) para saber se é o mesmo arquivo.
+PDFs obtidos em 12/10/2026. **Não estão no repositório** (o RENABE tem 14 MB e a licença de reprodução não foi conferida). Aqui ficam só o que são, o que foi lido e o que se concluiu. Hash SHA-256 (16 primeiros caracteres) para saber se é o mesmo arquivo.
 
 | Arquivo | O que é | Hash |
 | --- | --- | --- |
@@ -11,9 +11,9 @@ PDFs que o usuário baixou em 2026-10-12 (pasta Downloads dele). **Não estão n
 
 ## Como li
 
-- `niveis_metas.pdf` tem uma fonte com mapeamento de glifos errado: o texto extraído sai como letras trocadas. **Decifrei à mão** a troca (é regular, e as maiúsculas iniciais se perdem) e li o texto inteiro, incluindo as tabelas. Os números (743; faixas de 40, 50, 60, 70 e 80%; a coluna 2023 a 2030) conferem entre si. Releia o original antes de citar em documento oficial.
-- Os outros três saíram em texto normal. Do RENABE li o **sumário executivo (p. 33 a 41)**, as conclusões do **capítulo 3 (p. 115 e 116)** e os exemplos do **capítulo 9 (cerca de p. 281 e 282)**. **Não li o RENABE inteiro.**
-- Do PNAIC li o quadro de direitos de aprendizagem de Língua Portuguesa do Ano 1; do Plano de Trabalho, só a introdução e os dados do ICA.
+- `niveis_metas.pdf` tem uma fonte com mapeamento de glifos errado: o texto extraído sai como letras trocadas. A troca foi **decifrada à mão** (é regular, e as maiúsculas iniciais se perdem) e o texto foi lido inteiro, incluindo as tabelas. Os números (743; faixas de 40, 50, 60, 70 e 80%; a coluna 2023 a 2030) conferem entre si. Releia o original antes de citar em documento oficial.
+- Os outros três saíram em texto normal. Do RENABE foram lidos o **sumário executivo (p. 33 a 41)**, as conclusões do **capítulo 3 (p. 115 e 116)** e os exemplos do **capítulo 9 (cerca de p. 281 e 282)**. **O RENABE não foi lido inteiro.**
+- Do PNAIC foi lido o quadro de direitos de aprendizagem de Língua Portuguesa do Ano 1; do Plano de Trabalho, só a introdução e os dados do ICA.
 
 ## O que dizem e importa ao jogo
 

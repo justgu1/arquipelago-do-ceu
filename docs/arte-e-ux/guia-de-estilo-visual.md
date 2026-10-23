@@ -1,6 +1,6 @@
 # Guia de estilo visual
 
-Padrão que toda arte do jogo segue. Desde 23/10/2026 os modelos novos são feitos no Blender por script (ADR 0009); as seções que falam do Meshy descrevem como foram feitos os modelos que ainda estão no jogo. Complementa [direcao-de-arte-e-ux.md](direcao-de-arte-e-ux.md) (câmera, luz, HUD) com o que faltava para as peças combinarem entre si: cores, formas, regras por tipo de asset e animação das torres. Os valores marcados como **proposta** ainda precisam de aprovação.
+Padrão que toda arte do jogo segue. Complementa [direcao-de-arte-e-ux.md](direcao-de-arte-e-ux.md) (câmera, luz, HUD) com o que faltava para as peças combinarem entre si: cores, formas, regras por tipo de asset e animação das torres. Os valores marcados como **proposta** ainda precisam de aprovação.
 
 ## 1. Paleta
 
@@ -31,7 +31,7 @@ Cor viva, nunca pastel. O erro mais comum das primeiras folhas foi o chão sair 
 - **Textura pintada à mão**, com variação leve de tom dentro de cada superfície. Sem contorno preto, sem foto-realismo.
 - **Silhueta legível** a 128 px. Se duas criaturas se confundem na silhueta, uma delas muda de forma, não só de cor.
 - **Proporção chibi** em personagens e criaturas: cabeça grande, olhos grandes e simpáticos.
-- **Sem texto, logotipo, marca ou etiqueta** em nenhum modelo. Número, palavra e nome vêm do jogo (balão de pedido, UI e fonte do HUD). Texto gerado por IA sai errado e pode ensinar letra ou conta errada.
+- **Sem texto, logotipo, marca ou etiqueta** em nenhum modelo. Número, palavra e nome vêm do jogo (balão de pedido, UI e fonte do HUD), para nunca aparecer letra ou conta errada.
 
 ## 3. Chão hexagonal (decidido)
 
@@ -57,7 +57,7 @@ Há **um corpo base só**, neutro, sem gênero marcado. A aparência vem de part
 
 O rosto **não troca de malha**, só de textura, para não quebrar as expressões. O cabelo é gerado em tom neutro e ganha cor no Godot.
 
-**O corpo base tem de sair com o rosto liso**, sem olhos, sobrancelhas nem boca pintados, porque essas partes entram por cima, como decalque. No primeiro teste de Image to 3D o rosto veio com olhos e sobrancelhas na textura, o que impede a troca. Olhos podem ser gerados por IA (a folha `31a-olhos` serve); **sobrancelhas e bocas são formas simples e devem ser desenhadas em vetor**, com a paleta do guia, porque a IA gerou bocas com dentes e sobrancelhas que pareciam bigode.
+**O corpo base tem de sair com o rosto liso**, sem olhos, sobrancelhas nem boca pintados, porque essas partes entram por cima, como decalque; rosto pintado na textura impede a troca. Os olhos seguem a folha `31a-olhos`; **sobrancelhas e bocas são formas simples, desenhadas em vetor** com a paleta do guia, sem dentes e sem nada que pareça bigode.
 
 ## 5. Criaturas
 
@@ -81,7 +81,7 @@ Cada torre tem uma identidade própria que se vê de longe e se move devagar. **
 | Mecanismo | Engrenagens girando em sincronia, ponteiros de relógio, cristal do topo pulsando | Livros que abrem e fecham, páginas virando, pena escrevendo um rastro de luz no ar |
 | Reação ao progresso | Os medalhões do Nível já vencido acendem em dourado | As peças do Nível já vencido acendem em azul-céu |
 
-**Como se faz:** o Meshy gera só a torre e as **peças em branco** (medalhão, peça de madeira, engrenagem, livro, pena). **O algarismo, a letra, a conta e a sílaba são desenhados pelo jogo**, com a fonte do HUD, a partir dos dados do conteúdo. Assim nunca aparece uma conta errada ou uma letra deformada, e a fonte para dislexia vale também aqui. As peças são instâncias de um mesmo modelo, no máximo 40 por torre.
+**Como se faz:** o modelo traz só a torre e as **peças em branco** (medalhão, peça de madeira, engrenagem, livro, pena). **O algarismo, a letra, a conta e a sílaba são desenhados pelo jogo**, com a fonte do HUD, a partir dos dados do conteúdo. Assim nunca aparece uma conta errada ou uma letra deformada, e a fonte para dislexia vale também aqui. As peças são instâncias de um mesmo modelo, no máximo 40 por torre.
 
 **Regras de movimento (proposta):**
 
@@ -90,13 +90,9 @@ Cada torre tem uma identidade própria que se vê de longe e se move devagar. **
 - A opção **Redução de animações** deixa os anéis parados e as expressões fixas; o Modo calmo reduz as partículas.
 - Os números e as letras em órbita seguem o Nível: no Nível 1, só o que o 1º ano usa.
 
-## 7. Como gerar uma nova peça (Meshy)
+## 7. Aprovação de uma peça nova
 
-1. Escolha as cores da seção 1 e escreva-as por extenso no prompt (por exemplo, "vivid purple and gold").
-2. Use este fechamento: `stylized 3D game asset, vivid saturated colors, chunky rounded shapes, soft bevels, hand-painted textures, storybook cartoon style, clean readable silhouette, plain light gray background, game-ready`.
-3. Termine com: `no text, no letters, no numbers, no labels, no logo, no watermark, no teeth, no weapons`. A API de imagem não tem campo de negative prompt, então o negativo vai no próprio texto.
-4. Imagem de referência ajuda no estilo, mas **o modelo copia as peças dela**. Para variar o conteúdo, gere sem referência de conteúdo, só com texto.
-5. Confira a folha contra o checklist abaixo antes de passar para o 3D. Refazer uma folha custa 3 créditos.
+As referências aprovadas ficam em `referencias/` e as folhas de assets em `folhas/`, nesta pasta. Uma peça nova parte delas e passa pelo checklist antes de entrar no jogo.
 
 **Checklist de aprovação:** cores da paleta e saturação viva; silhueta legível; sem texto, letra, número ou etiqueta; sem dente, arma ou osso; chanfros e arredondados; combina com as outras folhas aprovadas.
 
@@ -121,11 +117,7 @@ A otimização é requisito: o jogo roda em PC e em tablets Android de gama méd
 
 **Texturas:** um material por modelo, **só cor base** (sem normal, metálico nem rugosidade, porque o estilo é pintado à mão). 1024 pixels para personagem e criatura, 512 para prop e atlas compartilhado de 1024 para os tiles, com compressão de GPU no import do Godot.
 
-**Como chegar lá no Meshy** (medido no corpo base):
-
-- O Image to 3D com `target_polycount` 12.000 gerou **12.461 triângulos** e uma textura de 2048 pixels (2,7 MB). Muito para um personagem chibi.
-- O *remesh* da Meshy (5 créditos) levou o mesmo modelo para **3.671 triângulos** com o visual praticamente idêntico, **mas** devolveu 3 texturas PNG (2048, 2048 e 4096 pixels, 8 MB no total). Só a cor base é usada; o resto se descarta.
-- Portanto: gerar com `should_remesh` e `target_polycount` já no limite da tabela, e **medir os triângulos do arquivo** antes de aceitar. Uma verificação automática de triângulos dos modelos na CI é recomendada quando houver modelos no repositório.
+Todo modelo tem os **triângulos medidos no arquivo** antes de entrar no jogo. Uma verificação automática dos triângulos na CI é recomendada.
 
 ### Escala no jogo (altura em unidades do mundo; o Personagem tem cerca de 1,5)
 
@@ -147,10 +139,10 @@ A criatura nunca passa do Personagem nem fica menor que um objeto de chão. Em c
 
 Tudo aqui é **proposta** para o MVP. A regra geral é a mesma da seção 8: o que o motor faz de graça não se gera em modelo.
 
-**Personagem (humanoide).** O Meshy tem rig automático, mas só para humanoides, e devolve animações básicas de andar e correr. Para as demais, a opção é a biblioteca do Mixamo, reaproveitada no Godot pelo mapa de ossos humanoide. Clipes do MVP: parado, andar, interagir, atacar (lançar o orbe ou conjurar sílabas), acerto, golpe perfeito, erro (tropeço leve, sem queda) e voltar flutuando ao Lobby. O repositório [Motion2MixamoRig](https://github.com/MaxLiu22/Motion2MixamoRig), que copia o movimento de um vídeo para um rig do Mixamo, **não entra no MVP**: é experimental, baixa cerca de 5 GB de pesos, é lento em CPU, exige vídeo de uma pessoa, e o modelo corporal SMPL-X é de uso não comercial por padrão. Fica como opção se um dia precisarmos de um movimento próprio.
+**Personagem (humanoide).** Tem esqueleto humanoide, e o equipamento e os Cosméticos se prendem aos ossos dele. Clipes do MVP: parado, andar, interagir, atacar (lançar o orbe ou conjurar sílabas), acerto, golpe perfeito, erro (tropeço leve, sem queda) e voltar flutuando ao Lobby.
 
-**Criaturas e torres (não humanoides).** O Meshy não faz rig delas. Elas se animam **no Godot, sem esqueleto**: pairar e balançar, esticar e achatar, inclinar, pulsar o escudo, balançar por shader de vértice. Clipes: parada, mover devagar, avisar antes de atacar, lançar bolha, travessura, ser libertada (sorri e se dissolve). Os anéis e as peças das torres giram por script.
+**Criaturas e torres (não humanoides).** Não têm esqueleto. Elas se animam **no Godot**: pairar e balançar, esticar e achatar, inclinar, pulsar o escudo, balançar por shader de vértice. Clipes: parada, mover devagar, avisar antes de atacar, lançar bolha, travessura, ser libertada (sorri e se dissolve). Os anéis e as peças das torres giram por script.
 
 **Física.** O MVP não usa `RigidBody3D` em nenhuma regra de jogo. O Personagem e as criaturas são corpos cinemáticos que andam na grade hexagonal, e as bolhas de névoa são áreas lentas com aviso. Física torna o tempo do jogo menos previsível e pesa em tablet. Só objetos decorativos opcionais podem usá-la, e o Modo calmo os desliga.
 
-**Efeitos.** Feitos com partículas e shaders do Godot, sem modelo do Meshy: raio de energia da conta ou do nome, névoa que se dissolve, brilho dourado do acerto, rajada do golpe perfeito, bolha com anel de aviso, tremida leve do erro (nunca vermelho forte), brilho do portal e pulso do cristal. Limite proposto: até 200 partículas na tela, e o Modo calmo reduz as partículas.
+**Efeitos.** Feitos com partículas e shaders do Godot, sem modelo 3D: raio de energia da conta ou do nome, névoa que se dissolve, brilho dourado do acerto, rajada do golpe perfeito, bolha com anel de aviso, tremida leve do erro (nunca vermelho forte), brilho do portal e pulso do cristal. Limite proposto: até 200 partículas na tela, e o Modo calmo reduz as partículas.

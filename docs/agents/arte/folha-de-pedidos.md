@@ -1,6 +1,6 @@
 # Folha de pedidos do Meshy (#199)
 
-> **Histórico.** O Meshy saiu do pipeline em 23/10/2026 (ADR 0009) e o script de geração foi removido. A lista abaixo continua valendo como o que refazer no Blender.
+> **Histórico.** O Meshy saiu do pipeline em 23/10/2026 ([pipeline-de-arte.md](pipeline-de-arte.md)) e o script de geração foi removido. A lista abaixo continua valendo como o que refazer no Blender.
 
 O que faltava modelar além do que já estava em `game/assets/modelos/`, gerado na época por um script de pedidos (`tools/meshy`, removido).
 

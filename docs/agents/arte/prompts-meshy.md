@@ -4,18 +4,18 @@ Os prompts seguem o que está no repositório: um Personagem só, personalizáve
 
 ## Imagens de referência
 
-As imagens em `referencias/` foram aprovadas como referência de estilo. Use-as no Meshy (geração de imagem e Image to 3D), uma folha por chamada.
+As imagens em `docs/arte-e-ux/referencias/` foram aprovadas como referência de estilo. Use-as no Meshy (geração de imagem e Image to 3D), uma folha por chamada.
 
 | Imagem | Serve para |
 | --- | --- |
-| [interior-torre-dos-numeros.png](referencias/interior-torre-dos-numeros.png) | objetos e paredes da Torre dos Números |
-| [interior-torre-das-letras.png](referencias/interior-torre-das-letras.png) | objetos e paredes da Torre das Letras |
-| [tiles-torre-dos-numeros.png](referencias/tiles-torre-dos-numeros.png) | tiles das Salas da Torre dos Números |
-| [tiles-torre-das-letras.png](referencias/tiles-torre-das-letras.png) | tiles das Salas da Torre das Letras |
-| [corpo-base.png](referencias/corpo-base.png) | corpo base do Personagem |
-| [personagem-matematico.png](referencias/personagem-matematico.png) | estilo do Personagem; não copie a calculadora nem as fórmulas avançadas |
+| [interior-torre-dos-numeros.png](../../arte-e-ux/referencias/interior-torre-dos-numeros.png) | objetos e paredes da Torre dos Números |
+| [interior-torre-das-letras.png](../../arte-e-ux/referencias/interior-torre-das-letras.png) | objetos e paredes da Torre das Letras |
+| [tiles-torre-dos-numeros.png](../../arte-e-ux/referencias/tiles-torre-dos-numeros.png) | tiles das Salas da Torre dos Números |
+| [tiles-torre-das-letras.png](../../arte-e-ux/referencias/tiles-torre-das-letras.png) | tiles das Salas da Torre das Letras |
+| [corpo-base.png](../../arte-e-ux/referencias/corpo-base.png) | corpo base do Personagem |
+| [personagem-matematico.png](../../arte-e-ux/referencias/personagem-matematico.png) | estilo do Personagem; não copie a calculadora nem as fórmulas avançadas |
 
-Fluxo: gere cada folha como imagem, salve como `folhas/NN-nome.png`, revise e só então passe para o 3D. Prompts têm limite de 800 caracteres.
+Fluxo: gere cada folha como imagem, salve como `docs/arte-e-ux/folhas/NN-nome.png`, revise e só então passe para o 3D. Prompts têm limite de 800 caracteres.
 
 ## Estilo travado
 

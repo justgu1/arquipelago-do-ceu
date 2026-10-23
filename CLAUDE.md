@@ -15,7 +15,8 @@ Idioma: português do Brasil nos documentos, textos do jogo e commits. Identific
 - `docs/referencia/legislacao/`: Lei 15.247/2025 (Compromisso Criança Alfabetizada) e decretos anteriores, colados pelo usuário e não conferidos com o DOU. A lei não impõe método; a PNA (2019) está revogada.
 - `GLOSSARY.md`: vocabulário canônico do projeto (Lobby, Dungeon, Nível, Andar, Sala, Expedição, Papel...). Use esses termos e evite os listados em _Avoid_.
 - `docs/arte-e-ux/direcao-de-arte-e-ux.md`: estilo visual, HUD (cores, fonte, tamanhos), acessibilidade e pipeline de arte.
-- `docs/arte-e-ux/meshy/`: imagens de referência aprovadas e folhas de assets, que guiam os modelos feitos no Blender, e os prompts antigos do Meshy (histórico).
+- `docs/arte-e-ux/referencias/` e `docs/arte-e-ux/folhas/`: imagens de referência aprovadas e folhas de assets.
+- `docs/agents/`: documentação para a IA (fluxo de desenvolvimento, skills, issue tracker, domínio e o pipeline de arte em `docs/agents/arte/`). **Só aqui, no CLAUDE.md e em `.claude/` se fala de ferramentas e de como o projeto é feito** (Blender, MCP, Meshy, skills); o resto de `docs/`, o README e o CREDITS falam só do jogo e da API.
 - `docs/apresentacao/apresentacao.md`: resumo do jogo.
 - `mockups/`: telas de referência da Torre dos Números, Torre das Letras e Lobby.
 
@@ -33,7 +34,7 @@ Idioma: português do Brasil nos documentos, textos do jogo e commits. Identific
 - **Repetição espaçada**: caixas de Leitner por conceito, calculadas no próprio jogo.
 - **Privacidade**: sem nome real; perfis por apelido; telemetria só com consentimento do responsável.
 - **Sem ranking, anúncios ou compras**, e sem punição por ficar sem jogar.
-- **Modelos feitos no Blender por script** (ADR 0009, 23/10/2026), conduzido pelo MCP do Blender, sem gerador de IA. Os do Meshy em uso saem um por um, conforme cada substituto fica pronto.
+- **Modelos feitos no Blender por script** (23/10/2026, `docs/agents/arte/pipeline-de-arte.md`), conduzido pelo MCP do Blender, sem gerador de IA. Os do Meshy em uso saem um por um, conforme cada substituto fica pronto.
 - **Primeiro marco**: Lobby funcional (ver `docs/produto/documento-de-produto.md`). Nomes do jogo e dos Papéis são provisórios e ficam em dados.
 - **Treino no Lobby é o combate real contra o Boneco, com Energia própria** (zerar só tira a criança da Área de treino), e usa todas as Mecânicas existentes; **não conta progresso**, só o que acontece nas Dungeons conta. Cosméticos só por aprendizado e exploração, ou comprados no Mercador com moedas do jogo (ADR 0007).
 - **Equipamento dá atributos e isso é regra (decisão de 16/10/2026, a partir do experimento do PR #97)**: o Personagem tem os atributos base e soma os bônus do equipamento (Energia base + até 2, velocidade até 1,12×, alcance de interação até +0,5). É a exceção declarada a "Cosmético não dá vantagem": Cosmético continua só aparência, e equipamento é outra coisa. Equipar ou trocar nunca cura, e conteúdo educacional e dificuldade não mudam. O Personagem tem três espaços (Capacete, Armadura e Acessório) por Papel, cada equipamento tem um atributo e pede uma Maestria mínima do Papel (em `game/data/equipamentos.json`), e um substitui o outro, sem evoluir. Ver `docs/arte-e-ux/quatro-caminhos-e-equipamentos.md`; o #119 escreve as regras nas docs.

@@ -51,7 +51,7 @@ Os três GLBs (parado, andando, correndo) preservam a espessura de 5 mm e 118 es
 
 A capa pré-calculada aprovada é o padrão. F8 compara com o solver experimental anterior, ocultando a outra malha; não há duas capas visíveis simultaneamente. Reduzir movimento usa a capa pré-calculada parada. A aprovação da fonte não equivale a aprovação artística dos novos acessórios ou de toda combinação possível entre movimentos; as capturas locais permitem essa revisão. O tamanho dos GLBs ainda merece otimização futura.
 
-A dobra forte da capa na corrida foi comparada visualmente: quadros 11/21 do Blender original correspondem aos ticks 10/20 no Godot e apresentam a mesma silhueta. Ela pertence à animação aprovada, não à transferência. Dez ciclos de transição (240 quadros) mantiveram soma dos morphs em 1, com erro máximo de 5,59×10⁻⁸. F8 e redução de movimento confirmaram uma única capa visível.
+A dobra forte da capa na corrida foi comparada visualmente: quadros 11/21 da animação original correspondem aos ticks 10/20 no Godot e apresentam a mesma silhueta. Ela pertence à animação aprovada, não à transferência. Dez ciclos de transição (240 quadros) mantiveram soma dos morphs em 1, com erro máximo de 5,59×10⁻⁸. F8 e redução de movimento confirmaram uma única capa visível.
 
 
 ## Revisão visual v02: o que é novo e o que foi preservado
