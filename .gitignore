@@ -40,3 +40,7 @@ node_modules/
 game/content/
 game.tests/coverage.json
 game.tests/coverage.*.xml
+
+# Os modelos nascem dos scripts em tools/blender; o .blend é só o espaço de trabalho
+*.blend
+*.blend1

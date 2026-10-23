@@ -7,7 +7,7 @@ Como os modelos do jogo são feitos. A documentação do jogo (`docs/arte/`) diz
 Todo modelo novo (Personagem, kits dos Papéis, criaturas, cenário e itens) é feito no Blender por scripts Python versionados no repositório, com o Claude conduzindo o Blender pelo MCP (`mcp-for-blender`, em modo seguro, sem telemetria e só em localhost). Nenhum gerador de IA entra no pipeline. Os modelos do Meshy que o jogo já usa ficam até o substituto ficar pronto, e cada troca remove o modelo antigo.
 
 - **Formas simples e cor chapada**, no padrão do guia de estilo: o que um script faz bem (primitivas, subdivisão, chanfros, cor por material) e o que a máquina de desenvolvimento, sem GPU dedicada, renderiza rápido.
-- **O script é a fonte**, não o `.blend`: refazer um modelo é rodar o script de novo, e mudar cor ou proporção é mudar um parâmetro.
+- **O script é a fonte**, não o `.blend`: refazer um modelo é rodar o script de novo, e mudar cor ou proporção é mudar um parâmetro. Cada criatura tem o seu script em `tools/blender/criaturas/` (ver o LEIA-ME de lá) e o `.blend` não vai para o repositório.
 - **Saída em glTF** com origem nos pés, escala em metros e nomes de peça fixos, para o jogo carregar pelo nome, como hoje.
 - **Peças trocáveis no mesmo esqueleto**: Capacete, Armadura, Acessório e ferramenta são malhas separadas presas aos ossos do Personagem.
 - **Aprovação visual é humana**: o Claude confere por capturas, e o usuário aprova cada modelo no jogo.

@@ -11,3 +11,5 @@
 *.yml text eol=lf
 *.tscn text eol=lf
 *.editorconfig text eol=lf
+*.py text eol=lf
+*.mjs text eol=lf
