@@ -1,0 +1,11 @@
+{
+  "team": ["Guilherme Santos", "Rudan Borges"],
+  "components": [
+    { "name": "Godot Engine", "author": "Colaboradores do Godot Engine; Juan Linietsky e Ariel Manzur", "license": "MIT" },
+    { "name": ".NET 8", "author": ".NET Foundation e colaboradores", "license": "MIT", "file": "licencas/dotnet.txt" },
+    { "name": "Componentes de terceiros do .NET", "author": "Vários autores", "license": "Várias, listadas no arquivo", "file": "licencas/dotnet-avisos-de-terceiros.txt" },
+    { "name": "JsonSchema.Net, JsonPointer.Net e Json.More.Net", "author": "Greg Dennis, .NET Foundation e colaboradores", "license": "MIT", "file": "licencas/json-everything.txt" },
+    { "name": "Humanizer", "author": ".NET Foundation e colaboradores", "license": "MIT", "file": "licencas/humanizer.txt" },
+    { "name": "OpenDyslexic", "author": "Abbie Gonzalez", "license": "SIL Open Font License 1.1", "file": "licencas/opendyslexic-ofl.txt" }
+  ]
+}

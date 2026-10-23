@@ -212,7 +212,9 @@ public partial class Main : Node3D
 		UpdatePlayerControl();
 	}
 
-	void ShowSettings() => ShowOverlay(new SettingsScreen(settings, voice, current?.Nickname, ShowProfiles));
+	void ShowSettings() => ShowOverlay(new SettingsScreen(settings, voice, current?.Nickname, ShowProfiles, ShowCredits));
+
+	void ShowCredits() => ShowOverlay(new CreditsScreen(catalogs.Required("creditos.json", Credits.Parse)));
 
 	void ShowOverlay(OverlayScreen next)
 	{

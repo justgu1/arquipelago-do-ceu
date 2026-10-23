@@ -14,15 +14,17 @@ public partial class SettingsScreen : OverlayScreen
 	readonly VoiceService voice;
 	readonly string? nickname;
 	readonly Action openProfiles;
+	readonly Action openCredits;
 	string section = "jogo";
 	string? error;
 
-	public SettingsScreen(SettingsService settings, VoiceService voice, string? nickname, Action openProfiles)
+	public SettingsScreen(SettingsService settings, VoiceService voice, string? nickname, Action openProfiles, Action openCredits)
 	{
 		this.settings = settings;
 		this.voice = voice;
 		this.nickname = nickname;
 		this.openProfiles = openProfiles;
+		this.openCredits = openCredits;
 	}
 
 	public override void _Ready()
@@ -79,6 +81,11 @@ public partial class SettingsScreen : OverlayScreen
 		{
 			Close();
 			openProfiles();
+		}));
+		box.AddChild(UiKit.BigButton("Créditos", () =>
+		{
+			Close();
+			openCredits();
 		}));
 	}
 
