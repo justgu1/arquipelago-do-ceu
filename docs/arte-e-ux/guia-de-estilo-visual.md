@@ -1,6 +1,6 @@
 # Guia de estilo visual
 
-Padrão que toda arte do jogo segue, gerada no Meshy ou feita à mão. Complementa [direcao-de-arte-e-ux.md](direcao-de-arte-e-ux.md) (câmera, luz, HUD) com o que faltava para as peças combinarem entre si: cores, formas, regras por tipo de asset e animação das torres. Os valores marcados como **proposta** ainda precisam de aprovação.
+Padrão que toda arte do jogo segue. Desde 23/10/2026 os modelos novos são feitos no Blender por script (ADR 0009); as seções que falam do Meshy descrevem como foram feitos os modelos que ainda estão no jogo. Complementa [direcao-de-arte-e-ux.md](direcao-de-arte-e-ux.md) (câmera, luz, HUD) com o que faltava para as peças combinarem entre si: cores, formas, regras por tipo de asset e animação das torres. Os valores marcados como **proposta** ainda precisam de aprovação.
 
 ## 1. Paleta
 

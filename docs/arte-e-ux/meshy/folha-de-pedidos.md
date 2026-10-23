@@ -1,6 +1,8 @@
 # Folha de pedidos do Meshy (#199)
 
-O que falta modelar além do que já está em `game/assets/modelos/`. A fonte dos dados é [`tools/meshy/pedidos.json`](../../../tools/meshy/pedidos.json); esta tabela sai de `node tools/meshy/gerar.mjs --lista --md`.
+> **Histórico.** O Meshy saiu do pipeline em 23/10/2026 (ADR 0009) e o script de geração foi removido. A lista abaixo continua valendo como o que refazer no Blender.
+
+O que faltava modelar além do que já estava em `game/assets/modelos/`, gerado na época por um script de pedidos (`tools/meshy`, removido).
 
 **Gerado em 18/10/2026**, depois de o usuário aprovar a lista e o custo (o script recusa rodar sem `--aprovado=<total>`). O totem de Fast travel saiu da lista porque o `portal.glb` já existe.
 

@@ -31,7 +31,7 @@ Os números, as sílabas e as energias brilham em dourado ou azul. Assim, o que 
 
 ## Personagens, criaturas e névoa
 
-O Personagem é um só, personalizável (cores, características, acessórios e variações da ferramenta), e assume o Papel de Matemático ou de Escriba conforme a Dungeon, com roupas e ferramenta próprias. No jogo final usa modelos próprios, gerados no Meshy e com o rig ajustado no Blender.
+O Personagem é um só, personalizável (cores, características, acessórios e variações da ferramenta), e assume o Papel de Matemático ou de Escriba conforme a Dungeon, com roupas e ferramenta próprias. No jogo final usa modelos próprios, feitos no Blender por script, com as peças de cada Papel no mesmo esqueleto (ADR 0009).
 
 - **Papel Matemático:** roupa com dourado e uma bolsa de números na cintura que brilha. A pose de ataque é lançar um orbe.
 - **Papel Escriba:** chapéu e capa roxos e um livro aberto. A pose de ataque é conjurar as sílabas no ar.
@@ -102,8 +102,8 @@ Todas as ações funcionam com toque, mouse ou teclado, e nenhuma depende de cor
 
 No MVP, a arte usa kits CC0 para o cenário e modelos próprios só para os dois heróis e as criaturas.
 
-1. Cenário: kits KayKit Dungeon e Medieval Hexagon (CC0) como provisório, com cores ajustadas por torre e registrados em CREDITS.md. O cenário próprio é gerado no Meshy, no padrão do guia de estilo (chão hexagonal da folha `18-chao-hexagonal-lobby-b`, com as cores vivas da paleta).
-2. Heróis: Meshy, depois limpeza e rig no Blender, exportados em glTF para o Godot.
+1. Cenário: feito no Blender por script, no padrão do guia de estilo (chão hexagonal da folha `18-chao-hexagonal-lobby-b`, com as cores vivas da paleta). Os modelos do Meshy em uso ficam até cada substituto ficar pronto (ADR 0009).
+2. Heróis: modelados, com rig e animados no Blender por script, exportados em glTF para o Godot.
 3. Criaturas: um modelo base redondo com variações de cor, chifre e orelha. Assim 40 criaturas saem de poucos modelos.
 4. Godot: luz quente, SSAO, glow só nos itens mágicos e desfoque de profundidade pela câmera.
 5. HUD: Control nodes com tema único (painéis, fonte e cores desta página).
