@@ -4,21 +4,30 @@ Roguelite educativo em 3D isométrico, feito em Godot, para crianças de 6 a 10 
 
 ## O jogo
 
-Uma névoa do esquecimento cobriu as ilhas do céu: criaturas esqueceram seus nomes, máquinas perderam seus números. A criança parte do Lobby e sobe as torres das dungeons, geradas proceduralmente, uma por disciplina, para restaurar o que a névoa apagou.
+Uma névoa do esquecimento cobriu as ilhas do céu: criaturas esqueceram seus nomes, máquinas perderam seus números. A criança parte do Lobby e sobe as torres, uma por matéria, para restaurar o que a névoa apagou. A matéria é a mecânica do jogo, não um questionário com desenhos em volta: para vencer, a criança precisa pensar.
 
-- **Matemático**: carrega uma bolsa de números e operações. Cada criatura mostra um escudo com um número, e a criança monta a conta que chega nele.
-- **Escriba**: as criaturas esqueceram o próprio nome. No 1º ano a criança junta sílabas, no 2º escreve a palavra, no 3º completa frases.
-- **Combate em tempo real, sem violência**: ao atacar, o tempo desacelera para a criança pensar. O acerto dissolve a névoa e a criatura entra no Álbum de criaturas.
-- **Aprendizado**: revisão espaçada, dificuldade adaptativa, desafios opcionais do ano seguinte e voz em todas as instruções.
+- **Torres e Níveis:** a Torre dos Números (Matemática) e a Torre das Letras (Português), com 3 Níveis cada, um por ano escolar (1º ao 3º). Cada Andar é gerado na hora; as portas são Puzzles, e avançar numa torre pede um item achado na outra. Todo Perfil começa no Nível 1, e o Atalho de Nível dá uma única tentativa de vencer direto o Desafio épico.
+- **Combate desenhando, sem violência:** a criança responde desenhando em qualquer lugar da tela, com o dedo, o mouse ou a caneta, e o tempo desacelera enquanto ela desenha. Na Matemática a criatura pede um resultado e a criança desenha uma conta que chegue nele, ou responde uma conta pronta. Na Torre das Letras, o Escriba junta sílabas no 1º ano, escreve a palavra no 2º e completa frases no 3º. O acerto dissolve a névoa e liberta a criatura.
+- **Errar não pune:** errar custa 1 de Energia, dica nunca custa, e zerar a Energia só leva de volta ao Lobby, sem perder o que foi aprendido.
+- **Feito para crianças:** gratuito, sem anúncios, compras, ranking ou castigo por ficar sem jogar. Funciona offline, salva sozinho e só coleta dados com autorização do responsável. Voz em todas as instruções, legendas, modo calmo e fonte para dislexia.
+
+Primeira versão: computador (Windows), matemática e português, 1º ao 3º ano.
 
 ## Estrutura
 
 ```text
+game/          o jogo no Godot: cenas, telas, entrada, voz, dados (game/data) e modelos; é o que vira o executável
+core/          as regras em C# puro, sem Godot: combate, geração dos Andares, save, economia
+game.tests/    testes automáticos (xUnit) do core e dos dados; rodam sem abrir o Godot e não vão no jogo
+content/       missões base em JSON e o schema
+tools/         scripts de desenvolvimento (portões de qualidade, geração de dados, otimização de modelos)
 docs/
-  produto/       gameplay, mundo, conteúdo educacional e escopo do MVP
-  tecnico/       arquitetura, Godot/C#, geração procedural, conteúdo e cliente de rede (o backend é outro repositório)
-  arte-e-ux/     direção de arte, HUD e acessibilidade
-  apresentacao/  resumo do jogo
+  produto/       o jogo: regras, mundo, combate, conteúdo educacional e escopo do MVP
+  tecnico/       o sistema: arquitetura, geração procedural, save, missões e cliente da API (o backend é outro repositório)
+  adr/           decisões de arquitetura e de regra
+  pedagogia/     ordem recomendada dos Conceitos e habilidades da BNCC
+  arte/          direção de arte, HUD, acessibilidade, guia de estilo e referências visuais
+  legal/         privacidade (LGPD), ECA Digital e licenças
 ```
 
 ## Ambiente

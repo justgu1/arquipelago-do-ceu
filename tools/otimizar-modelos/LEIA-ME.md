@@ -8,4 +8,4 @@ npm install
 node otimizar.mjs <pasta com os .glb> <pasta de saída>
 ```
 
-Os limites de triângulos de cada tipo de asset estão em `docs/arte-e-ux/guia-de-estilo-visual.md`, seção 8.
+Os limites de triângulos de cada tipo de asset estão em `docs/arte/guia-de-estilo-visual.md`, seção 8.

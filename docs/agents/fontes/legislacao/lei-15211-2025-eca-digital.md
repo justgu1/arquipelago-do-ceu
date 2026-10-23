@@ -6,27 +6,7 @@ Dispõe sobre a proteção de crianças e adolescentes em ambientes digitais (Es
 
 **Em vigor desde 17 de março de 2026** (art. 41-A).
 
-## O que importa ao jogo
-
-A lei vale para todo produto ou serviço de tecnologia "direcionado a crianças e a adolescentes" (art. 1º), e a definição cita programas de computador e jogos eletrônicos (art. 2º, I). O jogo é feito para crianças de 6 a 10 anos, então a lei se aplica, e com a API (contas, sincronização e telemetria) se aplica sem dúvida. As obrigações são moduladas pelo porte do fornecedor e pelo número de usuários (art. 39).
-
-| O que a lei pede | Artigo | Como o jogo atende | Falta |
-| --- | --- | --- | --- |
-| Privacidade e proteção de dados no nível mais alto **por padrão** | 7º | Perfil só com apelido; telemetria desligada até o consentimento do responsável (LGPD art. 14) | Nada no jogo; a API segue a mesma regra |
-| Configurações que evitem o **uso compulsivo** | 8º, IV; 17, §4º, II | Sem sequência diária, relógio, "só hoje", notificações nem recompensa por tempo jogado (ADR 0007) | Nada |
-| Informar a **faixa etária indicada** no momento do acesso, conforme a classificação indicativa | 8º, II e V | — | Obter a classificação indicativa e mostrá-la na abertura do jogo e onde ele for distribuído |
-| Informações sobre **riscos e medidas de segurança**, acessíveis sem precisar adquirir o jogo | 16 | — | Página pública com o que o jogo coleta, por quê e como apagar |
-| **Supervisão parental**: ferramentas fáceis de usar, informação em local de fácil acesso, aviso quando estiverem ativas e **limitar e acompanhar o tempo de uso** | 17, I a IV; 17, §4º, IV | — | Área do responsável (protegida por pergunta de controle parental) com limite de tempo, tempo total de uso e as configurações de privacidade |
-| O responsável vê e gerencia a conta e a privacidade, vê o **tempo total de uso**, ativa ou desativa salvaguardas, tudo em português | 18 | — | A mesma área do responsável; na API, a conta do responsável |
-| Nenhuma interface que manipule a escolha ou enfraqueça as salvaguardas | 18, §2º | Nada pressiona a criança: sem punição por ficar sem jogar e derrota que fala da aventura, nunca da criança | Revisar a área do responsável quando existir |
-| **Caixas de recompensa** proibidas | 20 | Não existem; nada se compra e nada é sorteado (ADR 0007) | Nada |
-| Interação entre usuários só com salvaguardas e, por padrão, limitada até o consentimento do responsável | 21 | Não há interação entre usuários | Se um dia houver, aplicar o art. 21 e a Lei 14.852/2024 |
-| Sem perfilamento para publicidade | 22; 26 | Sem anúncios; o que o jogo aprende da criança (repetição espaçada, dificuldade) serve só ao conteúdo | Nada |
-| Contas de crianças até 16 anos **vinculadas à conta de um responsável** | 24 | Previsto: uma conta de responsável com vários perfis de criança | Implementar na API |
-| Canal para notificar violações de direitos de crianças | 28 | Não há conteúdo feito por usuários | Um canal de contato público junto da página do art. 16 |
-| Ferramentas de IA revistas e com opção de desligar o que não é essencial | 17, §4º, VIII | O jogo não usa IA; as missões chegam prontas e são validadas na borda | Nada no jogo |
-
-Relatório semestral (art. 31) só vale acima de 1 milhão de usuários nessa faixa etária. As sanções vão de advertência a multa de até 10% do faturamento no Brasil ou, sem faturamento, de R$ 10 a R$ 1.000 por usuário cadastrado, limitada a R$ 50 milhões por infração (art. 35).
+O que a lei pede ao jogo e o que falta está em [docs/legal/privacidade-e-eca-digital.md](../../../legal/privacidade-e-eca-digital.md).
 
 ## Texto da lei
 

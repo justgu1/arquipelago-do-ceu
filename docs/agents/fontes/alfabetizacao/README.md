@@ -39,4 +39,4 @@ PDFs obtidos em 12/10/2026. **Não estão no repositório** (o RENABE tem 14 MB 
 ## O que não consegui ler ou resolver
 
 - O RENABE inteiro, o Caderno da PNA, o Decreto 12.191/2024 e a versão **final** do documento do Inep (este é preliminar).
-- Se a posição do RENABE sobre grafema-fonema vale para este jogo: é decisão para pedagogia e fonoaudiologia (pergunta 16 em [ordem-recomendada-mvp.md](../../pedagogia/ordem-recomendada-mvp.md)).
+- Se a posição do RENABE sobre grafema-fonema vale para este jogo: é decisão para pedagogia e fonoaudiologia (pergunta 16 em [ordem-recomendada-mvp.md](../../../pedagogia/ordem-recomendada-mvp.md)).

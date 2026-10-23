@@ -176,7 +176,7 @@ O MVP cobre matemática e português do 1º ao 3º ano: cerca de 60 missões bas
 - **Leitura:** texto com voz sintética (TTS). Toda instrução pode ser ouvida, porque uma criança de 6 anos ainda está aprendendo a ler. O Godot 4 tem TTS embutido que usa as vozes do sistema.
 - **Dificuldade adaptativa:** no MVP é uma regra simples e transparente, por exemplo: três acertos sem dica sobem um nível, duas tentativas com dica descem um nível. Nada de modelo estatístico ainda. Responsáveis e educadores conseguem entender e ajustar a regra.
 - **Revisão:** nenhuma missão vai para a criança sem revisão pedagógica, inclusive as variantes geradas por IA.
-- **Progressão validada por profissionais:** a ordem das habilidades da BNCC, a granularidade dos Conceitos e a progressão de dificuldade só são definitivas depois do **consenso de profissionais de pedagogia, psicologia e fonoaudiologia**. Até lá, vale a [ordem recomendada provisória](../pedagogia/ordem-recomendada-mvp.md), e a progressão fica em dados, para mudar sem alterar o código. A referência das habilidades está em [docs/referencia/bncc/](../referencia/bncc/README.md).
+- **Progressão validada por profissionais:** a ordem das habilidades da BNCC, a granularidade dos Conceitos e a progressão de dificuldade só são definitivas depois do **consenso de profissionais de pedagogia, psicologia e fonoaudiologia**. Até lá, vale a [ordem recomendada provisória](../pedagogia/ordem-recomendada-mvp.md), e a progressão fica em dados, para mudar sem alterar o código. A referência das habilidades está em [docs/pedagogia/bncc/](../pedagogia/bncc/README.md).
 
 ### Exemplos de missão para o MVP
 
@@ -271,7 +271,7 @@ A LGPD (art. 14) exige consentimento específico de um responsável para tratar 
 
 **CPF não é necessário, nem do responsável nem da criança.** A LGPD pede consentimento do responsável, não um documento, e manda coletar o mínimo de dados; CPF seria mais um dado sensível para proteger sem ganho real. Para confirmar que é um adulto: e-mail confirmado, consentimento explícito e uma pergunta de controle parental. Uma conta de responsável tem vários perfis de criança, cada um só com apelido.
 
-O jogo e as contas seguem o ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): privacidade no nível mais alto por padrão, nada que estimule uso compulsivo, sem caixas de recompensa, contas de criança vinculadas à do responsável, faixa etária informada na abertura e supervisão parental com limite e acompanhamento do tempo de uso. O que o jogo já atende e o que falta está em [lei-15211-2025-eca-digital.md](../referencia/legislacao/lei-15211-2025-eca-digital.md).
+O jogo e as contas seguem o ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): privacidade no nível mais alto por padrão, nada que estimule uso compulsivo, sem caixas de recompensa, contas de criança vinculadas à do responsável, faixa etária informada na abertura e supervisão parental com limite e acompanhamento do tempo de uso. O que o jogo já atende e o que falta está em [privacidade-e-eca-digital.md](../legal/privacidade-e-eca-digital.md).
 
 ### Sem compras
 

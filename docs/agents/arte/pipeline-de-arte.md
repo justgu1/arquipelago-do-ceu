@@ -1,6 +1,6 @@
 # Pipeline de arte
 
-Como os modelos do jogo são feitos. A documentação do jogo (`docs/arte-e-ux/`) diz como a arte deve ficar; este documento diz com que ferramentas e passos ela é produzida.
+Como os modelos do jogo são feitos. A documentação do jogo (`docs/arte/`) diz como a arte deve ficar; este documento diz com que ferramentas e passos ela é produzida.
 
 ## Decisão de 23/10/2026: modelos novos feitos no Blender por script
 
@@ -21,7 +21,7 @@ A licença dos modelos gerados no Meshy depende do plano da conta (uso comercial
 
 ## Histórico: como os modelos atuais foram gerados no Meshy
 
-Os modelos em `game/assets/modelos/` vieram da API de Image to 3D do Meshy, a partir das folhas em `docs/arte-e-ux/folhas/` (geradas lá também), e foram otimizados com `tools/otimizar-modelos` (só cor base, 1024 px). Os prompts estão em [prompts-meshy.md](prompts-meshy.md) e o último lote pedido em [folha-de-pedidos.md](folha-de-pedidos.md).
+Os modelos em `game/assets/modelos/` vieram da API de Image to 3D do Meshy, a partir das folhas em `docs/arte/folhas/` (geradas lá também), e foram otimizados com `tools/otimizar-modelos` (só cor base, 1024 px). Os prompts estão em [prompts-meshy.md](prompts-meshy.md) e o último lote pedido em [folha-de-pedidos.md](folha-de-pedidos.md).
 
 **Prompts de folha.** As cores da paleta iam por extenso no prompt ("vivid purple and gold"), com o fechamento `stylized 3D game asset, vivid saturated colors, chunky rounded shapes, soft bevels, hand-painted textures, storybook cartoon style, clean readable silhouette, plain light gray background, game-ready` e o negativo no próprio texto (`no text, no letters, no numbers, no labels, no logo, no watermark, no teeth, no weapons`), porque a API de imagem não tem campo de negative prompt. Imagem de referência ajuda no estilo, mas o modelo copia as peças dela.
 
