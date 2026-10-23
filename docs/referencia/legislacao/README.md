@@ -7,6 +7,7 @@ Textos que o usuário colou ou enviou em 2026-10-12, depois que os sites do MEC 
 | [lei-15247-2025.md](lei-15247-2025.md) | Lei nº 15.247/2025, Compromisso Nacional Criança Alfabetizada | Em vigor (texto integral) |
 | [decreto-11556-2023.md](decreto-11556-2023.md) | Decreto nº 11.556/2023, mesmo Compromisso | Revogou a PNA. Não verifiquei se segue em vigor depois da Lei |
 | [decreto-9765-2019-pna.md](decreto-9765-2019-pna.md) | Decreto nº 9.765/2019, Política Nacional de Alfabetização | **Revogado** em 2023. Só histórico |
+| [lei-15211-2025-eca-digital.md](lei-15211-2025-eca-digital.md) | Lei nº 15.211/2025, Estatuto Digital da Criança e do Adolescente (ECA Digital) | Em vigor desde 17/03/2026 (texto compilado e o que importa ao jogo) |
 | [nota-tecnica-7-2026.md](nota-tecnica-7-2026.md) | Nota Técnica MEC nº 7/2026 (Selo 2025) | Administrativa, sem efeito pedagógico |
 
 ## O que a legislação diz que importa ao jogo

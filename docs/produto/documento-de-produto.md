@@ -271,7 +271,7 @@ A LGPD (art. 14) exige consentimento específico de um responsável para tratar 
 
 **CPF não é necessário, nem do responsável nem da criança.** A LGPD pede consentimento do responsável, não um documento, e manda coletar o mínimo de dados; CPF seria mais um dado sensível para proteger sem ganho real. Para confirmar que é um adulto: e-mail confirmado, consentimento explícito e uma pergunta de controle parental. Uma conta de responsável tem vários perfis de criança, cada um só com apelido.
 
-As contas também seguem o ECA Digital (Lei 15.211/2025), que traz regras para serviços digitais usados por crianças.
+O jogo e as contas seguem o ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): privacidade no nível mais alto por padrão, nada que estimule uso compulsivo, sem caixas de recompensa, contas de criança vinculadas à do responsável, faixa etária informada na abertura e supervisão parental com limite e acompanhamento do tempo de uso. O que o jogo já atende e o que falta está em [lei-15211-2025-eca-digital.md](../referencia/legislacao/lei-15211-2025-eca-digital.md).
 
 ### Sem compras
 
