@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blatsdjqykmne"
-path="res://.godot/imported/torre-letras-meshy-v01_0.jpg-cfb703ae2c3f311872d7e609711518c4.ctex"
+uid="uid://cxj2m28auaovu"
+path="res://.godot/imported/torre-letras_0.jpg-b51a3b3cff880d3e925d4044a7b9e2b5.ctex"
 metadata={
 "vram_texture": false
 }
@@ -13,8 +13,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/modelos/torre-letras-meshy-v01_0.jpg"
-dest_files=["res://.godot/imported/torre-letras-meshy-v01_0.jpg-cfb703ae2c3f311872d7e609711518c4.ctex"]
+source_file="res://assets/modelos/torre-letras_0.jpg"
+dest_files=["res://.godot/imported/torre-letras_0.jpg-b51a3b3cff880d3e925d4044a7b9e2b5.ctex"]
 
 [params]
 

@@ -335,7 +335,7 @@
         "id": "matematica",
         "name": "Torre dos Números",
         "sign": "Aberta: chegue perto e entre",
-        "model": "torre-numeros-meshy-v01",
+        "model": "torre-numeros",
         "x": -19.5,
         "z": -0.87
       },
@@ -343,7 +343,7 @@
         "id": "portugues",
         "name": "Torre das Letras",
         "sign": "Aberta: chegue perto e entre",
-        "model": "torre-letras-meshy-v01",
+        "model": "torre-letras",
         "x": 9,
         "z": -17.32
       },

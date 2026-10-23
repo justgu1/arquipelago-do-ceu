@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dtkxmnm8dqxku"
-path="res://.godot/imported/torre-numeros-meshy-v01.glb-3a18b91e6068827a3313d964b576b01d.scn"
+uid="uid://ca4m68ed3cmwr"
+path="res://.godot/imported/torre-numeros.glb-900de2a2660697e2e8791fd4ee0584de.scn"
 
 [deps]
 
-source_file="res://assets/modelos/torre-numeros-meshy-v01.glb"
-dest_files=["res://.godot/imported/torre-numeros-meshy-v01.glb-3a18b91e6068827a3313d964b576b01d.scn"]
+source_file="res://assets/modelos/torre-numeros.glb"
+dest_files=["res://.godot/imported/torre-numeros.glb-900de2a2660697e2e8791fd4ee0584de.scn"]
 
 [params]
 

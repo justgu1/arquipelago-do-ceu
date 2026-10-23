@@ -160,7 +160,7 @@ public partial class Lobby : Node3D, ICombatStage
 		}
 	}
 
-	// Os modelos do Meshy têm a origem no centro da malha. Aqui a base da caixa vai para o chão.
+	// Os modelos importados têm a origem no centro da malha. Aqui a base da caixa vai para o chão.
 	static void PlaceOnGround(Node3D model, Vector3 ground)
 	{
 		var lowest = float.MaxValue;

@@ -27,7 +27,7 @@ public partial class SpectrumCharacter : Node3D
 	{
 		var model = GD.Load<PackedScene>("res://assets/modelos/spectrum-cape-body-v2/guerreiro-parado.glb").Instantiate<Node3D>();
 		AddChild(model);
-		// Altura da pele medida no Blender na guarda; preserva o chao e a mesma escala em ambos os clips.
+		// Altura da pele medida na pose de guarda; preserva o chao e a mesma escala em ambos os clips.
 		model.Scale = Vector3.One * (1.5f / 1.35681236f);
 		animations = model.FindChildren("*", "AnimationPlayer", true, false).OfType<AnimationPlayer>().First();
 		idle = animations.GetAnimationList().First(n => n != "RESET");

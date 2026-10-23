@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dknauup461l75"
-path="res://.godot/imported/torre-letras-meshy-v01.glb-91e3e50a42e64bc76f5c46872b817476.scn"
+uid="uid://d1qn2x5byxkor"
+path="res://.godot/imported/torre-letras.glb-39e413a7e30978cfc8f4bade0688ba00.scn"
 
 [deps]
 
-source_file="res://assets/modelos/torre-letras-meshy-v01.glb"
-dest_files=["res://.godot/imported/torre-letras-meshy-v01.glb-91e3e50a42e64bc76f5c46872b817476.scn"]
+source_file="res://assets/modelos/torre-letras.glb"
+dest_files=["res://.godot/imported/torre-letras.glb-39e413a7e30978cfc8f4bade0688ba00.scn"]
 
 [params]
 
