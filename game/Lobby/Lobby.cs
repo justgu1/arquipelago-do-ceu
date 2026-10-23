@@ -71,7 +71,7 @@ public partial class Lobby : Node3D, ICombatStage
 		AddLamps();
 	}
 
-	// Hexágono "flat-top": vértices à esquerda e à direita, como nos mockups.
+	// Hexágono "flat-top": vértices à esquerda e à direita.
 	public static Vector3 HexToWorld(int q, int r) =>
 		new(HexGrid.ToWorld(new HexCell(q, r)).X, 0f, HexGrid.ToWorld(new HexCell(q, r)).Y);
 
@@ -160,7 +160,7 @@ public partial class Lobby : Node3D, ICombatStage
 		}
 	}
 
-	// Os modelos do Meshy têm a origem no centro da malha. Aqui a base da caixa vai para o chão.
+	// Os modelos importados têm a origem no centro da malha. Aqui a base da caixa vai para o chão.
 	static void PlaceOnGround(Node3D model, Vector3 ground)
 	{
 		var lowest = float.MaxValue;
@@ -185,7 +185,7 @@ public partial class Lobby : Node3D, ICombatStage
 			if (item.Id != "boneco") list.Add(new Interactable(item.Id, new System.Numerics.Vector2(ground.X, ground.Z)));
 			var height = item.Id switch { "portal" => PortalHeight, "guia" => GuideHeight, "boneco" => DummyHeight, _ => LecternHeight };
 			var top = height;
-			if (LoadModel(item.Id == "guia" ? "guia-reconstruido-v05" : item.Model) is { } model)
+			if (LoadModel(item.Model) is { } model)
 			{
 				AddChild(model);
 				top = FitToHeight(model, height, ground);

@@ -87,6 +87,9 @@ public partial class TrainingDummy : Node3D
 
 	public bool ReduceMotion { get; set; }
 
+	// Quanto o corpo andou desde casa: o modelo 3D da Dungeon anda junto.
+	public Vector3 BodyOffset => body.Position;
+
 	// O meio do corpo, para o clique escolher o Boneco e o raio chegar nele.
 	public Vector3 Center => center + body.Position;
 
@@ -150,8 +153,12 @@ public partial class TrainingDummy : Node3D
 		SetShieldText(shield);
 	}
 
+	// O que aconteceu com a criatura (acerto, erro, libertada, travessura), para o modelo 3D se mexer.
+	public event System.Action<string>? Reacted;
+
 	public void Reduced(int remaining)
 	{
+		Reacted?.Invoke("hit");
 		SetShieldText(remaining);
 		// A névoa fica mais rala conforme o escudo cai; o número é a informação, a transparência é só um reforço.
 		mistMaterial.AlbedoColor = mistMaterial.AlbedoColor with { A = 0.18f + 0.32f * remaining / startingShield };
@@ -159,6 +166,7 @@ public partial class TrainingDummy : Node3D
 
 	public void Dissolved()
 	{
+		Reacted?.Invoke("freed");
 		SetShieldText(0);
 		tween?.Kill();
 		if (ReduceMotion)
@@ -196,7 +204,11 @@ public partial class TrainingDummy : Node3D
 		Play(perfect ? Tones.Perfect : Tones.Hit);
 	}
 
-	public void Overshoot() => Play(Tones.Overshoot);
+	public void Overshoot()
+	{
+		Reacted?.Invoke("miss");
+		Play(Tones.Overshoot);
+	}
 
 	// Sem treino em andamento: o Boneco descansa, com a névoa leve, esperando a criança escolher.
 	public void Idle()
@@ -214,6 +226,7 @@ public partial class TrainingDummy : Node3D
 	// A travessura: a névoa chacoalha e um som engraçado toca. Sem animação, só o som e o aviso escrito.
 	public void Prank()
 	{
+		Reacted?.Invoke("prank");
 		Play(Tones.Prank);
 		if (ReduceMotion) return;
 		var shake = CreateTween();

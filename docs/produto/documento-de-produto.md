@@ -176,7 +176,7 @@ O MVP cobre matemática e português do 1º ao 3º ano: cerca de 60 missões bas
 - **Leitura:** texto com voz sintética (TTS). Toda instrução pode ser ouvida, porque uma criança de 6 anos ainda está aprendendo a ler. O Godot 4 tem TTS embutido que usa as vozes do sistema.
 - **Dificuldade adaptativa:** no MVP é uma regra simples e transparente, por exemplo: três acertos sem dica sobem um nível, duas tentativas com dica descem um nível. Nada de modelo estatístico ainda. Responsáveis e educadores conseguem entender e ajustar a regra.
 - **Revisão:** nenhuma missão vai para a criança sem revisão pedagógica, inclusive as variantes geradas por IA.
-- **Progressão validada por profissionais:** a ordem das habilidades da BNCC, a granularidade dos Conceitos e a progressão de dificuldade só são definitivas depois do **consenso de profissionais de pedagogia, psicologia e fonoaudiologia**. Até lá, vale a [ordem recomendada provisória](../pedagogia/ordem-recomendada-mvp.md), e a progressão fica em dados, para mudar sem alterar o código. A referência das habilidades está em [docs/referencia/bncc/](../referencia/bncc/README.md).
+- **Progressão validada por profissionais:** a ordem das habilidades da BNCC, a granularidade dos Conceitos e a progressão de dificuldade só são definitivas depois do **consenso de profissionais de pedagogia, psicologia e fonoaudiologia**. Até lá, vale a [ordem recomendada provisória](../pedagogia/ordem-recomendada-mvp.md), e a progressão fica em dados, para mudar sem alterar o código. A referência das habilidades está em [docs/pedagogia/bncc/](../pedagogia/bncc/README.md).
 
 ### Exemplos de missão para o MVP
 
@@ -248,7 +248,7 @@ Depois do Lobby, as duas torres ficaram jogáveis, sem arte nem tema definitivos
 O primeiro marco entregável foi o Lobby funcional, ainda sem Dungeons jogáveis. Prova a base técnica (Godot C#, cena 3D isométrica, entrada, salvamento, CI e build Windows), o contrato de conteúdo e o combate real, jogado contra o Boneco de treino.
 
 - Criar e editar o Perfil e o Personagem (apelido, cores, características, acessórios). Todo Perfil começa no Nível 1.
-- Cena 3D caminhável, em greybox seguindo `mockups/lobby.png`; os assets CC0 entram depois, em ticket próprio.
+- Cena 3D caminhável.
 - Cinco ilhas com torres ao redor: Matemática e Português com placa "em construção", Ciências, História e Geografia com placa "em breve".
 - NPC Guia, que fala por voz sintética.
 - Área de treino com Boneco de treino: **o mesmo combate real das Dungeons** (desenho livre que ataca no fim do traço, tempo que desacelera, golpe perfeito, travessuras no erro, dicas, Modo calmo), contra um Boneco que não lança nem custa Energia (decisão do #189). Usa **tudo o que já existir**: as Mecânicas de Matemática (compor número, desenhando a conta) e de Português (formar palavras com sílabas, com o Escriba), com Desafios sorteados conforme a dificuldade escolhida, lidos de Missões em JSON validadas pelo schema.
@@ -271,7 +271,7 @@ A LGPD (art. 14) exige consentimento específico de um responsável para tratar 
 
 **CPF não é necessário, nem do responsável nem da criança.** A LGPD pede consentimento do responsável, não um documento, e manda coletar o mínimo de dados; CPF seria mais um dado sensível para proteger sem ganho real. Para confirmar que é um adulto: e-mail confirmado, consentimento explícito e uma pergunta de controle parental. Uma conta de responsável tem vários perfis de criança, cada um só com apelido.
 
-As contas também seguem o ECA Digital (Lei 15.211/2025), que traz regras para serviços digitais usados por crianças.
+O jogo e as contas seguem o ECA Digital (Lei 15.211/2025, em vigor desde 17/03/2026): privacidade no nível mais alto por padrão, nada que estimule uso compulsivo, sem caixas de recompensa, contas de criança vinculadas à do responsável, faixa etária informada na abertura e supervisão parental com limite e acompanhamento do tempo de uso. O que o jogo já atende e o que falta está em [privacidade-e-eca-digital.md](../legal/privacidade-e-eca-digital.md).
 
 ### Sem compras
 

@@ -52,6 +52,7 @@ public sealed class DungeonNarration
 	public string PromptFor(string id)
 	{
 		if (id == "rest") return "Descansar [E]";
+		if (id == "totem") return "Voltar ao Lobby [E]";
 		if (id == "stairs") return $"Subir para o Andar {expedition.Floor.Number + 1} [E]";
 		if (id == "stairs-down") return expedition.InDeep && expedition.Floor.Number == 1 ? "Voltar à Progressão [E]" : $"Descer para o Andar {expedition.Floor.Number - 1} [E]";
 		if (id == "stairs-deep") return "Descer aos Andares profundos [E]";

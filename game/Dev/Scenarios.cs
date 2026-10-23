@@ -185,6 +185,20 @@ static class Scenarios
 				await d.Press("Fechar");
 				await d.Shot("07-lobby-com-dica-de-teclado");
 				break;
+			case "creditos":
+				await d.Press("Ajustes");
+				await d.Press("Créditos");
+				d.Expect(d.HasVisible("Rudan Borges"), "a equipe aparece nos créditos");
+				await d.Shot("01-creditos");
+				await d.Press("Ler a licença: Godot Engine");
+				d.Expect(d.HasVisible("Godot Engine contributors"), "a licença do motor vem do próprio Godot");
+				await d.Shot("02-licenca-godot");
+				await d.Press("Voltar");
+				await d.Press("Ler a licença: OpenDyslexic");
+				d.Expect(d.HasVisible("SIL OPEN FONT LICENSE"), "a licença da fonte abre do arquivo do jogo");
+				await d.Shot("03-licenca-fonte");
+				await d.Press("Fechar");
+				break;
 			case "animacao":
 				GD.Print($"Parado: andando={d.Player!.IsWalkingAnimation}");
 				Input.ActionPress(Controls.Right);

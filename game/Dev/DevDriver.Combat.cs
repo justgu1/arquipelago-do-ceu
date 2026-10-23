@@ -31,6 +31,7 @@ public partial class DevDriver
 	// Escreve como a criança que digita: cada tecla é um símbolo e, na pausa, o jogo lê.
 	public async Task Write(string text)
 	{
+		if (Hud!.Presenter.TypesLetters && !Hud.Writing) await PressKey(Key.Enter);
 		foreach (var letter in Plain(text)) await PressKey((Key)letter);
 		await Wait(TraceWaitSeconds + 0.4);
 	}

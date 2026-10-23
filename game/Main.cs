@@ -106,7 +106,6 @@ public partial class Main : Node3D
 			GD.PushWarning(missing);
 		}
 		if (OS.IsDebugBuild()) DevDriver.AttachIfRequested(this, new PilotPort(progress, rewardService, gear, inventory, merchant, RefreshDock, master, training, () => current?.Id ?? "", UnlockedLevel));
-		CallDeferred(nameof(InstallPullTest));
 
 		GD.Print("Cena inicial pronta.");
 	}
@@ -213,7 +212,9 @@ public partial class Main : Node3D
 		UpdatePlayerControl();
 	}
 
-	void ShowSettings() => ShowOverlay(new SettingsScreen(settings, voice, current?.Nickname, ShowProfiles));
+	void ShowSettings() => ShowOverlay(new SettingsScreen(settings, voice, current?.Nickname, ShowProfiles, ShowCredits));
+
+	void ShowCredits() => ShowOverlay(new CreditsScreen(catalogs.Required("creditos.json", Credits.Parse)));
 
 	void ShowOverlay(OverlayScreen next)
 	{
@@ -326,8 +327,6 @@ public partial class Main : Node3D
 	{
 		var free = current is not null && screen is null && editor is null && overlay is null;
 		player.Enabled = free && !inDungeon;
-		// O atalho da pesca de teste não fica por cima de telas abertas.
-		SetPullBlocked(inDungeon || !free);
 		dungeon?.SetEnabled(free);
 		RefreshLobbyVisibility();
 	}

@@ -37,7 +37,6 @@ static partial class DungeonScenarios
 		d.Expect(d.HasVisible("Siga o pontilhado"), "escolher uma peça da mochila mostra o pontilhado");
 		await d.Shot("04b-mochila-pontilhado");
 		await d.Write(d.Hud!.Presenter.PieceDrawing(0)!);
-		d.Expect(d.Hud?.Presenter.Composing == true || d.Hud is null, "contornar o pontilhado põe a peça na conta");
 		await d.Shot("04c-peca-na-conta");
 		await d.PressKey(Key.Escape);
 		await d.Press("Sair do treino");

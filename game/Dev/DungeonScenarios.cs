@@ -152,7 +152,7 @@ static partial class DungeonScenarios
 		await d.Shot("01-nivel-concluido");
 		await d.Press("Continuar explorando");
 		d.Expect(Runs(d).Count == 1 && !d.HasVisible("Nível concluído!"), "continuar explorando deixa a criança na torre");
-		await d.Press("Voltar ao Lobby");
+		await d.PressLeave();
 		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "voltar ao Lobby encerra a Expedição");
 	}
@@ -195,7 +195,7 @@ static partial class DungeonScenarios
 		d.Expect(run.Progress.Levels.EpicDone(run.ProfileId, new LevelKey("matematica", 1)), "acertar o Atalho concluiu o Nível");
 		d.Expect(run.Progress.Levels.HasItem(run.ProfileId, new LevelKey("matematica", 1)), "e entregou o Item de troca");
 		await d.Shot("03-atalho-vencido");
-		await d.Press("Voltar ao Lobby");
+		await d.PressLeave();
 		await d.Wait(0.5);
 		var next = await Enter(d);
 		d.Expect(next is not null && d.Button("Tentar o Atalho") is null, "depois do Atalho a porta entra direto");

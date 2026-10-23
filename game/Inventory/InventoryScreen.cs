@@ -4,18 +4,19 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// O Inventário, como no mockup: o Personagem equipado ao centro das caixinhas, a biblioteca em grade e o painel de comparação,
+// O Inventário: o Personagem equipado ao centro das caixinhas, a biblioteca em grade e o painel de comparação,
 // com as abas Inventário e Cosméticos e o chip do Papel. Esc fecha.
 public partial class InventoryScreen : OverlayScreen
 {
 	const float DollWidth = 340f;
-	const float DollHeight = 440f;
+	const float DollHeight = 500f;
 
 	readonly InventoryHost host;
 	readonly GearTab gearTab;
 	readonly CosmeticsTab cosmeticsTab;
 	readonly CharacterPortrait portrait;
 	readonly ScrollContainer libraryScroll = new() { Name = "LibraryScroll", SizeFlagsVertical = SizeFlags.ExpandFill, SizeFlagsHorizontal = SizeFlags.ExpandFill, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled, FollowFocus = true };
+	readonly Label attributes = BookStyle.Text("", 15);
 	readonly PanelContainer comparisonPanel = new() { Name = "ComparisonPanel", CustomMinimumSize = new Vector2(DollWidth, 0) };
 	Button? gearButton;
 	Button? cosmeticsButton;
@@ -127,7 +128,22 @@ public partial class InventoryScreen : OverlayScreen
 		doll.AddChild(tag);
 		gearTab.Slots.Position = new Vector2(0, 30);
 		doll.AddChild(gearTab.Slots);
+		attributes.Position = new Vector2(8, DollHeight - 56);
+		attributes.Size = new Vector2(DollWidth - 16, 50);
+		attributes.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+		attributes.VerticalAlignment = VerticalAlignment.Center;
+		attributes.HorizontalAlignment = HorizontalAlignment.Center;
+		doll.AddChild(attributes);
+		gearTab.Updated += RefreshAttributes;
+		RefreshAttributes();
 		return doll;
+	}
+
+	// Os atributos do equipamento vestido ficam aqui, no Inventário, e não no HUD da Dungeon.
+	void RefreshAttributes()
+	{
+		var summary = host.Catalog.Summary(host.Worn);
+		attributes.Text = summary.Length == 0 ? "Sem bônus de equipamento" : summary;
 	}
 
 	void ShowTab(bool gear)

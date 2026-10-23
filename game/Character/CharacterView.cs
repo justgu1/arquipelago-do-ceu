@@ -152,7 +152,7 @@ public partial class CharacterView : Node3D
 		}
 	}
 
-	// Os modelos do Meshy têm a origem no centro da malha: escala para a altura do jogo e assenta os pés no chão.
+	// Os modelos importados têm a origem no centro da malha: escala para a altura do jogo e assenta os pés no chão.
 	void StandOnGround(Node3D model)
 	{
 		var box = BoundingBox(model);

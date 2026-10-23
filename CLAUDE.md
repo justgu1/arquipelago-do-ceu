@@ -10,14 +10,12 @@ Idioma: português do Brasil nos documentos, textos do jogo e commits. Identific
 
 - `docs/produto/documento-de-produto.md`: gameplay, mundo, combate, conteúdo educacional e escopo do MVP.
 - `docs/tecnico/documento-tecnico.md`: módulos do cliente, geração procedural, salvamento, schema de missão, cliente de rede e dados.
-- `docs/referencia/bncc/`: habilidades da BNCC (Matemática e Língua Portuguesa, 1º ao 3º ano), uma pasta por ano e um arquivo por matéria. A ordem de progressão **não está decidida**: exige consenso de profissionais de pedagogia, psicologia e fonoaudiologia (ordem recomendada provisória em `docs/pedagogia/ordem-recomendada-mvp.md`, usada no MVP).
-- `docs/referencia/alfabetizacao/`: resumo do RENABE, do padrão de alfabetização do Inep (743 no Saeb, preliminar), do PNAIC e do Plano de Trabalho do MEC, com o que li e o que não li. Os PDFs ficam fora do repositório.
-- `docs/referencia/legislacao/`: Lei 15.247/2025 (Compromisso Criança Alfabetizada) e decretos anteriores, colados pelo usuário e não conferidos com o DOU. A lei não impõe método; a PNA (2019) está revogada.
+- `docs/adr/`: as decisões de arquitetura e de regra.
+- `docs/pedagogia/`: a ordem recomendada provisória (`ordem-recomendada-mvp.md`, usada no MVP) e as habilidades da BNCC em `bncc/` (Matemática, Língua Portuguesa e Computação, 1º ao 3º ano). A ordem de progressão **não está decidida**: exige consenso de profissionais de pedagogia, psicologia e fonoaudiologia.
+- `docs/legal/privacidade-e-eca-digital.md`: LGPD, ECA Digital (o que o jogo cumpre e o que falta) e licenças.
 - `GLOSSARY.md`: vocabulário canônico do projeto (Lobby, Dungeon, Nível, Andar, Sala, Expedição, Papel...). Use esses termos e evite os listados em _Avoid_.
-- `docs/arte-e-ux/direcao-de-arte-e-ux.md`: estilo visual, HUD (cores, fonte, tamanhos), acessibilidade e pipeline de arte.
-- `docs/arte-e-ux/meshy/`: prompts do Meshy (Personagem modular, kits dos Papéis, criaturas, folhas de assets) e imagens de referência aprovadas.
-- `docs/apresentacao/apresentacao.md`: resumo do jogo.
-- `mockups/`: telas de referência da Torre dos Números, Torre das Letras e Lobby.
+- `docs/arte/`: direção de arte e UX (HUD, acessibilidade), guia de estilo visual e as imagens aprovadas em `referencias/` e `folhas/`.
+- `docs/agents/`: documentação para a IA (fluxo de desenvolvimento, skills, issue tracker, domínio, o pipeline de arte em `docs/agents/arte/` e o material de pesquisa em `docs/agents/fontes/`: leis e decretos transcritos, não conferidos com o DOU, e as notas de leitura do RENABE, Inep, PNAIC e Plano de Trabalho do MEC; a lei de alfabetização não impõe método e a PNA de 2019 está revogada). **Só aqui, no CLAUDE.md e em `.claude/` se fala de ferramentas e de como o projeto é feito** (Blender, MCP, Meshy, skills); o resto de `docs/`, o README e o CREDITS falam só do jogo e da API.
 
 ## Decisões principais
 
@@ -33,9 +31,10 @@ Idioma: português do Brasil nos documentos, textos do jogo e commits. Identific
 - **Repetição espaçada**: caixas de Leitner por conceito, calculadas no próprio jogo.
 - **Privacidade**: sem nome real; perfis por apelido; telemetria só com consentimento do responsável.
 - **Sem ranking, anúncios ou compras**, e sem punição por ficar sem jogar.
+- **Modelos feitos no Blender por script** (23/10/2026, `docs/agents/arte/pipeline-de-arte.md`), conduzido pelo MCP do Blender, sem gerador de IA. Os do Meshy em uso saem um por um, conforme cada substituto fica pronto.
 - **Primeiro marco**: Lobby funcional (ver `docs/produto/documento-de-produto.md`). Nomes do jogo e dos Papéis são provisórios e ficam em dados.
 - **Treino no Lobby é o combate real contra o Boneco, com Energia própria** (zerar só tira a criança da Área de treino), e usa todas as Mecânicas existentes; **não conta progresso**, só o que acontece nas Dungeons conta. Cosméticos só por aprendizado e exploração, ou comprados no Mercador com moedas do jogo (ADR 0007).
-- **Equipamento dá atributos e isso é regra (decisão de 16/10/2026, a partir do experimento do PR #97)**: o Personagem tem os atributos base e soma os bônus do equipamento (Energia base + até 2, velocidade até 1,12×, alcance de interação até +0,5). É a exceção declarada a "Cosmético não dá vantagem": Cosmético continua só aparência, e equipamento é outra coisa. Equipar ou trocar nunca cura, e conteúdo educacional e dificuldade não mudam. O Personagem tem três espaços (Capacete, Armadura e Acessório) por Papel, cada equipamento tem um atributo e pede uma Maestria mínima do Papel (em `game/data/equipamentos.json`), e um substitui o outro, sem evoluir. Ver `docs/arte-e-ux/quatro-caminhos-e-equipamentos.md`; o #119 escreve as regras nas docs.
+- **Equipamento dá atributos e isso é regra (decisão de 16/10/2026, a partir do experimento do PR #97)**: o Personagem tem os atributos base e soma os bônus do equipamento (Energia base + até 2, velocidade até 1,12×, alcance de interação até +0,5). É a exceção declarada a "Cosmético não dá vantagem": Cosmético continua só aparência, e equipamento é outra coisa. Equipar ou trocar nunca cura, e conteúdo educacional e dificuldade não mudam. O Personagem tem três espaços (Capacete, Armadura e Acessório) por Papel, cada equipamento tem um atributo e pede uma Maestria mínima do Papel (em `game/data/equipamentos.json`), e um substitui o outro, sem evoluir. As regras estão no documento de produto.
 - **Maestria, moedas e Andares profundos**: a Maestria é um número por Papel que sobe por Conceito dominado (vitórias na Dungeon, sem XP e sem perda). Moedas só do jogo, ganhas por criatura acalmada, Sala do Item e Andar completo, sem teto e sem perda, nunca por velocidade nem sequência. Entrar numa torre sempre começa a Progressão (o Plano do Nível); depois do último Andar, ou por uma escada lateral opcional na entrada de qualquer Andar, a criança chega aos Andares profundos (sem fim, sem Marco, Item nem Desafio épico, não avançam o Nível, nunca bloqueiam nem são obrigatórios; o Fast travel deles volta à Progressão).
 
 ## Estrutura planejada do código
@@ -76,7 +75,7 @@ Rodam na CI (job `qualidade`, mais `segredos` e `arquivos`) e localmente com `to
 
 ## Ambiente local (Windows)
 
-Ferramentas instaladas sem administrador em `C:\dev\tools` e no PATH do usuário: .NET SDK 8, Godot 4.7.2 .NET e Node LTS. A variável `GODOT` aponta para o executável de console (use-a para exportar e rodar o jogo sem abrir o editor). `dotnet test game.tests` roda os testes de regra, que não abrem o Godot. Os roteiros `e2e-1`, `e2e-2` e `--pull-qa` precisam do motor (ver README e `docs/tecnico/teste-pesca-neon.md`). O Godot usa `net8.0` e `Godot.NET.Sdk/4.7.2`.
+Ferramentas instaladas sem administrador em `C:\dev\tools` e no PATH do usuário: .NET SDK 8, Godot 4.7.2 .NET e Node LTS. A variável `GODOT` aponta para o executável de console (use-a para exportar e rodar o jogo sem abrir o editor). `dotnet test game.tests` roda os testes de regra, que não abrem o Godot. Os roteiros `e2e-1` e `e2e-2` precisam do motor (ver README). O Godot usa `net8.0` e `Godot.NET.Sdk/4.7.2`.
 
 ## Agent skills
 

@@ -15,8 +15,6 @@ public partial class DungeonHud : Node
 	// A Energia fica logo abaixo do card do avatar.
 	public const int EnergyTop = 104;
 
-	// Moedas e atributos ficam logo abaixo da Energia.
-	const int StatsTop = 168;
 
 	readonly DungeonContext ctx;
 	readonly Expedition expedition;
@@ -28,8 +26,6 @@ public partial class DungeonHud : Node
 	readonly Label coinToast = new() { Name = "AvisoDeMoedas", MouseFilter = Control.MouseFilterEnum.Ignore, HorizontalAlignment = HorizontalAlignment.Center };
 	readonly Label floorLabel = new() { AutowrapMode = TextServer.AutowrapMode.WordSmart };
 	readonly ProgressBar floorBar = new() { ShowPercentage = false, CustomMinimumSize = new Godot.Vector2(0, 14) };
-	readonly Label coinsLabel = new() { Name = "Moedas" };
-	readonly Label statsLabel = new() { Name = "Atributos" };
 	AvatarCard card = null!;
 	Dock dock = null!;
 	Button interactButton = null!;
@@ -43,17 +39,15 @@ public partial class DungeonHud : Node
 		this.expedition = expedition;
 	}
 
-	public EnergyView Energy { get; } = new("Voltar ao Lobby");
+	public EnergyView Energy { get; } = new(null);
 
-	// A velocidade de quem anda (equipamento incluído), para a lista de atributos.
-	public Func<float> Speed { get; set; } = () => 1f;
 
 	// Diz se há uma luta aberta; com ela o Inventário não abre e o dock some.
 	public Func<bool> InCombat { get; set; } = () => false;
 
 	public event Action? InteractPressed;
 
-	public event Action? LeaveRequested;
+	public event Action? MenuRequested;
 
 	public event Action? MapSpeechRequested;
 
@@ -75,10 +69,9 @@ public partial class DungeonHud : Node
 		hud.AddChild(card);
 		dock = BuildDock();
 		BuildCoinToast();
-		BuildStats();
+		BuildMenuButton();
 		ShowCoins($"Moedas: {ctx.Progress.Wallet.Balance(ctx.ProfileId)}");
 		ctx.UiRoot.AddChild(Energy);
-		Energy.LeaveRequested += () => LeaveRequested?.Invoke();
 		RefreshEnergy();
 		Energy.OffsetTop = EnergyTop;
 	}
@@ -166,41 +159,8 @@ public partial class DungeonHud : Node
 		hud.AddChild(coinToast);
 	}
 
-	// Moedas e atributos ficam sempre à vista, sob a Energia: o aviso de moedas some sozinho, mas o saldo não.
-	void BuildStats()
-	{
-		var icon = new TextureRect { Texture = Icons.For("coin", 28), CustomMinimumSize = new Godot.Vector2(28, 28), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, SizeFlagsVertical = Control.SizeFlags.ShrinkBegin };
-		foreach (var label in new[] { coinsLabel, statsLabel })
-		{
-			label.AutowrapMode = TextServer.AutowrapMode.Off;
-			label.AddThemeColorOverride("font_color", UiKit.TextColor);
-		}
-		coinsLabel.AddThemeFontSizeOverride("font_size", 20);
-		statsLabel.AddThemeFontSizeOverride("font_size", 15);
-		var texts = new VBoxContainer();
-		texts.AddChild(coinsLabel);
-		texts.AddChild(statsLabel);
-		var row = new HBoxContainer();
-		row.AddThemeConstantOverride("separation", 8);
-		row.AddChild(icon);
-		row.AddChild(texts);
-		var panel = new PanelContainer { Name = "Atributos de jogo", MouseFilter = Control.MouseFilterEnum.Ignore };
-		panel.AddThemeStyleboxOverride("panel", UiKit.Surface());
-		panel.SetAnchorsPreset(Control.LayoutPreset.TopLeft);
-		panel.OffsetLeft = 12;
-		panel.OffsetTop = StatsTop;
-		panel.AddChild(row);
-		hud.AddChild(panel);
-		RefreshStats();
-	}
-
-	public void RefreshStats()
-	{
-		var balance = ctx.Progress.Wallet.Balance(ctx.ProfileId);
-		coinsLabel.Text = balance == 1 ? "1 moeda" : $"{balance} moedas";
-		var reach = ctx.ExtraReach > 0f ? $" · Alcance +{ctx.ExtraReach:0.0}" : "";
-		statsLabel.Text = $"Energia máx. {expedition.Energy.Max} · Velocidade ×{Speed():0.00}{reach}";
-	}
+	// O saldo fica ao lado da Energia: o aviso de moedas some sozinho, mas o saldo não.
+	public void RefreshStats() => Energy.SetCoins(ctx.Progress.Wallet.Balance(ctx.ProfileId));
 
 	public void ShowCoins(string text)
 	{
@@ -231,6 +191,18 @@ public partial class DungeonHud : Node
 	{
 		interactButton.Visible = text is not null;
 		if (text is not null) interactButton.Text = text;
+	}
+
+	// O botão do menu, ao lado do mapa: continuar, ajustes e voltar ao Lobby.
+	void BuildMenuButton()
+	{
+		var menu = BookStyle.Button("Menu", () => MenuRequested?.Invoke(), "Menu", 56);
+		menu.SetAnchorsPreset(Control.LayoutPreset.TopRight);
+		menu.OffsetLeft = -392;
+		menu.OffsetRight = -312;
+		menu.OffsetTop = 12;
+		menu.OffsetBottom = 68;
+		hud.AddChild(menu);
 	}
 
 	// A cada quadro: a Energia e o marcador do mapa, que acompanha a criança passo a passo.

@@ -54,6 +54,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		if (expedition.CanEnterDeep) list.Add(new Interactable("stairs-deep", DeepStairsSpot));
 		if (expedition.CanReturnToProgression) list.Add(new Interactable("progression", FountainSpot));
 		if (expedition.Current.Kind.Restores) list.Add(new Interactable("rest", FountainSpot));
+		if (expedition.Current.Kind.SavesPoint) list.Add(new Interactable("totem", FountainSpot));
 		return list;
 	}
 
@@ -81,16 +82,41 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		AddChild(Creature);
 		AddChild(barrier);
 
-		var model = Lobby.LoadModel("boneco");
-		if (model is not null)
-		{
-			AddChild(model);
-			Lobby.FitToHeight(model, CreatureHeight, Vector3.Zero);
-			creatureModel = model;
-		}
+		Creature.Reacted += kind => creatureModel?.React(kind);
 	}
 
-	Node3D? creatureModel;
+	CreatureModel? creatureModel;
+	string? shownCreature;
+
+	// Os modelos da torre, na ordem em que aparecem de Sala em Sala; sem eles vale o Boneco.
+	public IReadOnlyList<string> CreatureSet { get; set; } = [];
+
+	void ShowCreatureModel(int roomId)
+	{
+		var name = CreatureSet.Count > 0 ? CreatureSet[roomId % CreatureSet.Count] : "boneco";
+		if (name == shownCreature) return;
+		if (creatureModel is not null) RemoveChild(creatureModel.Node);
+		creatureModel?.Node.QueueFree();
+		shownCreature = name;
+		creatureModel = CreatureModel.Load(name) ?? CreatureModel.Load("boneco");
+		if (creatureModel is null) return;
+		creatureModel.ReduceMotion = ReduceMotion;
+		AddChild(creatureModel.Node);
+		creatureModel.Fit();
+	}
+	IReadOnlyList<MeshInstance3D> walls = [];
+
+	// Onde a criança está no chão da Sala; as paredes na frente dela ou da criatura ficam transparentes.
+	public System.Func<System.Numerics.Vector2>? PlayerAt { get; set; }
+
+	public override void _Process(double delta)
+	{
+		creatureModel?.Tick(delta, Creature.BodyOffset);
+		var seen = new List<Vector3>();
+		if (PlayerAt?.Invoke() is { } at) seen.Add(new Vector3(at.X, 1f, at.Y));
+		if (Creature.Visible) seen.Add(Creature.Center + new Vector3(0f, 0.8f, 0f));
+		RoomWalls.Fade(walls, -Camera.GlobalTransform.Basis.Z, seen, (float)delta);
+	}
 	readonly MeshInstance3D barrier = new()
 	{
 		Mesh = new BoxMesh { Size = new Vector3(3.4f, 2.2f, 0.4f) },
@@ -119,7 +145,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	public void ShowTarget(bool fight, bool puzzle)
 	{
 		Creature.Visible = fight;
-		if (creatureModel is not null) creatureModel.Visible = fight && !puzzle;
+		if (creatureModel is not null) creatureModel.Node.Visible = fight && !puzzle;
 		barrier.Visible = fight && puzzle;
 	}
 
@@ -139,8 +165,11 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		(shownFloor, currentId, spot) = (key, roomId, here.Spot);
 
 		var kind = floor.Rooms[roomId].Kind;
+		ShowCreatureModel(roomId);
 		var walkable = new HashSet<HexCell>(here.Cells.Select(Local));
 		var blocked = new HashSet<HexCell>();
+		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
+		var corridors = new HashSet<HexCell>();
 		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId));
 
 		foreach (var neighbor in floor.Neighbors(roomId).OrderBy(n => n))
@@ -163,18 +192,24 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			}
 
 			walkable.UnionWith(cells);
+			corridors.UnionWith(cells);
 			if (!CorridorKit.Add(room, cells)) RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false);
 			walkable.UnionWith(other.Cells.Select(Local));
 			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor));
+			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
 			var entry = GroundOf(Local(other.Cells.First(c => c.DistanceTo(layout.CorridorBetween(roomId, neighbor)![^1]) == 1)));
 			entries[neighbor] = new System.Numerics.Vector2(entry.X, entry.Z);
 		}
 		Grid.Reset(walkable, blocked);
+		walls = RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
 
-		AddSign($"{kind.Name}", new Vector3(0f, kind.HasChallenge ? 5.6f : 2.4f, 0f), 56);
+		// Com escada na Sala o nome sobe, para os textos não ficarem um em cima do outro.
+		var hasStairs = kind.Stairs == RoomStairs.Up || stairsDown || deepStairs;
+		AddSign($"{kind.Name}", new Vector3(0f, kind.HasChallenge ? 5.6f : hasStairs ? 4.6f : 2.4f, 0f), 56);
 		if (note is not null) AddSign(note, new Vector3(0f, 3.4f, 0f), 34);
 		if (kind.Stairs == RoomStairs.Up || stairsDown) AddStairs(stairsDown);
 		if (kind.Restores) AddFountain(cleared.Contains(roomId));
+		if (kind.SavesPoint) AddTotem();
 		if (deepStairs) AddDeepStairs();
 		return shift;
 	}
@@ -238,18 +273,42 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var material = new StandardMaterial3D { AlbedoColor = tint, Roughness = 0.8f };
 		var along = way.LengthSquared() > 0.0001f ? way.Normalized() : Vector3.Forward;
 		var side = new Vector3(-along.Z, 0f, along.X) * 0.8f;
-		foreach (var offset in new[] { side, -side })
-			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.28f, PillarHeight, 0.28f) }, MaterialOverride = material, Position = door.Ground + offset + new Vector3(0f, PillarHeight / 2f, 0f) });
 		var across = Mathf.Atan2(side.X, side.Z) - Mathf.Pi / 2f;
-		room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.9f, 0.26f, 0.3f) }, MaterialOverride = material, Position = door.Ground + new Vector3(0f, PillarHeight + 0.1f, 0f), Rotation = new Vector3(0f, across, 0f) });
+		if (RoomProps.Add(room, "cenario/porta-arco", 1.6f, door.Ground, Mathf.Atan2(along.X, along.Z)) is null)
+		{
+			foreach (var offset in new[] { side, -side })
+				room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.28f, PillarHeight, 0.28f) }, MaterialOverride = material, Position = door.Ground + offset + new Vector3(0f, PillarHeight / 2f, 0f) });
+			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.9f, 0.26f, 0.3f) }, MaterialOverride = material, Position = door.Ground + new Vector3(0f, PillarHeight + 0.1f, 0f), Rotation = new Vector3(0f, across, 0f) });
+		}
 		if (door.Locked)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.5f, PillarHeight - 0.1f, 0.18f) }, MaterialOverride = material, Position = door.Ground + new Vector3(0f, PillarHeight / 2f, 0f), Rotation = new Vector3(0f, across, 0f) });
 		AddSign(door.Label, door.Ground + new Vector3(0f, PillarHeight + 0.95f, 0f), 40);
 	}
 
 	// O Descanso é uma fonte no centro da Sala; ela escurece depois de usada.
+	// O totem de viagem do Fast travel: uma coluna com um cristal brilhante, e o nome em cima. Greybox, até a arte definitiva.
+	void AddTotem()
+	{
+		if (RoomProps.Add(room, "portal", 2f, Vector3.Zero, Mathf.Pi / 4f) is not null)
+		{
+			AddSign("Totem de viagem", new Vector3(0f, 3.5f, 0f), 34);
+			return;
+		}
+		var stone = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#8C84A6"), Roughness = 0.9f };
+		var glow = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#4DD0C4"), EmissionEnabled = true, Emission = Color.FromHtml("#4DD0C4"), EmissionEnergyMultiplier = 1.6f };
+		room.AddChild(new MeshInstance3D { Mesh = new CylinderMesh { TopRadius = 0.5f, BottomRadius = 0.75f, Height = 0.4f }, MaterialOverride = stone, Position = new Vector3(0f, 0.2f, 0f) });
+		room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.45f, 1.7f, 0.45f) }, MaterialOverride = stone, Position = new Vector3(0f, 1.25f, 0f) });
+		room.AddChild(new MeshInstance3D { Mesh = new PrismMesh { Size = new Vector3(0.7f, 0.9f, 0.7f) }, MaterialOverride = glow, Position = new Vector3(0f, 2.5f, 0f) });
+		AddSign("Totem de viagem", new Vector3(0f, 3.5f, 0f), 34);
+	}
+
 	void AddFountain(bool used)
 	{
+		if (RoomProps.Add(room, "cenario/fonte-descanso", 1f, Vector3.Zero) is { } fountain)
+		{
+			if (used) RoomProps.Dim(fountain);
+			return;
+		}
 		var water = new StandardMaterial3D { AlbedoColor = used ? Color.FromHtml("#7E7A99") : Color.FromHtml("#BA9BEA"), Roughness = 0.4f };
 		room.AddChild(new MeshInstance3D { Mesh = new CylinderMesh { TopRadius = 1.1f, BottomRadius = 1.2f, Height = 0.5f }, MaterialOverride = water, Position = new Vector3(0f, 0.25f, 0f) });
 		room.AddChild(new MeshInstance3D { Mesh = new SphereMesh { Radius = 0.45f, Height = 0.9f }, MaterialOverride = water, Position = new Vector3(0f, 0.9f, 0f) });
@@ -258,7 +317,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	void AddStairs(bool down)
 	{
 		var material = new StandardMaterial3D { AlbedoColor = FloorMap.ColorOf(RoomTypes.Exit), Roughness = 0.8f };
-		if (down) AddSign("Escada para baixo", new Vector3(0f, 3.4f, 0f), 40);
+		if (down) AddSign("Escada para baixo", new Vector3(0f, 3.3f, 0f), 40);
+		if (RoomProps.Add(room, "cenario/escada-pedra", 1.1f, Vector3.Zero, Mathf.Pi / 4f) is not null) return;
 		for (var step = 0; step < 4; step++)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.8f - step * 0.3f, 0.25f, 1.8f - step * 0.3f) }, MaterialOverride = material, Position = new Vector3(0f, 0.15f + step * 0.25f, 0f) });
 	}
@@ -267,9 +327,14 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	{
 		var material = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#6F5BB0"), Roughness = 0.8f };
 		var at = new Vector3(DeepStairsSpot.X, 0f, DeepStairsSpot.Y);
+		if (RoomProps.Add(room, "cenario/escada-pedra", 0.8f, at, Mathf.Pi / 4f) is not null)
+		{
+			AddSign("Andares profundos", at + new Vector3(0f, 1.5f, 0f), 34);
+			return;
+		}
 		for (var step = 0; step < 3; step++)
 			room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.2f - step * 0.3f, 0.2f, 1.2f - step * 0.3f) }, MaterialOverride = material, Position = at + new Vector3(0f, 0.1f + step * 0.2f, 0f) });
-		AddSign("Escada lateral\nAndares profundos", at + new Vector3(0f, 1.9f, 0f), 36);
+		AddSign("Andares profundos", at + new Vector3(0f, 1.5f, 0f), 34);
 	}
 
 	void AddSign(string text, Vector3 at, int size)

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ArquipelagoDoCeu.Combat;
 using ArquipelagoDoCeu.Rules;
 using Godot;
@@ -10,10 +12,12 @@ namespace ArquipelagoDoCeu;
 public partial class CombatHud
 {
 	FreeDrawLayer? layer;
-	// A peça da mochila que a criança escolheu e ainda vai contornar no pontilhado: (índice, o que desenhar).
-	(int Piece, string Drawing)? pending;
+	// As peças da mochila que a criança escolheu e ainda vai contornar no pontilhado, na ordem: (índice, o que desenhar).
+	readonly List<(int Piece, string Drawing)> pending = [];
 	const int ButtonSize = 56;
 	bool hintShown;
+	bool writing;
+	Button? writeButton;
 
 	// O que a criatura diz em voz e em texto (o balão dela) e o pedido que ela mostra, ou nulo para voltar ao normal.
 	public event Action<string>? Said;
@@ -31,7 +35,7 @@ public partial class CombatHud
 		layer.ActiveChanged += _ => NotifyComposing();
 	}
 
-	// Como no mockup: a mochila fica sempre à vista, numa fileira baixa embaixo, com os botões pequenos ao lado. O pedido e os recados
+	// A mochila fica sempre à vista, numa fileira baixa embaixo, com os botões pequenos ao lado. O pedido e os recados
 	// ficam no balão da criatura. A criança escolhe entre atacar na hora (as peças) e desenhar.
 	Control BuildCompactBar()
 	{
@@ -46,7 +50,8 @@ public partial class CombatHud
 		bag.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		bar.SizeFlagsVertical = SizeFlags.ShrinkEnd;
 		bar.AddChild(bag);
-		Button[] buttons = [undo, BookStyle.Button("Dica", AskHint, "Hint", ButtonSize), BookStyle.Button("Ouvir", () => ReadRequested?.Invoke(), "Read", ButtonSize), BookStyle.Button("Soltar alvo", Abandon, "Release", ButtonSize)];
+		if (presenter.TypesLetters) writeButton = BookStyle.Button(WriteLabel, () => SetWriting(!writing), "Write", ButtonSize);
+		Button[] buttons = [.. new[] { writeButton }.OfType<Button>(), undo, BookStyle.Button("Dica", AskHint, "Hint", ButtonSize), BookStyle.Button("Ouvir", () => ReadRequested?.Invoke(), "Read", ButtonSize), BookStyle.Button("Soltar alvo", Abandon, "Release", ButtonSize)];
 		foreach (var button in buttons)
 		{
 			button.SizeFlagsVertical = SizeFlags.ShrinkCenter;
@@ -58,6 +63,22 @@ public partial class CombatHud
 		bar.OffsetBottom = -Margin;
 		bar.GrowVertical = GrowDirection.Begin;
 		return bar;
+	}
+
+	public bool Writing => writing;
+
+	string WriteLabel => writing ? "Andar [Esc]" : "Escrever [Enter]";
+
+	// Com letras, o teclado só escreve depois de escolher escrever (como na forca); sem isso, WASD anda.
+	void SetWriting(bool on)
+	{
+		if (!presenter.TypesLetters || on == writing) return;
+		writing = on;
+		Controls.TypingPanels += on ? 1 : -1;
+		layer?.SetWriting(on, presenter.GuideText?.Length ?? 0);
+		if (!on) layer?.Clear();
+		if (writeButton is not null) writeButton.Text = WriteLabel;
+		if (on) Notice("Escreva com o teclado. Esc volta a andar.");
 	}
 
 	// Um aviso curto: no balão da criatura e em voz.
@@ -78,30 +99,36 @@ public partial class CombatHud
 	void RefreshGuide()
 	{
 		if (layer is null) return;
-		if (pending is { } waiting)
+		if (pending.Count > 0)
 		{
-			layer.SetGuide(waiting.Drawing, true);
+			layer.SetGuide(string.Concat(pending.Select(p => p.Drawing)), true);
 			return;
 		}
 		var text = hintShown ? presenter.HintGuide ?? presenter.GuideText : presenter.GuideText;
 		var shown = text is not null && (hintShown || presenter.GuideAlways);
 		layer.SetGuide(text ?? "", shown);
+		layer.SetSlots(text?.Length ?? 0);
 	}
 
 	// Tocar na peça mostra o pontilhado dela no centro; a peça entra na conta quando a criança o contorna.
+	// Escolher mais peças antes de contornar põe todas na fila: o pontilhado mostra as peças juntas, na ordem, para desenhar de uma vez.
 	void AskToTrace(int piece, string drawing)
 	{
-		pending = (piece, drawing);
+		if (pending.Any(p => p.Piece == piece)) return;
+		pending.Add((piece, drawing));
 		layer!.Clear();
 		RefreshGuide();
+		RefreshPieces();
 		Notice("Siga o pontilhado.");
 	}
 
+	// Apagar tira a última peça da fila, e o pontilhado das outras continua.
 	void DropPending()
 	{
-		pending = null;
+		if (pending.Count > 0) pending.RemoveAt(pending.Count - 1);
 		layer?.Clear();
 		RefreshGuide();
+		RefreshPieces();
 	}
 
 	void OnRead(TextGuess guess)
@@ -130,9 +157,9 @@ public partial class CombatHud
 				Notice("Fiquei na dúvida. Tente de novo.");
 				return;
 		}
-		if (pending is { } waiting)
+		if (pending.Count > 0)
 		{
-			TraceChecked(waiting, guess.Text);
+			TraceChecked(guess.Text);
 			return;
 		}
 		if (presenter.Write(guess.Text, out var refusal))
@@ -145,15 +172,27 @@ public partial class CombatHud
 	}
 
 	// A peça escolhida foi desenhada: se bate, entra na conta; se não, a criança tenta de novo, sem custo.
-	void TraceChecked((int Piece, string Drawing) waiting, string drawn)
+	// Vale desenhar todas de uma vez ou só as primeiras: as peças que bateram entram na conta, e as outras seguem esperando.
+	void TraceChecked(string drawn)
 	{
-		if (!string.Equals(drawn, waiting.Drawing, StringComparison.OrdinalIgnoreCase))
+		var matched = Enumerable.Range(1, pending.Count).Reverse().FirstOrDefault(k => string.Equals(drawn, string.Concat(pending.Take(k).Select(p => p.Drawing)), StringComparison.OrdinalIgnoreCase));
+		if (matched == 0)
 		{
 			Notice("Quase! Siga o pontilhado.");
 			return;
 		}
-		pending = null;
-		presenter.Place(waiting.Piece);
+		var placing = pending.Take(matched).ToList();
+		pending.RemoveRange(0, matched);
+		foreach (var (piece, _) in placing)
+		{
+			if (presenter.Pieces[piece] is not { Enabled: true })
+			{
+				pending.Clear();
+				Notice("Essa peça não cabe aí. Escolha outra.");
+				break;
+			}
+			presenter.Place(piece);
+		}
 		AfterPlace();
 	}
 
@@ -162,6 +201,13 @@ public partial class CombatHud
 	{
 		if (layer is null) return;
 		bool handled;
+		if (presenter.TypesLetters && !writing)
+		{
+			if (key.PhysicalKeycode is not (Key.Enter or Key.KpEnter)) return;
+			SetWriting(true);
+			GetViewport().SetInputAsHandled();
+			return;
+		}
 		switch (key.PhysicalKeycode)
 		{
 			case Key.Backspace:

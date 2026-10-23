@@ -55,7 +55,7 @@ public partial class DungeonRun : Node
 		exploration = new DungeonExploration(ctx);
 		expedition = Expedition.Start(floors, plan, seed, ctx.Version, new Energy(ctx.Rules.MaxEnergy + ctx.ExtraEnergy), ctx.HasTradeItem,
 			ctx.StartFloor, ctx.AtFastTravel, ctx.Shortcut, exploration.Get);
-		hud = new DungeonHud(ctx, expedition) { Speed = () => player?.SpeedMultiplier ?? 1f };
+		hud = new DungeonHud(ctx, expedition);
 		narration = new DungeonNarration(ctx, expedition);
 		rewards = new DungeonRewards(ctx, () => InShortcut, hud.ShowCoins);
 	}
@@ -95,7 +95,7 @@ public partial class DungeonRun : Node
 	{
 		AddChild(world);
 		world.Camera.MakeCurrent();
-		world.Name = "Dungeon";
+		world.Name = "Dungeon"; world.CreatureSet = CreaturesOf(ctx.Discipline); world.PlayerAt = () => player.GroundPosition;
 
 		player = new Player(world.Grid, world.Camera, world.HeightAt);
 		ctx.ConfigurePlayer(player);
@@ -113,7 +113,7 @@ public partial class DungeonRun : Node
 
 		AddChild(hud);
 		hud.InteractPressed += Activate;
-		hud.LeaveRequested += () => Leave("");
+		hud.MenuRequested += OpenMenu;
 		hud.MapSpeechRequested += () => Say(narration.MapSpeech(IsFloorDone()));
 		hud.MapOpenRequested += OpenMap;
 		hud.RoomPointed += room => Say(narration.RoomSpeech(room));
@@ -301,6 +301,7 @@ public partial class DungeonRun : Node
 	{
 		if (left) return;
 		if (@event.IsActionPressed(Controls.Map)) OpenMap();
+		else if (@event.IsActionPressed("ui_cancel")) OpenMenu();
 		else if (@event.IsActionPressed(Controls.Interact)) Activate();
 	}
 
@@ -308,13 +309,12 @@ public partial class DungeonRun : Node
 	{
 		if (left || !enabled || target is null) return;
 		if (target == "rest") { Rest(); return; }
-
+		if (target == "totem") { Leave(""); return; }
 		if (InShortcut)
 		{
 			Say("Termine o Atalho ou volte ao Lobby.");
 			return;
 		}
-
 		if (target == "stairs") { ChangeFloor(expedition.Ascend); return; }
 		if (target == "stairs-deep") { ChangeFloor(expedition.EnterDeep, "Andar profundo! Aqui os Andares não têm fim: ganhe moedas e Maestria, e volte quando quiser."); return; }
 		if (target == "progression") { ChangeFloor(expedition.ReturnToProgression, "De volta à Progressão."); return; }

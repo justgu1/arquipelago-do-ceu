@@ -13,8 +13,8 @@ public static class FloorLayouts
 	// Distância entre os centros dos espaços onde as Salas podem cair; com o desvio, os corredores saem curtos, longos, retos ou com curva.
 	const int Pitch = 20;
 	const int Jitter = 2;
-	const int CompactPitch = 13;
-	const int CompactJitter = 1;
+	const int CompactPitch = 11;
+	const int CompactJitter = 0;
 	// Hexágonos vazios que separam uma Sala de qualquer outra coisa: sem isso a criança passaria de uma para outra sem cruzar a porta.
 	const int Gap = 2;
 	const int Attempts = 60;

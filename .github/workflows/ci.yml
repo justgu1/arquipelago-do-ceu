@@ -13,13 +13,18 @@ concurrency:
 permissions:
   contents: read
 
+# Hashes publicados em SHA512-SUMS.txt do release do Godot; mudam junto com GODOT_VERSION nos jobs.
+env:
+  GODOT_ZIP_SHA512: 79229fd112b0c9cbeab82363a4ef7be18ea70f1caf86bf912789335b136fbe7e01db0053a33461438c5da1c680c17bbb10040bd09bedc51221cd4423d0367757
+  GODOT_TPZ_SHA512: bb5c41d72370ed743660361f6228006f808ab04ca33abdc545d740b044f3fe057f32ae8cb7873a1bc86ddcd82ae683b9f6dfdfe4179852f2c0f1acde2ff6bd5a
+
 jobs:
   testes:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 8.0.x
       - name: Rodar os testes
@@ -29,13 +34,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 8.0.x
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: lts/*
       - name: Formatação
@@ -59,10 +64,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -70,8 +75,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: aquasecurity/trivy-action@v0.36.0
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scanners: vuln,secret,misconfig
@@ -86,8 +91,8 @@ jobs:
     env:
       GODOT_VERSION: 4.7.2
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 8.0.x
       - name: Instalar o Godot e as templates de exportação
@@ -95,6 +100,9 @@ jobs:
           $base = "https://github.com/godotengine/godot-builds/releases/download/$env:GODOT_VERSION-stable"
           Invoke-WebRequest "$base/Godot_v$env:GODOT_VERSION-stable_mono_win64.zip" -OutFile godot.zip
           Invoke-WebRequest "$base/Godot_v$env:GODOT_VERSION-stable_mono_export_templates.tpz" -OutFile templates.zip
+          foreach ($par in @(@("godot.zip", $env:GODOT_ZIP_SHA512), @("templates.zip", $env:GODOT_TPZ_SHA512))) {
+            if ((Get-FileHash $par[0] -Algorithm SHA512).Hash -ne $par[1]) { Write-Error "O checksum de $($par[0]) não confere."; exit 1 }
+          }
           Expand-Archive godot.zip -DestinationPath "$env:RUNNER_TEMP\godot"
           Expand-Archive templates.zip -DestinationPath "$env:RUNNER_TEMP\templates"
           # O Godot procura as templates numa pasta com o nome exato da versão.
@@ -122,7 +130,7 @@ jobs:
           $codigo = $LASTEXITCODE
           Write-Host "Saída ($codigo):"; Write-Host $saida
           if ($codigo -ne 0 -or $saida -notmatch "Cena inicial pronta") { exit 1 }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: windows-build
           path: build/
@@ -132,8 +140,8 @@ jobs:
     env:
       GODOT_VERSION: 4.7.2
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 8.0.x
       - name: Instalar o Godot e as templates de exportação
@@ -141,6 +149,9 @@ jobs:
           $base = "https://github.com/godotengine/godot-builds/releases/download/$env:GODOT_VERSION-stable"
           Invoke-WebRequest "$base/Godot_v$env:GODOT_VERSION-stable_mono_win64.zip" -OutFile godot.zip
           Invoke-WebRequest "$base/Godot_v$env:GODOT_VERSION-stable_mono_export_templates.tpz" -OutFile templates.zip
+          foreach ($par in @(@("godot.zip", $env:GODOT_ZIP_SHA512), @("templates.zip", $env:GODOT_TPZ_SHA512))) {
+            if ((Get-FileHash $par[0] -Algorithm SHA512).Hash -ne $par[1]) { Write-Error "O checksum de $($par[0]) não confere."; exit 1 }
+          }
           Expand-Archive godot.zip -DestinationPath "$env:RUNNER_TEMP\godot"
           Expand-Archive templates.zip -DestinationPath "$env:RUNNER_TEMP\templates"
           $destino = "$env:APPDATA\Godot\export_templates\$env:GODOT_VERSION.stable.mono"

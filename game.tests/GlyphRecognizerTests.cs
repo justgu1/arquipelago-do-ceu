@@ -60,6 +60,24 @@ public class GlyphRecognizerTests
 		Assert.True(sure >= Letters.Length * 0.7, $"{sure} de {Letters.Length} lidas com segurança");
 	}
 
+	// O 8 de uma volta só, que a maioria das crianças faz, e não os dois círculos da trilha.
+	[Theory]
+	[InlineData(1f)]
+	[InlineData(-1f)]
+	public void O_oito_de_uma_volta_so_e_lido(float side)
+	{
+		IReadOnlyList<Vector2> loop = [.. Enumerable.Range(0, 60).Select(i =>
+		{
+			var t = i / 59f * 2f * MathF.PI;
+			return new Vector2(300 + side * 90f * MathF.Sin(2f * t) * 1.1f, 200 - 150f * MathF.Cos(t) * 1.05f);
+		})];
+
+		var guess = Recognizer.Recognize([loop], Digits);
+
+		Assert.Equal("8", guess.Glyph);
+		Assert.Equal(GuessKind.Sure, guess.Kind);
+	}
+
 	[Fact]
 	public void A_ordem_e_a_direcao_dos_tracos_nao_importam()
 	{

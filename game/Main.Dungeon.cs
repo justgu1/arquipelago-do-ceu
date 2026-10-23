@@ -32,11 +32,6 @@ public partial class Main
 			(System.Action)(() => EnterDungeon(p.Discipline, p.Level, p.Floor, atFastTravel: true)))).ToList());
 	}
 
-	void SetPullBlocked(bool blocked)
-	{
-		foreach (var gate in GetTree().Root.GetChildren().OfType<PullTestGate>()) gate.Blocked = blocked;
-	}
-
 	MasterChallenge master = null!;
 
 	void ShowMaster()
@@ -104,12 +99,11 @@ public partial class Main
 		var floor = startFloor > 0 ? startFloor : progress.Levels.HighestFloor(current.Id, new LevelKey(discipline, towerLevel));
 		coinsAtStart = (current.Id, progress.Wallet.Balance(current.Id));
 		var run = new DungeonRun(new DungeonContext(rules, current.Id, discipline, tower, towerLevel, voice, settings, uiRoot,
-			progress, floors.Value!, forms.Value!, LoadRewards(), rewardService, current.Nickname, RoleName(discipline), towers, equipmentBonuses.ExtraEnergy, equipmentBonuses.InteractionReachBonus, ConfigureDungeonPlayer, random, floor, atFastTravel, ShowOverlay, shortcut, LoadConcepts(), ShowInventory, NewInventoryCount, ExpeditionCompleted, battleMechanics));
+			progress, floors.Value!, forms.Value!, LoadRewards(), rewardService, current.Nickname, RoleName(discipline), towers, equipmentBonuses.ExtraEnergy, equipmentBonuses.InteractionReachBonus, ConfigureDungeonPlayer, random, floor, atFastTravel, ShowOverlay, shortcut, LoadConcepts(), ShowInventory, NewInventoryCount, ExpeditionCompleted, battleMechanics, ShowSettings));
 		run.Left += LeaveDungeon;
 		dungeon = run;
 		inDungeon = true;
 
-		SetPullBlocked(true);
 		lobby.Visible = false;
 		lobby.ProcessMode = ProcessModeEnum.Disabled;
 		player.Visible = false;
@@ -123,7 +117,6 @@ public partial class Main
 	{
 		inDungeon = false;
 		dungeon = null;
-		SetPullBlocked(false);
 		lobby.ProcessMode = ProcessModeEnum.Inherit;
 		lobby.Visible = true;
 		lobby.Camera.MakeCurrent();

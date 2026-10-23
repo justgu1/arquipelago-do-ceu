@@ -3,13 +3,14 @@
     "allow": [
       "Bash(dotnet *)",
       "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git add*)", "Bash(git commit*)",
-      "Bash(git checkout*)", "Bash(git switch*)", "Bash(git branch*)", "Bash(git push -u origin*)",
-      "Bash(gh pr *)", "Bash(gh issue *)", "Bash(gh run *)",
-      "Bash(node *)", "Bash(npm *)", "Bash(npx *)",
+      "Bash(git checkout*)", "Bash(git switch*)", "Bash(git branch*)",
+      "Bash(gh pr view*)", "Bash(gh pr list*)", "Bash(gh pr diff*)", "Bash(gh pr checks*)",
+      "Bash(gh issue *)", "Bash(gh run *)",
+      "Bash(node *)",
       "PowerShell(dotnet *)", "PowerShell(git status*)", "PowerShell(git diff*)", "PowerShell(git log*)"
     ],
     "deny": [
-      "Bash(git push --force*)", "Bash(git push -f*)", "Bash(git reset --hard*)",
+      "Bash(git push --force*)", "Bash(git push -f*)", "Bash(git reset --hard*)", "Bash(gh pr merge*)",
       "Read(./.env)", "Read(./.env.*)"
     ]
   }

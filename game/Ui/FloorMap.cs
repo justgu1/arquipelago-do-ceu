@@ -124,6 +124,7 @@ public partial class FloorMap : Control
 		}
 
 		if (playerAt is { } live) DrawLive(live);
+		DrawCompass(font);
 		if (!complete) return;
 		DrawCircle(new Vector2(18, 18), 16, Colors.Black);
 		DrawCircle(new Vector2(18, 18), 14, Color.FromHtml("#FFD54F"));
@@ -131,6 +132,16 @@ public partial class FloorMap : Control
 	}
 
 	Sight SightOf(int room) => source?.SightOf(room) ?? Sight.Seen;
+
+	// A bússola no canto: o norte é o alto do mapa. A seta e a letra N dizem isso sem depender de cor.
+	void DrawCompass(Font font)
+	{
+		var at = new Vector2(Size.X - 26, 34);
+		DrawCircle(at, 17, new Color(0.18f, 0.15f, 0.25f, 0.85f));
+		DrawColoredPolygon([at + new Vector2(0, -12), at + new Vector2(5, 2), at + new Vector2(-5, 2)], Color.FromHtml("#F4D58D"));
+		DrawColoredPolygon([at + new Vector2(0, 12), at + new Vector2(5, 2), at + new Vector2(-5, 2)], Color.FromHtml("#8A8399"));
+		DrawString(font, at + new Vector2(-5, -17), "N", HorizontalAlignment.Left, -1, 13, Colors.White);
+	}
 
 	void DrawCheck(Vector2 at)
 	{

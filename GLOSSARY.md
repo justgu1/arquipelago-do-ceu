@@ -93,10 +93,6 @@ O comerciante do Lobby. Compra Equipamento da criança (em lote, nunca o vestido
 **Carga de rotação**:
 O que cada Expedição concluída (com ou sem Andares profundos) dá ao Mercador, no máximo uma. O botão Rotacionar gasta a carga. Nunca há relógio, "só hoje" nem contagem regressiva.
 
-**Pesca** (modo de teste, F9):
-Prática opcional em que a criança "puxa" sílabas com uma encenação (BOA/B) e confere desenhando a letra com traço neon. Não grava progresso e não integra a campanha; o Escriba do jogo continua desenhando as sílabas no Desenho livre.
-_Avoid_: Minijogo (é outra coisa, prevista para depois do MVP)
-
 **Dungeon**:
 O espaço de uma disciplina inteira, em forma de torre. Tem três Níveis, um por ano escolar.
 _Avoid_: Arquipélago, torre (como termo de regra)

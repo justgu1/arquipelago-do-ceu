@@ -3,7 +3,7 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// Os ícones das molduras (equipamento, Cosmético, moeda, cadeado), desenhados em SVG do mockup e rasterizados na hora, sem arquivos de
+// Os ícones das molduras (equipamento, Cosmético, moeda, cadeado), desenhados em SVG e rasterizados na hora, sem arquivos de
 // imagem: trocar por arte de verdade é trocar o texto do SVG. Sem ícone para o nome pedido, devolve nulo e a moldura fica só com o texto.
 public static class Icons
 {

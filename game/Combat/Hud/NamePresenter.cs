@@ -73,7 +73,7 @@ sealed class NamePresenter(NameBattle battle, Action<NameVerdict> checkedName, b
 
 	public bool TypesLetters => FreeDraw;
 
-	public string KeyHelp => FreeDraw ? "Desenhe as letras na tela, ou digite. Backspace apaga. Para andar, use as setas." : $"Teclado: 1 a {Math.Min(9, battle.Pieces.Count)} escolhem a peça. Backspace desfaz.";
+	public string KeyHelp => FreeDraw ? "Desenhe as letras na tela, ou aperte Enter para escrever com o teclado (Esc volta a andar com WASD)." : $"Teclado: 1 a {Math.Min(9, battle.Pieces.Count)} escolhem a peça. Backspace desfaz.";
 
 	public string? ExtraLabel => null;
 

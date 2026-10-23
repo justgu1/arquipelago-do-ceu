@@ -6,7 +6,7 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// A aba Inventário, como no mockup: as caixinhas em volta do Personagem, a biblioteca em grade (equipado, novo, bloqueado) e a comparação.
+// A aba Inventário: as caixinhas em volta do Personagem, a biblioteca em grade (equipado, novo, bloqueado) e a comparação.
 // Apontar, tocar ou focar mostra uma prévia; só o botão Equipar (ou Enter no equipamento focado) vale de verdade.
 public sealed partial class GearTab : Node
 {
