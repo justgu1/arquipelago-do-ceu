@@ -96,7 +96,7 @@ public partial class DungeonHud : Node
 		mapBox.AddChild(floorBar);
 		mapBox.AddChild(floorLabel);
 		mapBox.AddChild(UiKit.BigButton("Ouvir o mapa", () => MapSpeechRequested?.Invoke(), 200));
-		mapBox.AddChild(UiKit.BigButton("Abrir o mapa [M]", () => MapOpenRequested?.Invoke(), 200));
+		mapBox.AddChild(UiKit.BigButton(DeviceInfo.IsTouch ? "Abrir o mapa" : "Abrir o mapa [M]", () => MapOpenRequested?.Invoke(), 200));
 		panel.AddChild(mapBox);
 		hud.AddChild(panel);
 
@@ -143,7 +143,13 @@ public partial class DungeonHud : Node
 
 	public void RefreshDock() => dock.SetNewCount(ctx.NewInventoryItems?.Invoke() ?? 0);
 
-	public override void _Process(double delta) => dock.Visible = !InCombat();
+	// No celular o direcional fica na luta, para a criança desviar das bolhas; só os botões em volta somem.
+	public override void _Process(double delta)
+	{
+		var combat = InCombat();
+		dock.Visible = DeviceInfo.IsTouch || !combat;
+		dock.SetInCombat(combat && DeviceInfo.IsTouch);
+	}
 
 	// Aviso curto das moedas ("+3 moedas"): some sozinho e nunca bloqueia o jogo nem o combate.
 	void BuildCoinToast()
@@ -190,7 +196,7 @@ public partial class DungeonHud : Node
 	public void ShowPrompt(string? text)
 	{
 		interactButton.Visible = text is not null;
-		if (text is not null) interactButton.Text = text;
+		if (text is not null) interactButton.Text = DeviceInfo.IsTouch ? text.Replace(" [E]", "") : text;
 	}
 
 	// O botão do menu, ao lado do mapa: continuar, ajustes e voltar ao Lobby.

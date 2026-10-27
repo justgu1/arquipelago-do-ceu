@@ -56,7 +56,7 @@ public sealed class MissionLoader
 	}
 
 	// `source` é o nome do arquivo; vai nas mensagens de erro.
-	public Result<Mission> Parse(string source, string json)
+	public Result<Mission> Parse(string source, string json, bool validateSchema = true)
 	{
 		JsonDocument document;
 		try
@@ -69,7 +69,7 @@ public sealed class MissionLoader
 		}
 
 		using var _ = document;
-		var errors = SchemaErrors(document.RootElement);
+		var errors = validateSchema ? SchemaErrors(document.RootElement) : [];
 		if (errors.Count > 0) return Result<Mission>.Fail($"{source}: {string.Join("; ", errors)}");
 
 		Mission mission;
@@ -87,13 +87,13 @@ public sealed class MissionLoader
 			: Result<Mission>.Fail($"{source}: /mechanic: a Mecânica \"{mission.Mechanic}\" ainda não existe no jogo");
 	}
 
-	public MissionLoad Load(IEnumerable<(string Source, string Json)> files)
+	public MissionLoad Load(IEnumerable<(string Source, string Json)> files, bool validateSchema = true)
 	{
 		var missions = new List<Mission>();
 		var rejected = new List<RejectedMission>();
 		foreach (var (source, json) in files)
 		{
-			var parsed = Parse(source, json);
+			var parsed = Parse(source, json, validateSchema);
 			if (parsed.IsOk) missions.Add(parsed.Value!);
 			else rejected.Add(new RejectedMission(source, parsed.Error!));
 		}

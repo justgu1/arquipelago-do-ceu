@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://coc1bdwsueen0"
-path="res://.godot/imported/tinta-roxa_0.jpg-e92638169be60869acaee95171da0011.ctex"
+path.bptc="res://.godot/imported/tinta-roxa_0.jpg-e92638169be60869acaee95171da0011.bptc.ctex"
+path.astc="res://.godot/imported/tinta-roxa_0.jpg-e92638169be60869acaee95171da0011.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "f02e38edbb4c204c911c5c46a3da91db"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/criaturas/tinta-roxa_0.jpg"
-dest_files=["res://.godot/imported/tinta-roxa_0.jpg-e92638169be60869acaee95171da0011.ctex"]
+dest_files=["res://.godot/imported/tinta-roxa_0.jpg-e92638169be60869acaee95171da0011.bptc.ctex", "res://.godot/imported/tinta-roxa_0.jpg-e92638169be60869acaee95171da0011.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

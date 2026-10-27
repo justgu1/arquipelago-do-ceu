@@ -10,7 +10,12 @@ public static class MissionSource
 {
 	const string Root = "res://content";
 
-	public static MissionLoad Load()
+	static MissionLoad? loaded;
+
+	// Lida uma vez só: a luta, o Desafio mestre e a torre pedem as mesmas Missões.
+	public static MissionLoad Load() => loaded ??= Read();
+
+	static MissionLoad Read()
 	{
 		var schema = ReadText($"{Root}/mission.schema.json");
 		if (schema is null) return Failed($"Não foi possível ler {Root}/mission.schema.json.");
@@ -23,7 +28,8 @@ public static class MissionSource
 			if (ReadText(path) is { } text) files.Add((path, text));
 			else GD.PushWarning($"Não foi possível ler a Missão {path}.");
 
-		var load = loader.Value!.Load(files);
+		// O conteúdo do build já é conferido contra o schema na CI; validar de novo na abertura custava uns 11 s no celular.
+		var load = loader.Value!.Load(files, validateSchema: false);
 		foreach (var rejected in load.Rejected) GD.PushWarning($"Missão ignorada: {rejected.Reason}");
 		GD.Print($"Missões carregadas: {load.Missions.Count} ({load.Rejected.Count} ignoradas)");
 		return load;

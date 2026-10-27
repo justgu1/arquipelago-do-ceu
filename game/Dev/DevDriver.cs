@@ -25,7 +25,23 @@ public partial class DevDriver : Node
 		if (!ok) Failures++;
 	}
 
-	public string Arg(string name) => OS.GetCmdlineUserArgs().FirstOrDefault(a => a.StartsWith($"--{name}="))?[$"--{name}=".Length..] ?? "";
+	// No celular não há linha de comando: o piloto também lê user://driver.args (uma linha, escrita por adb run-as) e apaga o arquivo.
+	static string[]? userArgs;
+
+	static string[] UserArgs() => userArgs ??= ReadUserArgs();
+
+	static string[] ReadUserArgs()
+	{
+		var args = OS.GetCmdlineUserArgs();
+		const string path = "user://driver.args";
+		if (!Godot.FileAccess.FileExists(path)) return args;
+		using var file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
+		var fromFile = file.GetAsText().Split([' ', '\n', '\r'], System.StringSplitOptions.RemoveEmptyEntries);
+		DirAccess.RemoveAbsolute(path);
+		return [.. args, .. fromFile];
+	}
+
+	public string Arg(string name) => UserArgs().FirstOrDefault(a => a.StartsWith($"--{name}="))?[$"--{name}=".Length..] ?? "";
 
 	// Texto na tela, em rótulo da interface ou no balão 3D da criatura.
 	public bool HasVisible(string text) =>
@@ -34,7 +50,7 @@ public partial class DevDriver : Node
 
 	public static void AttachIfRequested(Node parent, PilotPort port)
 	{
-		var args = OS.GetCmdlineUserArgs();
+		var args = UserArgs();
 		var scenario = args.FirstOrDefault(a => a.StartsWith("--driver="))?["--driver=".Length..];
 		if (scenario is null || !OS.IsDebugBuild()) return;
 		var output = args.FirstOrDefault(a => a.StartsWith("--saida="))?["--saida=".Length..] ?? ".";
@@ -59,8 +75,8 @@ public partial class DevDriver : Node
 	public async Task Shot(string name)
 	{
 		await Wait(0.25);
-		// Sem janela (--headless) não há imagem para gravar.
-		if (DisplayServer.GetName() == "headless") return;
+		// Sem janela (--headless) ou no celular não há onde gravar a imagem.
+		if (DisplayServer.GetName() == "headless" || OS.HasFeature("mobile")) return;
 		GetViewport().GetTexture().GetImage().SavePng($"{outputDir}/{name}.png");
 	}
 

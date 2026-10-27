@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://jhc2sr8fyqpi"
-path="res://.godot/imported/history-v01_normal.png-6031decf9ad83b2a5bae5ca812f6d599.ctex"
+path.bptc="res://.godot/imported/history-v01_normal.png-6031decf9ad83b2a5bae5ca812f6d599.bptc.ctex"
+path.astc="res://.godot/imported/history-v01_normal.png-6031decf9ad83b2a5bae5ca812f6d599.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "3f8862962e0b6dcc78bf5a99c56d3d79"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/landmarks/history-v01_normal.png"
-dest_files=["res://.godot/imported/history-v01_normal.png-6031decf9ad83b2a5bae5ca812f6d599.ctex"]
+dest_files=["res://.godot/imported/history-v01_normal.png-6031decf9ad83b2a5bae5ca812f6d599.bptc.ctex", "res://.godot/imported/history-v01_normal.png-6031decf9ad83b2a5bae5ca812f6d599.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

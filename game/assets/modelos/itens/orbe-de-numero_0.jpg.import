@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bf645bjcgbnoy"
-path="res://.godot/imported/orbe-de-numero_0.jpg-2d2ce14e30c12eb23fd2fdf3d0f64c77.ctex"
+path.bptc="res://.godot/imported/orbe-de-numero_0.jpg-2d2ce14e30c12eb23fd2fdf3d0f64c77.bptc.ctex"
+path.astc="res://.godot/imported/orbe-de-numero_0.jpg-2d2ce14e30c12eb23fd2fdf3d0f64c77.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "ea398ab25600b17e60abb8d1a761aa1f"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/itens/orbe-de-numero_0.jpg"
-dest_files=["res://.godot/imported/orbe-de-numero_0.jpg-2d2ce14e30c12eb23fd2fdf3d0f64c77.ctex"]
+dest_files=["res://.godot/imported/orbe-de-numero_0.jpg-2d2ce14e30c12eb23fd2fdf3d0f64c77.bptc.ctex", "res://.godot/imported/orbe-de-numero_0.jpg-2d2ce14e30c12eb23fd2fdf3d0f64c77.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

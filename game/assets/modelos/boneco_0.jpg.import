@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://duda2fntjvvrj"
-path="res://.godot/imported/boneco_0.jpg-cc972e433935e1c4437991abcabfef05.ctex"
+path.bptc="res://.godot/imported/boneco_0.jpg-cc972e433935e1c4437991abcabfef05.bptc.ctex"
+path.astc="res://.godot/imported/boneco_0.jpg-cc972e433935e1c4437991abcabfef05.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "32424d13fcfeedb3d4705926208d2d66"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/boneco_0.jpg"
-dest_files=["res://.godot/imported/boneco_0.jpg-cc972e433935e1c4437991abcabfef05.ctex"]
+dest_files=["res://.godot/imported/boneco_0.jpg-cc972e433935e1c4437991abcabfef05.bptc.ctex", "res://.godot/imported/boneco_0.jpg-cc972e433935e1c4437991abcabfef05.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bbej1cw7h0kak"
-path="res://.godot/imported/placa-de-letra_0.jpg-2e16fc8f9144a6083768d820c8c8de7c.ctex"
+path.bptc="res://.godot/imported/placa-de-letra_0.jpg-2e16fc8f9144a6083768d820c8c8de7c.bptc.ctex"
+path.astc="res://.godot/imported/placa-de-letra_0.jpg-2e16fc8f9144a6083768d820c8c8de7c.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "53c5aefe5bda28b3736713fbb156e658"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/itens/placa-de-letra_0.jpg"
-dest_files=["res://.godot/imported/placa-de-letra_0.jpg-2e16fc8f9144a6083768d820c8c8de7c.ctex"]
+dest_files=["res://.godot/imported/placa-de-letra_0.jpg-2e16fc8f9144a6083768d820c8c8de7c.bptc.ctex", "res://.godot/imported/placa-de-letra_0.jpg-2e16fc8f9144a6083768d820c8c8de7c.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

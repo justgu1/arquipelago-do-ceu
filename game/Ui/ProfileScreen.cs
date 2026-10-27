@@ -36,6 +36,14 @@ public partial class ProfileScreen : Control
 		ShowHome();
 	}
 
+	// O teclado virtual do celular cobre a metade de baixo; a tela encolhe e o cartão sobe junto, em vez de ficar atrás dele.
+	public override void _Process(double delta)
+	{
+		var window = DisplayServer.WindowGetSize().Y;
+		var inset = window > 0 ? DisplayServer.VirtualKeyboardGetHeight() * GetViewportRect().Size.Y / window : 0;
+		OffsetBottom = -inset;
+	}
+
 	// Sem nenhum Perfil só dá para criar; com algum, a criança escolhe.
 	public void ShowHome()
 	{

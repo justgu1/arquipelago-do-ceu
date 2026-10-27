@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c06m8m1y8il1q"
-path="res://.godot/imported/papel-fantasma_0.jpg-dee78adaa8b9076b9dab74b4dd51ecde.ctex"
+path.bptc="res://.godot/imported/papel-fantasma_0.jpg-dee78adaa8b9076b9dab74b4dd51ecde.bptc.ctex"
+path.astc="res://.godot/imported/papel-fantasma_0.jpg-dee78adaa8b9076b9dab74b4dd51ecde.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "90db3b1890e42d4990b4aa323a4dffb0"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/criaturas/papel-fantasma_0.jpg"
-dest_files=["res://.godot/imported/papel-fantasma_0.jpg-dee78adaa8b9076b9dab74b4dd51ecde.ctex"]
+dest_files=["res://.godot/imported/papel-fantasma_0.jpg-dee78adaa8b9076b9dab74b4dd51ecde.bptc.ctex", "res://.godot/imported/papel-fantasma_0.jpg-dee78adaa8b9076b9dab74b4dd51ecde.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

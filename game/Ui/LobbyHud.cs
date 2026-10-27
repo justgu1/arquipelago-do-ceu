@@ -14,6 +14,7 @@ public partial class LobbyHud : Control
 	readonly Label notice = BookStyle.Text("", 18);
 	readonly Button interact = BookStyle.Button("", () => { }, "Interact");
 	readonly PanelContainer context;
+	readonly Control topRight;
 	string interaction = "";
 
 	public LobbyHud(Action<string> speak)
@@ -28,7 +29,8 @@ public partial class LobbyHud : Control
 		Dock.RoleSwitchRequested += () => RoleSwitchRequested?.Invoke();
 		context = BuildContext();
 		AddChild(card);
-		AddChild(BuildTopRight());
+		topRight = BuildTopRight();
+		AddChild(topRight);
 		AddChild(Dock);
 		AddChild(context);
 		interact.Pressed += () => InteractRequested?.Invoke();
@@ -65,13 +67,21 @@ public partial class LobbyHud : Control
 
 	public void SetInteraction(string? text)
 	{
-		interaction = text ?? "";
+		// A tecla entre colchetes é dica de teclado; no celular só atrapalha.
+		interaction = DeviceInfo.IsTouch ? (text ?? "").Replace(" [E]", "") : text ?? "";
 		interact.Text = interaction;
 		UpdateContext();
 	}
 
 	// Com uma luta aberta ou fora do jogo livre, o HUD some; a luta tem a própria tela.
-	public void SetPlayState(bool enabled) => Visible = enabled;
+	// No celular o direcional fica na luta de treino, para desviar das bolhas; só os botões em volta e o resto do HUD somem.
+	public void SetPlayState(bool enabled, bool fighting = false)
+	{
+		var keepStick = fighting && DeviceInfo.IsTouch;
+		Visible = enabled || keepStick;
+		card.Visible = topRight.Visible = context.Visible = !keepStick;
+		Dock.SetInCombat(keepStick);
+	}
 
 	Control BuildTopRight()
 	{

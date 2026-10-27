@@ -38,12 +38,22 @@ public partial class Player : Node3D
 		get => enabled;
 		set
 		{
+			if (enabled != value) CountEnabled(value);
 			enabled = value;
 			if (!value) mover.Stop();
 		}
 	}
 
 	bool enabled;
+	static int enabledCount;
+
+	static void CountEnabled(bool on) => enabledCount += on ? 1 : -1;
+
+	// O direcional do toque só aparece enquanto algum Personagem pode andar, e não com uma tela aberta por cima.
+	public static bool AnyEnabled => enabledCount > 0;
+
+	// No celular o Personagem anda pelo direcional; tocar no chão para andar é impreciso e fica desligado.
+	public static bool TapToWalk { get; set; } = true;
 	Vector2? faceTarget;
 
 	public bool IsWalkingAnimation => view.IsWalkingAnimation;
@@ -116,11 +126,11 @@ public partial class Player : Node3D
 				view.ToggleCapeMode();
 				GetViewport().SetInputAsHandled();
 				break;
-			case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } click:
+			case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } click when TapToWalk:
 				WalkTo(click.Position);
 				break;
 			// Com o toque também chega um clique emulado; os dois levam ao mesmo ponto, então não atrapalha.
-			case InputEventScreenTouch { Pressed: true } touch when !Controls.Pinching:
+			case InputEventScreenTouch { Pressed: true } touch when TapToWalk && !Controls.Pinching:
 				WalkTo(touch.Position);
 				break;
 		}
