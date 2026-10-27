@@ -34,12 +34,16 @@ public sealed class RootUi
 
 	public Label Notice { get; }
 
-	public void Fit(Viewport viewport, float textScale, bool compensateStretch)
+	// Os recortes e os cantos arredondados vêm em pixels da janela; a raiz encolhe por eles para nada importante ficar escondido.
+	public void Fit(Viewport viewport, float textScale, bool compensateStretch, ArquipelagoDoCeu.Touch.Insets? insets = null)
 	{
 		var stretch = Mathf.Max(.1f, viewport.GetFinalTransform().Scale.X);
 		var effectiveScale = compensateStretch ? textScale / stretch : textScale;
+		var margin = insets is null ? Vector2.Zero : new Vector2(insets.Left, insets.Top) / stretch;
+		var opposite = insets is null ? Vector2.Zero : new Vector2(insets.Right, insets.Bottom) / stretch;
 		Root.Scale = Vector2.One * effectiveScale;
-		Root.Size = viewport.GetVisibleRect().Size / effectiveScale;
+		Root.Position = margin;
+		Root.Size = (viewport.GetVisibleRect().Size - margin - opposite) / effectiveScale;
 	}
 }
 

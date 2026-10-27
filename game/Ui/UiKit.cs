@@ -7,7 +7,7 @@ namespace ArquipelagoDoCeu;
 // painel escuro com borda dourada, texto grande e alvos de toque de pelo menos 72 px.
 public static partial class UiKit
 {
-	public static int MinTouch => 44;
+	public static int MinTouch => DeviceInfo.IsTouch ? 64 : 44;
 	public static int BodyFont => 20;
 	public static Color TextColor => BookStyle.Ink;
 	public static StyleBoxFlat Surface() => BookStyle.Box();
