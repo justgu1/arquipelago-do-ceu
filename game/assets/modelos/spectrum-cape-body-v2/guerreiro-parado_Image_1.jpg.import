@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dyt45k082obep"
-path="res://.godot/imported/guerreiro-parado_Image_1.jpg-ec6c7723701e4ac85f96427b6991b2c1.ctex"
+path.bptc="res://.godot/imported/guerreiro-parado_Image_1.jpg-ec6c7723701e4ac85f96427b6991b2c1.bptc.ctex"
+path.astc="res://.godot/imported/guerreiro-parado_Image_1.jpg-ec6c7723701e4ac85f96427b6991b2c1.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "ce518135d7165cfa6b46b0c302bc1b16"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/spectrum-cape-body-v2/guerreiro-parado_Image_1.jpg"
-dest_files=["res://.godot/imported/guerreiro-parado_Image_1.jpg-ec6c7723701e4ac85f96427b6991b2c1.ctex"]
+dest_files=["res://.godot/imported/guerreiro-parado_Image_1.jpg-ec6c7723701e4ac85f96427b6991b2c1.bptc.ctex", "res://.godot/imported/guerreiro-parado_Image_1.jpg-ec6c7723701e4ac85f96427b6991b2c1.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

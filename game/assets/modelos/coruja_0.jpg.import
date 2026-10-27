@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ccdg0nio80j3a"
-path="res://.godot/imported/coruja_0.jpg-230e88c9d57f03010df1bd14ca89b78f.ctex"
+path.bptc="res://.godot/imported/coruja_0.jpg-230e88c9d57f03010df1bd14ca89b78f.bptc.ctex"
+path.astc="res://.godot/imported/coruja_0.jpg-230e88c9d57f03010df1bd14ca89b78f.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "c225c607c8cc59edae2f49daf0f51711"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/coruja_0.jpg"
-dest_files=["res://.godot/imported/coruja_0.jpg-230e88c9d57f03010df1bd14ca89b78f.ctex"]
+dest_files=["res://.godot/imported/coruja_0.jpg-230e88c9d57f03010df1bd14ca89b78f.bptc.ctex", "res://.godot/imported/coruja_0.jpg-230e88c9d57f03010df1bd14ca89b78f.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://8rg3eqv6082d"
-path="res://.godot/imported/botanic-v01_Image_2.jpg-3670f7d6936ccc46e974fafa1c7c8b07.ctex"
+path.bptc="res://.godot/imported/botanic-v01_Image_2.jpg-3670f7d6936ccc46e974fafa1c7c8b07.bptc.ctex"
+path.astc="res://.godot/imported/botanic-v01_Image_2.jpg-3670f7d6936ccc46e974fafa1c7c8b07.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "4033de359a8d4e52869e8ea930f41378"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/landmarks/botanic-v01_Image_2.jpg"
-dest_files=["res://.godot/imported/botanic-v01_Image_2.jpg-3670f7d6936ccc46e974fafa1c7c8b07.ctex"]
+dest_files=["res://.godot/imported/botanic-v01_Image_2.jpg-3670f7d6936ccc46e974fafa1c7c8b07.bptc.ctex", "res://.godot/imported/botanic-v01_Image_2.jpg-3670f7d6936ccc46e974fafa1c7c8b07.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

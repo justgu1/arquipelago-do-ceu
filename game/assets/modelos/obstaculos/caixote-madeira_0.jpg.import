@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b7pkfysfqh4k1"
-path="res://.godot/imported/caixote-madeira_0.jpg-d0fff1c327809c65d4759f527e76d538.ctex"
+path.bptc="res://.godot/imported/caixote-madeira_0.jpg-d0fff1c327809c65d4759f527e76d538.bptc.ctex"
+path.astc="res://.godot/imported/caixote-madeira_0.jpg-d0fff1c327809c65d4759f527e76d538.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "b88c9bc3bfd6098ce127e0c3b4fc68d5"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/obstaculos/caixote-madeira_0.jpg"
-dest_files=["res://.godot/imported/caixote-madeira_0.jpg-d0fff1c327809c65d4759f527e76d538.ctex"]
+dest_files=["res://.godot/imported/caixote-madeira_0.jpg-d0fff1c327809c65d4759f527e76d538.bptc.ctex", "res://.godot/imported/caixote-madeira_0.jpg-d0fff1c327809c65d4759f527e76d538.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

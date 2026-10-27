@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dm76gvakn3k8p"
-path="res://.godot/imported/automato-base_0.jpg-8e759b6925cead63ddaf5c9880ed5c28.ctex"
+path.bptc="res://.godot/imported/automato-base_0.jpg-8e759b6925cead63ddaf5c9880ed5c28.bptc.ctex"
+path.astc="res://.godot/imported/automato-base_0.jpg-8e759b6925cead63ddaf5c9880ed5c28.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "f17d2b8258c377afd4da02dbbd7e623c"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/criaturas/automato-base_0.jpg"
-dest_files=["res://.godot/imported/automato-base_0.jpg-8e759b6925cead63ddaf5c9880ed5c28.ctex"]
+dest_files=["res://.godot/imported/automato-base_0.jpg-8e759b6925cead63ddaf5c9880ed5c28.bptc.ctex", "res://.godot/imported/automato-base_0.jpg-8e759b6925cead63ddaf5c9880ed5c28.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

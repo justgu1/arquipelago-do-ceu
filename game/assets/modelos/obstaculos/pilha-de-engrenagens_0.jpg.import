@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c8bkh17u7k28i"
-path="res://.godot/imported/pilha-de-engrenagens_0.jpg-6c7debc3963768bf2adbb3ffa9593758.ctex"
+path.bptc="res://.godot/imported/pilha-de-engrenagens_0.jpg-6c7debc3963768bf2adbb3ffa9593758.bptc.ctex"
+path.astc="res://.godot/imported/pilha-de-engrenagens_0.jpg-6c7debc3963768bf2adbb3ffa9593758.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "4349451710c03e397e251fd026ae1937"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/obstaculos/pilha-de-engrenagens_0.jpg"
-dest_files=["res://.godot/imported/pilha-de-engrenagens_0.jpg-6c7debc3963768bf2adbb3ffa9593758.ctex"]
+dest_files=["res://.godot/imported/pilha-de-engrenagens_0.jpg-6c7debc3963768bf2adbb3ffa9593758.bptc.ctex", "res://.godot/imported/pilha-de-engrenagens_0.jpg-6c7debc3963768bf2adbb3ffa9593758.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

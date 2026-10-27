@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ctjq5l8mcucqp"
-path="res://.godot/imported/livro-com-pernas_0.jpg-d5c49cc49fd9f0c3c27472dfcd227e8f.ctex"
+path.bptc="res://.godot/imported/livro-com-pernas_0.jpg-d5c49cc49fd9f0c3c27472dfcd227e8f.bptc.ctex"
+path.astc="res://.godot/imported/livro-com-pernas_0.jpg-d5c49cc49fd9f0c3c27472dfcd227e8f.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "ba01560ceba44314a736a63240a307a1"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/criaturas/livro-com-pernas_0.jpg"
-dest_files=["res://.godot/imported/livro-com-pernas_0.jpg-d5c49cc49fd9f0c3c27472dfcd227e8f.ctex"]
+dest_files=["res://.godot/imported/livro-com-pernas_0.jpg-d5c49cc49fd9f0c3c27472dfcd227e8f.bptc.ctex", "res://.godot/imported/livro-com-pernas_0.jpg-d5c49cc49fd9f0c3c27472dfcd227e8f.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
