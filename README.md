@@ -32,7 +32,7 @@ docs/
 
 ## Ambiente
 
-Para rodar o jogo: .NET SDK 8, Godot 4.7.2 (versão .NET) e Node LTS (validação do schema das missões). A variável `GODOT` deve apontar para o executável de console do Godot. O backend não faz parte deste repositório.
+Para rodar o jogo: .NET SDK 9, Godot 4.7.2 (versão .NET) e Node LTS (validação do schema das missões). A variável `GODOT` deve apontar para o executável de console do Godot. O backend não faz parte deste repositório.
 
 ### Como rodar
 
