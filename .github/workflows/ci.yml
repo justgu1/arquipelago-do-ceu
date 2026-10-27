@@ -120,9 +120,9 @@ jobs:
           New-Item -ItemType Directory build -Force | Out-Null
           & $env:GODOT --headless --path game --import
           $log = & $env:GODOT --headless --path game --export-release "Windows Desktop" 2>&1 | ForEach-Object { $linha = "$_"; Write-Host $linha; $linha }
-          # O Godot termina com saída 0 e gera o executável mesmo quando a exportação deu erro
-          # (por exemplo, sem o .sln o código C# fica de fora); por isso a saída também é conferida.
-          if ($LASTEXITCODE -ne 0 -or ($log -match '^ERROR:') -or -not (Test-Path build/ArquipelagoDoCeu.exe)) { Write-Error "A exportação falhou."; exit 1 }
+          # O Godot sai com 0 e gera o executável mesmo com erro na exportação (sem o .sln, o C# fica de fora);
+          # por isso a saída é conferida, menos o aviso do plugin de Android em modo headless.
+          if ($LASTEXITCODE -ne 0 -or ($log | Where-Object { $_ -match '^ERROR:' -and $_ -notmatch 'shutdown_adb_on_exit' }) -or -not (Test-Path build/ArquipelagoDoCeu.exe)) { Write-Error "A exportação falhou."; exit 1 }
       - name: Abrir o executável exportado
         run: |
           Get-ChildItem build -Recurse | ForEach-Object { $_.FullName.Replace("$PWD\", "") }
@@ -169,7 +169,7 @@ jobs:
           New-Item -ItemType Directory build-e2e -Force | Out-Null
           & $env:GODOT --headless --path game --import
           $log = & $env:GODOT --headless --path game --export-debug "Windows Desktop" "../build-e2e/ArquipelagoDoCeu.exe" 2>&1 | ForEach-Object { $linha = "$_"; Write-Host $linha; $linha }
-          if ($LASTEXITCODE -ne 0 -or ($log -match '^ERROR:') -or -not (Test-Path build-e2e/ArquipelagoDoCeu.console.exe)) { Write-Error "A exportação falhou."; exit 1 }
+          if ($LASTEXITCODE -ne 0 -or ($log | Where-Object { $_ -match '^ERROR:' -and $_ -notmatch 'shutdown_adb_on_exit' }) -or -not (Test-Path build-e2e/ArquipelagoDoCeu.console.exe)) { Write-Error "A exportação falhou."; exit 1 }
       - name: Teste de ponta a ponta no executável (criar Perfil, andar, treinar nos dois Papéis, fechar e reabrir)
         run: |
           $save = Join-Path $PWD "e2e-save.json"
