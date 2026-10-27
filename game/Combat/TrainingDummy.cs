@@ -62,7 +62,7 @@ public partial class TrainingDummy : Node3D
 	public void SetRequest(string? text)
 	{
 		request = text;
-		shieldLabel.FontSize = text is null ? 96 : 200;
+		shieldLabel.FontSize = DeviceInfo.IsTouch ? (text is null ? 80 : 140) : (text is null ? 96 : 200);
 		UpdateCaption();
 	}
 	int startingShield = 1;
@@ -119,7 +119,11 @@ public partial class TrainingDummy : Node3D
 		body.AddChild(ring);
 		mist.MaterialOverride = mistMaterial;
 		shieldLabel.Position = new Vector3(ground.X, top + 2.3f, ground.Z);
-		popup.Position = new Vector3(ground.X, top + 3.3f, ground.Z);
+		// No celular o texto da criatura é maior em relação à tela: o aviso sobe mais e quebra em linhas mais curtas, para não cobrir o escudo.
+		var phone = DeviceInfo.IsTouch;
+		popup.FontSize = phone ? 56 : 72;
+		popup.Width = phone ? 520f : 640f;
+		popup.Position = new Vector3(ground.X, top + (phone ? 4.3f : 3.3f), ground.Z);
 		body.AddChild(mist);
 		body.AddChild(shieldLabel);
 		foreach (var label in new Label3D[] { shieldLabel, popup, creatureMark }) label.AddToGroup(CameraController.LabelGroup);
