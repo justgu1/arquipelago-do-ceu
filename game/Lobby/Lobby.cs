@@ -56,19 +56,29 @@ public partial class Lobby : Node3D, ICombatStage
 	public override void _Ready()
 	{
 		BuildMap();
+		Startup.Mark("  Lobby: mapa");
 		Grid = new HexGrid(tiles.Keys.Select(c => new HexCell(c.X, c.Y)), BlockedCells());
 		AddEnvironment();
 		AddCamera();
 		AddDepthOfField();
 		AddTerrain();
+		Startup.Mark("  Lobby: terreno");
 		AddIslandKit();
+		Startup.Mark("  Lobby: ilhas");
 		AddBridges();
 		AddLote02Details();
+		Startup.Mark("  Lobby: pontes e detalhes");
 		AddTrees();
+		Startup.Mark("  Lobby: árvores");
 		AddObjects();
+		Startup.Mark("  Lobby: objetos");
 		AddPlaces();
+		Startup.Mark("  Lobby: lugares e torres");
 		AddConceptWaterfall();
 		AddLamps();
+		Startup.Mark("  Lobby: cachoeira e lâmpadas");
+		InstanceStatic();
+		Startup.Mark("  Lobby: instanciação em lote");
 	}
 
 	// Hexágono "flat-top": vértices à esquerda e à direita.
@@ -155,6 +165,7 @@ public partial class Lobby : Node3D, ICombatStage
 		{
 			var tree = scene.Instantiate<Node3D>();
 			AddChild(tree);
+			treeRoots.Add(tree);
 			tree.Scale = Vector3.One * 1.4f;
 			PlaceOnGround(tree, HexToWorld(spot.X, spot.Y));
 		}
