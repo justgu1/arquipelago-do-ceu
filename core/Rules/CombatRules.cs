@@ -22,6 +22,9 @@ public sealed record CombatRules(int HandSize, IReadOnlyList<int> BagNumbers, in
 
 	public FreeDrawRules FreeDraw { get; init; } = FreeDrawRules.Default;
 
+	// O combate em duas camadas (ADR 0009), em protótipo: só vale com a chave de desenvolvimento ligada.
+	public FogRules Fog { get; init; } = FogRules.Default;
+
 	// O que o desenho de uma conta pode usar neste Nível: os sinais e o número de parcelas.
 	public MathLevel MathLevel => new(Operators, MaxTerms);
 
@@ -47,7 +50,7 @@ sealed record BubbleDto(float? IntervalSeconds, float? WarningSeconds, float? Sp
 
 sealed record TracingDto(int? DotSpacing, float? Tolerance, float? MinCoverage, float? MaxStray);
 
-sealed record CombatDto(int? HandSize, int[]? BagNumbers, int? BagCopies, float? SlowTimeScale, float? TargetRange, string[]? Operators, TracingDto? Tracing, int? MistakesForHint, float? PrankSeconds, EnergyDto? Energy, BubbleDto? Bubble, RhythmDto? Rhythm, MovementDto? Movement, YearBagDto[]? Years, int? MaxTerms, FreeDrawDto? FreeDraw);
+sealed record CombatDto(int? HandSize, int[]? BagNumbers, int? BagCopies, float? SlowTimeScale, float? TargetRange, string[]? Operators, TracingDto? Tracing, int? MistakesForHint, float? PrankSeconds, EnergyDto? Energy, BubbleDto? Bubble, RhythmDto? Rhythm, MovementDto? Movement, YearBagDto[]? Years, int? MaxTerms, FreeDrawDto? FreeDraw, FogDto? Fog = null);
 
 static class CombatChecks
 {
@@ -79,7 +82,7 @@ static class CombatChecks
 		if (combat.Operators.Length == 0) return "Regras inválidas: 'combat.operators' precisa de ao menos um sinal.";
 		if (combat.Operators.Any(o => !SupportedOperators.Contains(o)))
 			return $"Regras inválidas: 'combat.operators' só aceita {string.Join(", ", SupportedOperators)} por enquanto (veio {string.Join(", ", combat.Operators)}).";
-		return CheckTracing(combat.Tracing) ?? CheckFeedback(combat) ?? CheckEnergy(combat.Energy) ?? CheckBubble(combat.Bubble) ?? RhythmChecks.Check(combat.Rhythm) ?? MovementChecks.Check(combat.Movement) ?? CheckYears(combat) ?? CheckTerms(combat.MaxTerms, "combat.maxTerms") ?? FreeDrawChecks.Check(combat.FreeDraw);
+		return CheckTracing(combat.Tracing) ?? CheckFeedback(combat) ?? CheckEnergy(combat.Energy) ?? CheckBubble(combat.Bubble) ?? RhythmChecks.Check(combat.Rhythm) ?? MovementChecks.Check(combat.Movement) ?? CheckYears(combat) ?? CheckTerms(combat.MaxTerms, "combat.maxTerms") ?? FreeDrawChecks.Check(combat.FreeDraw) ?? FogChecks.Check(combat.Fog);
 	}
 
 
@@ -166,6 +169,7 @@ static class CombatChecks
 		{
 			MaxTerms = combat.MaxTerms ?? 2,
 			FreeDraw = FreeDrawChecks.Build(combat.FreeDraw),
+			Fog = FogChecks.Build(combat.Fog),
 		};
 
 	static string Required(string field) => $"Regras inválidas: o campo '{field}' é obrigatório.";
