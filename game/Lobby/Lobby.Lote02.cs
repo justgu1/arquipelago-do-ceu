@@ -13,8 +13,10 @@ public partial class Lobby
 	readonly Dictionary<int, Material> pathMaterials = new();
 	readonly List<Node3D> lote02Roots = new();
 
-	// O chão do Lobby é plano: as pontes entre as ilhas e os corredores da Dungeon ficam rentes ao chão.
-	public float GroundHeight(Point p) => 0f;
+	// O chão do Lobby é plano; só o piso em arco das pontes sobe, e o Personagem anda sobre ele.
+	readonly List<(Point Center, Point Direction)> bridgeDeck = new();
+
+	public float GroundHeight(Point p) => BridgeDeck.Height(bridgeDeck, p);
 
 	Node3D AddLote02(string asset, Vector3 position, Vector3? scale = null, float yaw = 0f)
 	{

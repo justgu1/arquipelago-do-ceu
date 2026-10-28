@@ -166,6 +166,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 
 		var kind = floor.Rooms[roomId].Kind;
 		ShowCreatureModel(roomId);
+		corridorDeck.Clear();
 		var walkable = new HashSet<HexCell>(here.Cells.Select(Local));
 		var blocked = new HashSet<HexCell>();
 		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
@@ -193,7 +194,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 
 			walkable.UnionWith(cells);
 			corridors.UnionWith(cells);
-			if (!CorridorKit.Add(room, cells)) RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false);
+			if (CorridorKit.Add(room, cells)) corridorDeck.AddRange(CorridorKit.Deck(cells));
+			else RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false);
 			walkable.UnionWith(other.Cells.Select(Local));
 			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor));
 			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
@@ -239,12 +241,15 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		return found?.Room;
 	}
 
-	// A altura do chão sob o ponto (só o desnível tem altura).
+	// A altura do chão sob o ponto: o desnível da Sala e o arco do piso dos corredores.
 	public float HeightAt(System.Numerics.Vector2 ground)
 	{
 		var cell = HexGrid.FromWorld(ground) + spot;
-		return layout?.RoomAt(cell) is { } placed ? placed.HeightAt(cell) : 0f;
+		return (layout?.RoomAt(cell) is { } placed ? placed.HeightAt(cell) : 0f) + BridgeDeck.Height(corridorDeck, ground);
 	}
+
+	// Os pisos em arco dos corredores da Sala de agora, no chão local.
+	readonly List<(System.Numerics.Vector2 Center, System.Numerics.Vector2 Direction)> corridorDeck = new();
 
 	// Os cantos da Sala de agora e das portas, no chão (x, z), para a câmera enquadrar tudo sem cortar nada.
 	public IEnumerable<System.Numerics.Vector2> Bounds() =>

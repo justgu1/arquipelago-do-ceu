@@ -45,6 +45,7 @@ public partial class LobbyAmbience : Node3D
 				if (mesh.GetActiveMaterial(i) is not BaseMaterial3D original) continue;
 				var material = new ShaderMaterial { Shader = GD.Load<Shader>(portal ? "res://Lobby/portal_energy.gdshader" : "res://Lobby/guide_idle.gdshader") };
 				material.SetShaderParameter("albedo_tex", original.AlbedoTexture);
+				material.SetShaderParameter("albedo_color", original.AlbedoColor);
 				if (portal) material.SetShaderParameter("paint_tex", GD.Load<Texture2D>("res://Lobby/portal_paint.png"));
 				mesh.SetSurfaceOverrideMaterial(i, material);
 				materials.Add(material);

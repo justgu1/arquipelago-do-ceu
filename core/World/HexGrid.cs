@@ -37,9 +37,12 @@ public sealed class HexGrid
 	readonly HashSet<HexCell> blocked;
 	readonly Func<Vector2, bool>? pointAllowed;
 	readonly Func<HexCell, HexCell, bool>? edgeAllowed;
+	readonly IReadOnlyDictionary<HexCell, float> props;
 
-	public HexGrid(IEnumerable<HexCell> cells, IEnumerable<HexCell> blocked, Func<Vector2, bool>? pointAllowed = null, Func<HexCell, HexCell, bool>? edgeAllowed = null)
+	public HexGrid(IEnumerable<HexCell> cells, IEnumerable<HexCell> blocked, Func<Vector2, bool>? pointAllowed = null, Func<HexCell, HexCell, bool>? edgeAllowed = null,
+		IReadOnlyDictionary<HexCell, float>? props = null)
 	{
+		this.props = props ?? new Dictionary<HexCell, float>();
 		this.pointAllowed = pointAllowed;
 		this.edgeAllowed = edgeAllowed;
 		this.cells = [.. cells];
@@ -134,7 +137,13 @@ public sealed class HexGrid
 	}
 
 	// Livre para um corpo de certo raio: o centro e quatro pontos em volta estão em hexágonos livres.
-	bool IsFreePoint(Vector2 point) => IsWalkable(FromWorld(point)) && (pointAllowed?.Invoke(point) ?? true);
+	// Um obstáculo redondo (árvore, torre) bloqueia o hexágono para o caminho, mas deixa o corpo chegar rente a ele: só o círculo é parede.
+	bool IsFreePoint(Vector2 point)
+	{
+		var cell = FromWorld(point);
+		var open = props.TryGetValue(cell, out var radius) ? cells.Contains(cell) && Vector2.Distance(point, ToWorld(cell)) > radius : IsWalkable(cell);
+		return open && (pointAllowed?.Invoke(point) ?? true);
+	}
 
 	public bool IsFree(Vector2 point, float radius) =>
 		IsFreePoint(point)

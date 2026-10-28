@@ -31,7 +31,7 @@ public partial class Main
 		get
 		{
 			if (current is null) return new EquipmentLoadout();
-			return EquipmentLooks.For(gear.Get(current.Id, role), inventory.WornLooks(current.Id));
+			return EquipmentLooks.For(gear.Get(current.Id, role), inventory.WornLooks(current.Id), role);
 		}
 	}
 

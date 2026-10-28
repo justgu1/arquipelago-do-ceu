@@ -40,6 +40,8 @@ public partial class Main : Node3D
 	Lobby lobby = null!;
 	Player player = null!;
 	string? interactTarget;
+	// Entrar no portal ou na porta de uma torre a pé já as ativa; o botão e a tecla E continuam valendo.
+	readonly EntryTrigger entry = new(1.2f, 2f);
 	float uiScale = 1f;
 	TrainingDummy dummy = null!;
 
@@ -305,6 +307,13 @@ public partial class Main : Node3D
 		};
 	}
 
+	void StepThroughThresholds()
+	{
+		var thresholds = lobby.Interactables.Where(i => i.Id is "portal" or "mestre" || i.Id.StartsWith("torre-", StringComparison.Ordinal)).ToList();
+		if (!player.Enabled) entry.Settle(player.GroundPosition, thresholds);
+		else if (entry.Step(player.GroundPosition, thresholds) is { } id) Interact(id);
+	}
+
 	public override void _ExitTree() => Engine.TimeScale = 1.0;
 
 	GodotSpeechEngine speech = null!;
@@ -379,6 +388,7 @@ public partial class Main : Node3D
 			? InteractionFinder.Nearest(player.GroundPosition, lobby.Interactables, rules.Lobby.InteractionReach + equipmentBonuses.InteractionReachBonus)?.Id
 			: null;
 		training.CheckRange();
+		StepThroughThresholds();
 		if (target != interactTarget)
 		{
 			interactTarget = target;

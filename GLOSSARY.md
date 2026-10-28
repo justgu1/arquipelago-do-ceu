@@ -73,6 +73,30 @@ O que fica na tela durante a luta, sem painel que abra por cima. Hoje é só a E
 A criança escreve números, sinais e letras em qualquer lugar da tela, com a cena visível. O jogo reconhece sozinho, sem IA e sem rede, comparando com as Trilhas; levantar o dedo e esperar cerca de 0,8 s fecha o desenho, e o fim dele ataca (não há botão Atacar). Enquanto ela desenha o mundo fica em 0,3× e o Personagem anda no tempo normal. Ambiguidade nunca custa Energia: o jogo pede para escrever de novo.
 _Avoid_: Traçado guiado, reconhecimento de escrita (sugere IA)
 
+**Névoa**:
+A vida da criatura no combate em duas camadas (ADR 0009, a validar num protótipo). Os Ataques básicos a dissolvem, sem violência. Fica dividida em Etapas. Não é a Bolha de névoa (o ataque lento da criatura) nem o escudo numérico dos Autômatos da Matemática.
+_Avoid_: Vida, HP, Guarda, Escudo (escudo é o número da criatura)
+
+**Etapa**:
+Cada instância de dano da Névoa. Uma criatura comum tem 2 (a do meio e a final), o Desafio épico e o Guardião do Nível têm 3, igual nos três Níveis. Zerar a Etapa abre o QTE: passar encerra a Etapa de vez e a luta avança; falhar devolve uma fração da Névoa dela (em dados, cerca de metade).
+_Avoid_: Fase, round
+
+**Ataque básico**:
+Um dos três ataques que tiram a Névoa: Precisa, Diagonal e Carregado, vindos do experimento F9. Cada criatura tem uma fraqueza entre os três, que multiplica o dano (o ataque errado tira menos, nunca zero) e muda uma vez na luta, com aviso antes. Cada um tem a sua Recarga, em dados, e fica num botão do lado oposto ao do movimento ou numa tecla. Sem conteúdo educacional; errar o tipo nunca custa Energia. Sem violência: a encenação é de luz.
+_Avoid_: Golpe (o golpe perfeito é do QTE), skill
+
+**Recarga**:
+O tempo até um Ataque básico poder ser usado de novo, mostrado por um anel que enche no botão e por um número ou forma que muda perto do fim (nunca só cor). Cai para cerca de 1 s no Modo calmo.
+_Avoid_: Cooldown, espera
+
+**QTE**:
+O momento educacional do combate em duas camadas: abre quando a Névoa de uma Etapa zera, e cada QTE é um Desafio completo. No Escriba é a pesca de sílabas (escolher as certas entre distratores) e depois o Desenho livre. No modo normal tem uma janela de tempo cujo fim devolve Névoa e nunca custa Energia; no Modo calmo não há relógio. O QTE da última Etapa é o golpe final.
+_Avoid_: Quick time event (por extenso só em texto corrido), pergunta
+
+**Pesca**:
+O modo de teste F9 (removido no commit `f7864c9`, recuperável de `f7864c9^`): a criança "puxa" sílabas ao redor do personagem com uma encenação de ataque e confere desenhando a letra em traço neon. É a referência do QTE do Escriba; não existe mais no jogo.
+_Avoid_: Minijogo (é outra coisa, prevista para depois do MVP)
+
 **Pedido**:
 O que a criatura pede no balão dela. Na Matemática é um resultado (a criança desenha uma conta que o dê; o número sozinho e o zero como parcela não valem) ou uma conta pronta, "3 + 5 = ?", respondida só com o número e sem sinais. No Escriba é o nome, a palavra ou a sílaba.
 _Avoid_: Enunciado (é da Missão), pergunta

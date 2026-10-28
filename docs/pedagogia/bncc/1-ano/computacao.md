@@ -15,7 +15,7 @@ Habilidades específicas do ano (`EF01CO`). Eixos e objetos de conhecimento segu
 | EF01CO07 | Cultura digital | Segurança e responsabilidade no uso de tecnologia computacional | Conhecer as possibilidades de uso seguro das tecnologias computacionais para proteção dos dados pessoais e para garantir a própria segurança. |
 
 Total: 7 habilidades.
-
+z
 ## Habilidades compartilhadas do 1º ao 5º ano (`EF15CO`)
 
 Valem também para o 1º ano (tabela "Computação / Por etapa – 1º ao 5º ano" do anexo).

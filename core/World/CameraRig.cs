@@ -39,12 +39,6 @@ public sealed class CameraRig
 
 	public void ZoomFactor(float factor) => Size = targetSize = Math.Clamp(Size * factor, rules.MinSize, rules.MaxSize);
 
-	public void Pan(Vector2 offset)
-	{
-		Focus += offset;
-		if (Focus.Length() > rules.MaxPan) Focus = Vector2.Normalize(Focus) * rules.MaxPan;
-	}
-
 	public void ResetZoom() => targetSize = rules.Size;
 
 	public void Update(Vector2 player, float seconds, bool reduceMotion)

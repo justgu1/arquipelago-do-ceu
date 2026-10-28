@@ -11,12 +11,12 @@ public sealed class CreatureModel
 	const float DefaultHeight = 1.2f;
 	static readonly System.Collections.Generic.Dictionary<string, float> Heights = new()
 	{
-		["pato"] = 1.0f,
-		["coruja"] = 1.1f,
-		["criaturas/automato-base"] = 1.3f,
-		["criaturas/automato-pesado"] = 1.4f,
-		["criaturas/automato-voador"] = 1.2f,
-		["criaturas/automato-cristal"] = 1.4f,
+		["criaturas/mapa"] = 1.2f,
+		["criaturas/pato"] = 1.0f,
+		["criaturas/sapo"] = 0.9f,
+		["criaturas/tartaruga"] = 1.0f,
+		["criaturas/besouro"] = 1.0f,
+		["criaturas/coruja"] = 1.3f,
 	};
 	const float ReactionSeconds = 0.8f;
 
@@ -39,7 +39,7 @@ public sealed class CreatureModel
 
 	public bool ReduceMotion { get; set; }
 
-	// O modelo pelo nome combinado (por exemplo "criaturas/automato-base"); nulo se não carregar.
+	// O modelo pelo nome combinado (por exemplo "criaturas/sapo"); nulo se não carregar.
 	public static CreatureModel? Load(string name) => Lobby.LoadModel(name) is { } node ? new CreatureModel(node, name) : null;
 
 	// Só depois de entrar na árvore: a escala sai da caixa do modelo no mundo.

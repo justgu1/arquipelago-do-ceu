@@ -8,13 +8,11 @@ namespace ArquipelagoDoCeu;
 // As que repetem a mesma malha com os mesmos materiais viram uma instanciação em lote, com uma chamada por grupo e sem copiar vértices.
 public partial class Lobby
 {
-	readonly List<Node3D> treeRoots = [];
-
 	void InstanceStatic()
 	{
 		var toLocal = GlobalTransform.AffineInverse();
 		var groups = new Dictionary<string, List<(MeshInstance3D Node, Material?[] Materials)>>();
-		foreach (var root in lote02Roots.Concat(treeRoots))
+		foreach (var root in lote02Roots)
 			foreach (var mesh in root.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>().Where(m => m.Mesh is not null && m.Visible))
 			{
 				var materials = Enumerable.Range(0, mesh.Mesh.GetSurfaceCount()).Select(mesh.GetActiveMaterial).ToArray();

@@ -52,20 +52,35 @@ public static class CorridorKit
 	static bool IsTurn(IReadOnlyList<HexCell> cells, int i) =>
 		i > 0 && i < cells.Count - 1 && cells[i] - cells[i - 1] != cells[i + 1] - cells[i];
 
-	// Cobre o trecho de `a` a `b` com pisos de dois hexágonos e põe os guarda-corpos e a cabeceira.
-	static void Span(Node3D parent, Vector3 a, Vector3 b, int count)
+	// Os pisos em arco do corredor, no chão (x, z): o Personagem anda sobre a altura deles (BridgeDeck).
+	public static IReadOnlyList<(System.Numerics.Vector2 Center, System.Numerics.Vector2 Direction)> Deck(IReadOnlyList<HexCell> cells)
+	{
+		var pieces = new List<(System.Numerics.Vector2, System.Numerics.Vector2)>();
+		foreach (var (from, to) in StraightRuns(cells))
+			foreach (var (center, direction) in Pieces(Center(cells[from]), Center(cells[to]), to - from + 1))
+				pieces.Add((new System.Numerics.Vector2(center.X, center.Z), new System.Numerics.Vector2(direction.X, direction.Z)));
+		return pieces;
+	}
+
+	// Um piso a cada dois hexágonos; o último se apoia no anterior se sobrar um.
+	static IEnumerable<(Vector3 Center, Vector3 Direction)> Pieces(Vector3 a, Vector3 b, int count)
 	{
 		var along = b - a;
 		var length = along.Length();
-		if (length < 0.01f) return;
+		if (length < 0.01f) yield break;
 		var direction = along / length;
-		var yaw = Mathf.Atan2(-direction.Z, direction.X);
-		var side = new Vector3(-direction.Z, 0f, direction.X);
 		var step = length / (count - 1);
-		// Um piso a cada dois hexágonos; o último se apoia no anterior se sobrar um.
 		for (var first = 0; first <= count - 1; first += 2)
+			yield return (a + direction * (Mathf.Min(first + 0.5f, count - 1.5f) * step), direction);
+	}
+
+	// Cobre o trecho de `a` a `b` com pisos de dois hexágonos e põe os guarda-corpos e a cabeceira.
+	static void Span(Node3D parent, Vector3 a, Vector3 b, int count)
+	{
+		foreach (var (center, direction) in Pieces(a, b, count))
 		{
-			var center = a + direction * (Mathf.Min(first + 0.5f, count - 1.5f) * step);
+			var yaw = Mathf.Atan2(-direction.Z, direction.X);
+			var side = new Vector3(-direction.Z, 0f, direction.X);
 			Place(parent, "ponte-piso", center + new Vector3(0f, FloorDrop, 0f), yaw);
 			foreach (var sign in new[] { -1f, 1f })
 				Place(parent, "ponte-guarda-corpo", center + side * (sign * RailOffset), yaw);

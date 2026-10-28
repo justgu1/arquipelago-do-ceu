@@ -6,7 +6,7 @@ using Godot;
 namespace ArquipelagoDoCeu;
 
 // O quadrado de prévia do Mercador: o item sozinho, girando devagar, num visor pequeno e próprio. É leve: as peças são formas simples,
-// o mesmo visor serve a toda oferta (só troca as peças) e nada do Personagem é carregado.
+// o mesmo visor serve a toda oferta (só troca as peças) e só a peça do item aparece, sem o corpo.
 public partial class ItemPreview : PanelContainer
 {
 	const int Side = 220;
@@ -15,7 +15,7 @@ public partial class ItemPreview : PanelContainer
 	readonly Node3D pivot = new();
 	readonly Func<bool> reduceMotion;
 	readonly Label empty = BookStyle.Text("Sem modelo ainda", 16);
-	EquipmentVisuals? parts;
+	CharacterModel? parts;
 	Camera3D? camera;
 
 	public ItemPreview(Func<bool> reduceMotion)
@@ -58,9 +58,9 @@ public partial class ItemPreview : PanelContainer
 	public void Show(EquipmentLoadout loadout)
 	{
 		parts?.QueueFree();
-		parts = new EquipmentVisuals();
+		parts = new CharacterModel { IdleOnly = true, ReduceMotion = true };
 		pivot.AddChild(parts);
-		parts.ShowAlone(loadout);
+		parts.Show(loadout, alone: true);
 		empty.Visible = parts.VisiblePartCount == 0;
 		Frame();
 	}
@@ -77,7 +77,7 @@ public partial class ItemPreview : PanelContainer
 	void Frame()
 	{
 		if (parts is null || camera is null) return;
-		var boxes = parts.FindChildren("*", "MeshInstance3D", true, false).OfType<MeshInstance3D>().Select(m => parts.GlobalTransform.AffineInverse() * m.GlobalTransform * m.GetAabb()).ToList();
+		var boxes = parts.FindChildren("*", "MeshInstance3D", true, false).OfType<MeshInstance3D>().Where(m => m.Visible).Select(m => parts.GlobalTransform.AffineInverse() * m.GlobalTransform * m.GetAabb()).ToList();
 		if (boxes.Count == 0) return;
 		var box = boxes.Aggregate((a, b) => a.Merge(b));
 		parts.Position = -(box.Position + box.Size / 2f);

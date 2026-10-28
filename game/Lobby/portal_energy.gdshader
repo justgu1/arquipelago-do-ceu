@@ -1,6 +1,7 @@
 shader_type spatial;
 render_mode cull_disabled;
 uniform sampler2D albedo_tex : source_color;
+uniform vec3 albedo_color : source_color = vec3(1.0);
 uniform sampler2D paint_tex : source_color,filter_linear_mipmap;
 uniform float phase=0.0;
 uniform float effect_strength=1.0;
@@ -18,7 +19,7 @@ vec3 paint(vec2 p,float cycle){
  return texture(paint_tex,vec2(source.x*.5+.5,.5-source.y*.5)).rgb;
 }
 void fragment(){
- vec3 original=texture(albedo_tex,UV).rgb;
+ vec3 original=texture(albedo_tex,UV).rgb*albedo_color;
  vec2 p=pos.xy-vec2(-.005,.015);
  float arch=length(vec2(p.x,max(p.y,0.0)));
  float inside=(1.0-smoothstep(.49,.565,arch))*smoothstep(-.94,-.87,pos.y);

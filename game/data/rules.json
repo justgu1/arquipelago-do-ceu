@@ -305,7 +305,7 @@
       {
         "id": "matematica",
         "q": -13,
-        "r": 6,
+        "r": 9,
         "radius": 2,
         "from": [
           -8,
@@ -315,7 +315,7 @@
       },
       {
         "id": "portugues",
-        "q": 6,
+        "q": 9,
         "r": -13,
         "radius": 2,
         "from": [
@@ -351,15 +351,15 @@
         "sign": "Aberta: chegue perto e entre",
         "model": "torre-numeros",
         "x": -19.5,
-        "z": -0.87
+        "z": 4.33
       },
       {
         "id": "portugues",
         "name": "Torre das Letras",
         "sign": "Aberta: chegue perto e entre",
         "model": "torre-letras",
-        "x": 9,
-        "z": -17.32
+        "x": 13.5,
+        "z": -14.72
       },
       {
         "id": "ciencias",
@@ -367,7 +367,7 @@
         "sign": "Em breve",
         "x": -16,
         "z": 26,
-        "model": "landmarks/botanic-v01"
+        "model": "landmarks/ciencias"
       },
       {
         "id": "historia",
@@ -375,7 +375,7 @@
         "sign": "Em breve",
         "x": 18,
         "z": 18,
-        "model": "landmarks/history-v01"
+        "model": "landmarks/historia"
       },
       {
         "id": "geografia",
@@ -383,7 +383,7 @@
         "sign": "Em breve",
         "x": 26,
         "z": -16,
-        "model": "landmarks/geography-v01"
+        "model": "landmarks/geografia"
       }
     ],
     "objects": [
@@ -404,26 +404,28 @@
         "name": "Torre dos Números",
         "prompt": "Entrar na Torre dos Números",
         "q": -12,
-        "r": 6
+        "r": 8
       },
       {
         "id": "torre-portugues",
         "name": "Torre das Letras",
         "prompt": "Entrar na Torre das Letras",
-        "q": 5,
+        "q": 8,
         "r": -12
       },
       {
         "id": "mercador",
         "name": "Mercador",
         "prompt": "Falar com o Mercador",
+        "model": "mercado",
         "q": 0,
         "r": 12
       },
       {
         "id": "mestre",
         "name": "Portal do Desafio mestre",
-        "prompt": "Ver o Desafio mestre"
+        "prompt": "Ver o Desafio mestre",
+        "model": "portal-mestre"
       },
       {
         "id": "boneco",
@@ -435,7 +437,7 @@
         "id": "guia",
         "name": "Guia",
         "prompt": "Falar com o Guia",
-        "model": "guia-reconstruido-v05",
+        "model": "guia",
         "lines": [
           "Olá! Eu sou o Guia do Arquipélago do Céu.",
           "Aqui no Lobby você pode se arrumar, olhar o Álbum e viajar pelo portal.",

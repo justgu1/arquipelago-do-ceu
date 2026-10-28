@@ -5,7 +5,7 @@ using Godot;
 namespace ArquipelagoDoCeu;
 
 // O contorno e a base de toda ilha com o kit lote02: margem reta nas arestas voltadas para o vazio, margem convexa nos cantos de fora e
-// uma rocha do kit sob cada hexágono da beira, na escala do modelo. A margem côncava ainda não está no jogo (está na folha de pedidos de arte).
+// uma rocha do kit sob cada hexágono da beira, na escala do modelo. As pontas da margem e a margem côncava (ainda fora do jogo) completam o contorno.
 public partial class Lobby
 {
 	const float HexEdge = 0.8660254f;
@@ -25,7 +25,13 @@ public partial class Lobby
 			var exposed = Enumerable.Range(0, Neighbors.Length).Where(i => !occupied(cell + Neighbors[i])).ToList();
 			if (exposed.Count == 0) continue;
 			AddRock(cell, center);
-			foreach (var i in exposed) AddEdge(center, Direction(i), "margem-reta", HexEdge, 0.5f);
+			foreach (var i in exposed)
+			{
+				AddEdge(center, Direction(i), "margem-reta", HexEdge, 0.5f);
+				// A ponta da margem que dá numa ponte ou numa ilha vizinha desce até sumir, em vez de acabar num corte seco.
+				if (!exposed.Contains((i + 5) % Neighbors.Length)) AddEdge(center, Direction(i), "margem-ponta-d", HexEdge, 0.5f);
+				if (!exposed.Contains((i + 1) % Neighbors.Length)) AddEdge(center, Direction(i), "margem-ponta-e", HexEdge, 0.5f);
+			}
 			foreach (var i in exposed.Where(i => exposed.Contains((i + 1) % Neighbors.Length)))
 				AddEdge(center, (Direction(i) + Direction((i + 1) % Neighbors.Length)).Normalized(), "margem-convexa", 1f, 0.575f);
 		}

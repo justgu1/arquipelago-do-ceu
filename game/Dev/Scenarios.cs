@@ -43,6 +43,9 @@ static class Scenarios
 				await d.Press("Pronto");
 				await d.Shot("04-fechado");
 				break;
+			case "vilarejo":
+				await LobbyScenarios.Village(d);
+				break;
 			case "movimento":
 				await d.Shot("01-parado");
 				await d.Hold(Controls.Right, 0.8);
@@ -98,21 +101,7 @@ static class Scenarios
 				await DungeonScenarios.Combat(d);
 				break;
 			case "kit-medidas":
-				foreach (var asset in new[] { "hex-base-v02", "margem-reta", "margem-convexa", "margem-concava", "ponte-piso", "ponte-guarda-corpo", "ponte-cabeceira", "rocha-inferior-avaliacao", "grama-tres-pontas-v01" })
-				{
-					var node = GD.Load<PackedScene>($"res://assets/modelos/lote02/{asset}.glb").Instantiate<Node3D>();
-					d.AddChild(node);
-					var box = default(Aabb);
-					var first = true;
-					foreach (var mesh in System.Linq.Enumerable.Cast<MeshInstance3D>(node.FindChildren("*", "MeshInstance3D", true, false)))
-					{
-						var b = mesh.GlobalTransform * mesh.GetAabb();
-						box = first ? b : box.Merge(b);
-						first = false;
-					}
-					GD.Print($"KIT {asset}: pos={box.Position} tamanho={box.Size}");
-					node.QueueFree();
-				}
+				LobbyScenarios.KitMeasures(d);
 				break;
 			case "modais-tempo":
 				await DungeonScenarios.ModalTimes(d);
@@ -156,8 +145,8 @@ static class Scenarios
 				break;
 			case "portal":
 				await d.GoToObject("portal");
+				// Chegar na soleira já abre o portal.
 				await d.Shot("01-perto-do-portal");
-				await d.Press("Usar o portal");
 				await d.Shot("02-portal");
 				await d.Press("Fechar");
 				await d.Shot("03-de-volta-ao-lobby");

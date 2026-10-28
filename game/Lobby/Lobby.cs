@@ -19,6 +19,14 @@ public partial class Lobby : Node3D, ICombatStage
 	const float GuideHeight = 1.8f;
 	const float DummyHeight = 1.7f;
 	const float TowerHeight = 5f;
+	const float MasterHeight = 3.6f;
+	const float StallHeight = 2.7f;
+	// O raio da parte dura de cada coisa: o corpo da criança chega rente a ela, sem a folga de um hexágono inteiro.
+	const float TreeBody = 0.35f;
+	const float ObjectBody = 0.5f;
+	const float TowerBody = 0.85f;
+	const float WideBody = 0.8f;
+	const float TreeHeight = 3.4f;
 
 	// O Mobile não desenha SSAO e avisa a cada vez que ele é ligado; só o Forward+ e o Compatibility o têm.
 	static bool SsaoAvailable => RenderingServer.GetCurrentRenderingMethod() != "mobile";
@@ -46,6 +54,8 @@ public partial class Lobby : Node3D, ICombatStage
 	public bool ReduceMotion { get; set; }
 
 	readonly List<Label3D> signs = new();
+	// O que fica translúcido quando esconde o Personagem: árvores, torres e o salão do Mestre.
+	readonly List<Node3D> occluders = new();
 	readonly Dictionary<string, Node3D> markers = new();
 	readonly Dictionary<string, (Vector3 Ground, float Top)> footprints = new();
 	double clock;
@@ -57,7 +67,7 @@ public partial class Lobby : Node3D, ICombatStage
 	{
 		BuildMap();
 		Startup.Mark("  Lobby: mapa");
-		Grid = new HexGrid(tiles.Keys.Select(c => new HexCell(c.X, c.Y)), BlockedCells());
+		Grid = new HexGrid(tiles.Keys.Select(c => new HexCell(c.X, c.Y)), BlockedCells(), p => BridgeDeck.Allows(bridgeDeck, p), props: RoundObstacles());
 		AddEnvironment();
 		AddCamera();
 		AddDepthOfField();
@@ -68,6 +78,7 @@ public partial class Lobby : Node3D, ICombatStage
 		AddBridges();
 		AddLote02Details();
 		Startup.Mark("  Lobby: pontes e detalhes");
+		AddVillage();
 		AddTrees();
 		Startup.Mark("  Lobby: árvores");
 		AddObjects();
@@ -79,6 +90,9 @@ public partial class Lobby : Node3D, ICombatStage
 		Startup.Mark("  Lobby: cachoeira e lâmpadas");
 		InstanceStatic();
 		Startup.Mark("  Lobby: instanciação em lote");
+		AddLife();
+		occluders.AddRange(pickable.Values);
+		AddChild(new LobbyOcclusion(this, occluders, () => ReduceMotion));
 	}
 
 	// Hexágono "flat-top": vértices à esquerda e à direita.
@@ -89,7 +103,18 @@ public partial class Lobby : Node3D, ICombatStage
 
 	IEnumerable<HexCell> BlockedCells() =>
 		tiles.Where(t => t.Value == Kind.Water).Select(t => t.Key).Concat(TreeSpots).Select(c => new HexCell(c.X, c.Y))
-			.Concat(Rules.Objects.Select(o => new HexCell(o.Q, o.R))).Concat(IslandCenters());
+			.Concat(Rules.Objects.Select(o => new HexCell(o.Q, o.R))).Concat(IslandCenters()).Concat(VillageSpots.Select(s => s.Cell));
+
+	// Árvores, objetos e torres bloqueiam o hexágono para o caminho, mas só o círculo deles é parede: dá para encostar.
+	Dictionary<HexCell, float> RoundObstacles()
+	{
+		var props = new Dictionary<HexCell, float>();
+		foreach (var c in TreeSpots) props[new HexCell(c.X, c.Y)] = TreeBody;
+		foreach (var o in Rules.Objects) props[new HexCell(o.Q, o.R)] = o.Id is "mestre" or "mercador" ? WideBody : ObjectBody;
+		foreach (var (cell, radius) in VillageObstacles()) props[cell] = radius;
+		foreach (var c in IslandCenters()) props[c] = TowerBody;
+		return props;
+	}
 
 	// Luz quente e sombras suaves (direção de arte). O glow só pega o que emite luz, nunca números nem pontilhado (interface 2D).
 	// O SSAO está nos dados, mas só o Forward+ o desenha; o Mobile, que é o do jogo, o ignora.
@@ -165,9 +190,8 @@ public partial class Lobby : Node3D, ICombatStage
 		{
 			var tree = scene.Instantiate<Node3D>();
 			AddChild(tree);
-			treeRoots.Add(tree);
-			tree.Scale = Vector3.One * 1.4f;
-			PlaceOnGround(tree, HexToWorld(spot.X, spot.Y));
+			FitToHeight(tree, TreeHeight, HexToWorld(spot.X, spot.Y));
+			occluders.Add(tree);
 		}
 	}
 
@@ -184,61 +208,6 @@ public partial class Lobby : Node3D, ICombatStage
 		model.Position = lowest == float.MaxValue ? ground : ground - new Vector3(0f, lowest, 0f);
 	}
 
-	// Objetos com que a criança interage: o modelo, os hexágonos bloqueados (em BlockedCells) e um indicador
-	// em forma de seta, que só aparece quando o Personagem está ao alcance (a cor nunca é a única pista).
-	void AddObjects()
-	{
-		var list = new List<Interactable>();
-		foreach (var item in Rules.Objects)
-		{
-			var ground = HexToWorld(item.Q, item.R);
-			// O Boneco é uma criatura: escolhida com clique ou tecla F, e não usada pelo botão de interação.
-			if (item.Id != "boneco") list.Add(new Interactable(item.Id, new System.Numerics.Vector2(ground.X, ground.Z)));
-			var height = item.Id switch { "portal" => PortalHeight, "guia" => GuideHeight, "boneco" => DummyHeight, _ => LecternHeight };
-			var top = height;
-			if (LoadModel(item.Model) is { } model)
-			{
-				AddChild(model);
-				top = FitToHeight(model, height, ground);
-				if (item.Id == "portal")
-					model.AddChild(new LobbyAmbience(model, true, () => ReduceMotion, () => reducedEffects));
-				else if (item.Id == "guia")
-					model.AddChild(new GuideIdle(model, () => ReduceMotion));
-			}
-			else if (item.Id.StartsWith("torre-")) top = TowerBaseHeight;
-			else if (item.Id == "mestre") top = AddHall(ground, item.Name);
-			else if (item.Id == "mercador") top = AddStall(ground, item.Name);
-			var marker = new MeshInstance3D
-			{
-				Mesh = new CylinderMesh { TopRadius = 0.32f, BottomRadius = 0f, Height = 0.55f, RadialSegments = 4, Rings = 0 },
-				MaterialOverride = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#F2B632"), ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded },
-				Position = ground + new Vector3(0f, top + 0.7f, 0f),
-				Visible = false,
-			};
-			AddChild(marker);
-			markers[item.Id] = marker;
-			footprints[item.Id] = (ground, top);
-		}
-		Interactables = list;
-	}
-
-	// A barraca do Mercador: balcão, dois postes e um toldo. Greybox, até a arte definitiva.
-	float AddStall(Vector3 ground, string name)
-	{
-		const float height = 2.0f;
-		var wood = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#8A5A32"), Roughness = 0.9f };
-		var cloth = new StandardMaterial3D { AlbedoColor = Color.FromHtml("#D9534F"), Roughness = 0.8f };
-		AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.6f, 0.8f, 0.7f) }, MaterialOverride = wood, Position = ground + new Vector3(0f, 0.4f, 0f) });
-		foreach (var side in new[] { -0.75f, 0.75f })
-			AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.12f, height, 0.12f) }, MaterialOverride = wood, Position = ground + new Vector3(side, height / 2f, -0.3f) });
-		AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(1.9f, 0.1f, 1.1f) }, MaterialOverride = cloth, Position = ground + new Vector3(0f, height, -0.1f), Rotation = new Vector3(0.18f, 0f, 0f) });
-		var sign = new Label3D { Text = name, Billboard = BaseMaterial3D.BillboardModeEnum.Enabled, FontSize = 44, PixelSize = 0.012f, OutlineSize = 14, OutlineModulate = Color.FromHtml("#1B1424"), Modulate = Color.FromHtml("#FFF6E0"), NoDepthTest = true, Position = ground + new Vector3(0f, height + 0.7f, 0f) };
-		AddChild(sign);
-		signs.Add(sign);
-		sign.AddToGroup(CameraController.LabelGroup);
-		return height;
-	}
-
 	// Ilhas e torres ao redor, cada uma com a placa; torre sem modelo vira uma torre simples em greybox.
 	void AddPlaces()
 	{
@@ -252,7 +221,7 @@ public partial class Lobby : Node3D, ICombatStage
 			{
 				AddChild(model);
 				// A fachada deste GLB aponta para +Z; orienta a porta ao centro do Lobby.
-				if (place.Id == "matematica") model.Rotation = new Vector3(0, Mathf.Atan2(-center.X, -center.Z), 0);
+				if (place.Id is "matematica" or "portugues") model.Rotation = new Vector3(0, Mathf.Atan2(-center.X, -center.Z), 0);
 				if (landmark)
 				{
 					PrepareLandmark(model, place.Id);
@@ -260,7 +229,7 @@ public partial class Lobby : Node3D, ICombatStage
 					float desired = place.Id == "historia" ? 3.2f : 3.5f;
 					// Mede antes de girar: a caixa alinhada ao mundo cresce na diagonal, mas a ilha não muda.
 					float height = Mathf.Min(desired, bounds.Size.Y * 4.9f / Mathf.Max(bounds.Size.X, bounds.Size.Z));
-					float facing = place.Id == "historia" ? Mathf.Atan2(center.X, center.Z) : Mathf.Atan2(-center.X, -center.Z);
+					float facing = Mathf.Atan2(-center.X, -center.Z);
 					model.Rotation = new Vector3(0, facing, 0);
 					top = FitToHeight(model, height, center + new Vector3(0f, .10f, 0f));
 				}
@@ -327,7 +296,7 @@ public partial class Lobby : Node3D, ICombatStage
 		return ground.Y + height;
 	}
 
-	static Aabb WorldBox(Node3D model)
+	internal static Aabb WorldBox(Node3D model)
 	{
 		Aabb? merged = null;
 		foreach (var node in model.FindChildren("*", "MeshInstance3D", true, false))

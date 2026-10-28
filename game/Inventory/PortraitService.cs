@@ -7,11 +7,10 @@ namespace ArquipelagoDoCeu;
 // o primeiro quadro compila os shaders), guardado e ligado só enquanto algum modal o mostra. Abrir o Inventário não monta nada.
 public partial class PortraitService : Node
 {
-	const string IdleModel = "res://assets/modelos/spectrum-cape-body-v2/guerreiro-parado.glb";
 	static readonly Vector2I Size = new(280, 440);
 
 	SubViewport? viewport;
-	SpectrumCharacter? character;
+	CharacterModel? character;
 	Camera3D? camera;
 	Node3D? world;
 	EquipmentLoadout pending = new();
@@ -31,7 +30,7 @@ public partial class PortraitService : Node
 	{
 		if (loading || viewport is not null) return;
 		loading = true;
-		ResourceLoader.LoadThreadedRequest(IdleModel);
+		ResourceLoader.LoadThreadedRequest(CharacterModel.ModelPath);
 		SetProcess(true);
 	}
 
@@ -41,7 +40,7 @@ public partial class PortraitService : Node
 	{
 		if (viewport is null && loading)
 		{
-			var status = ResourceLoader.LoadThreadedGetStatus(IdleModel);
+			var status = ResourceLoader.LoadThreadedGetStatus(CharacterModel.ModelPath);
 			if (status == ResourceLoader.ThreadLoadStatus.Loaded) Build();
 			else if (status is ResourceLoader.ThreadLoadStatus.Failed or ResourceLoader.ThreadLoadStatus.InvalidResource) GiveUp();
 			return;
@@ -72,7 +71,7 @@ public partial class PortraitService : Node
 	public void Show(EquipmentLoadout loadout)
 	{
 		pending = loadout;
-		character?.ApplyEquipment(loadout);
+		character?.Show(loadout);
 	}
 
 	void Build()
@@ -85,9 +84,9 @@ public partial class PortraitService : Node
 		world.AddChild(Background());
 		world.AddChild(new DirectionalLight3D { RotationDegrees = new Vector3(-35, -35, 0), LightEnergy = 1.7f });
 		world.AddChild(new DirectionalLight3D { RotationDegrees = new Vector3(-20, 145, 0), LightEnergy = 0.6f });
-		character = new SpectrumCharacter { Name = "PortraitCharacter", ReduceMotion = true, IdleOnly = true };
+		character = new CharacterModel { Name = "PortraitCharacter", ReduceMotion = true, IdleOnly = true };
 		world.AddChild(character);
-		character.ApplyEquipment(pending);
+		character.Show(pending);
 		character.SetLocomotion(0, false);
 		camera = new Camera3D { Projection = Camera3D.ProjectionType.Orthogonal, Size = 2.05f, Position = new Vector3(1.8f, 1.15f, 3.5f), Current = true };
 		world.AddChild(camera);
@@ -108,7 +107,7 @@ public partial class PortraitService : Node
 	{
 		loading = false;
 		SetProcess(false);
-		GD.PushWarning($"Não foi possível carregar o modelo do retrato em {IdleModel}.");
+		GD.PushWarning($"Não foi possível carregar o modelo do retrato em {CharacterModel.ModelPath}.");
 	}
 
 	void Sleep()

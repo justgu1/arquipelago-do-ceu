@@ -73,6 +73,16 @@ public sealed class EquipmentTests : IDisposable
 		Assert.Equal("scout", look.Armor);
 	}
 
+	[Fact]
+	public void O_acessorio_e_o_Papel_vao_para_a_aparencia_e_acessorio_sem_modelo_fica_de_fora()
+	{
+		var look = EquipmentLooks.For(new Gear().With("accessory", "lantern"), role: "matematica");
+
+		Assert.Equal("lantern", look.Accessory);
+		Assert.Equal("matematica", look.Role);
+		Assert.Equal("none", EquipmentLooks.For(new Gear().With("accessory", "peca-sem-modelo")).Accessory);
+	}
+
 	public void Dispose()
 	{
 		if (Directory.Exists(folder)) Directory.Delete(folder, true);
