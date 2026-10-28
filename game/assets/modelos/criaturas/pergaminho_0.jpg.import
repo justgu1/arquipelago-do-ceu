@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dke1ek744x8cw"
-path="res://.godot/imported/pergaminho_0.jpg-a8f83730577ed946d64e3b2c157a78ac.ctex"
+path.bptc="res://.godot/imported/pergaminho_0.jpg-a8f83730577ed946d64e3b2c157a78ac.bptc.ctex"
+path.astc="res://.godot/imported/pergaminho_0.jpg-a8f83730577ed946d64e3b2c157a78ac.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "9b280d35d9eae64f3e9114314323865b"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/criaturas/pergaminho_0.jpg"
-dest_files=["res://.godot/imported/pergaminho_0.jpg-a8f83730577ed946d64e3b2c157a78ac.ctex"]
+dest_files=["res://.godot/imported/pergaminho_0.jpg-a8f83730577ed946d64e3b2c157a78ac.bptc.ctex", "res://.godot/imported/pergaminho_0.jpg-a8f83730577ed946d64e3b2c157a78ac.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

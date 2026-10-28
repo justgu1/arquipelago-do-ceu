@@ -124,11 +124,16 @@ public partial class MerchantScreen : OverlayScreen
 		scroll.AddChild(grid);
 		body.AddChild(scroll);
 		detailBody.AddThemeConstantOverride("separation", 8);
-		detailBody.AddChild(preview);
-		detailBody.AddChild(previewName);
-		detailBody.AddChild(previewDetail);
-		detailBody.AddChild(summary);
-		detailBody.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
+		// Só a ficha do item rola; o botão de comprar fica sempre à vista, mesmo numa tela baixa de celular.
+		var info = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+		info.AddThemeConstantOverride("separation", 8);
+		info.AddChild(preview);
+		info.AddChild(previewName);
+		info.AddChild(previewDetail);
+		info.AddChild(summary);
+		var infoScroll = new ScrollContainer { SizeFlagsVertical = SizeFlags.ExpandFill, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+		infoScroll.AddChild(info);
+		detailBody.AddChild(infoScroll);
 		action = BookStyle.Button("", Confirm, "ActionButton", TargetHeight + 8);
 		detailBody.AddChild(action);
 		detail.AddChild(detailBody);

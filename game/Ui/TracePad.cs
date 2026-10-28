@@ -37,7 +37,7 @@ public partial class TracePad : VBoxContainer
 
 	public TracePad(TracingRules rules, TraceTrails? trails = null)
 	{
-		this.rules = rules;
+		this.rules = DeviceInfo.IsTouch ? Relaxed(rules) : rules;
 		this.trails = trails ?? TrailSource.Shared;
 		AddThemeConstantOverride("separation", 10);
 		prompt = UiKit.Heading("");
@@ -61,6 +61,9 @@ public partial class TracePad : VBoxContainer
 		buttons.AddChild(UiKit.BigButton("Completar sozinho", () => guided = true, CanvasSize.X));
 		AddChild(buttons);
 	}
+
+	// Um dedo é menos preciso que o mouse: a faixa aceita um desvio maior e a trilha cobra um pouco menos da cobertura.
+	static TracingRules Relaxed(TracingRules rules) => rules with { Tolerance = rules.Tolerance * 1.3f, MinCoverage = Math.Min(rules.MinCoverage, 0.75f), MaxStray = Math.Max(rules.MaxStray, 0.45f) };
 
 	public event Action? Completed;
 
@@ -184,8 +187,9 @@ public partial class TracePad : VBoxContainer
 // preenche conforme a criança passa e o traço dela.
 sealed partial class TraceCanvas : Control
 {
-	const float BandWidth = 46f;
-	const float InkWidth = 22f;
+	// A faixa mostra a tolerância de verdade: o que está dentro dela conta como traço certo.
+	float BandWidth => rules.Tolerance * 1.53f;
+	float InkWidth => BandWidth * 0.48f;
 	const float StrokeWidth = 8f;
 	const float MarkerRadius = 15f;
 	const float ArrowLength = 34f;

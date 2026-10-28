@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dd1jsn5jwx0db"
-path="res://.godot/imported/arvores_0.jpg-de7ed8e838ec23f1423239267e19880e.ctex"
+path.bptc="res://.godot/imported/arvores_0.jpg-de7ed8e838ec23f1423239267e19880e.bptc.ctex"
+path.astc="res://.godot/imported/arvores_0.jpg-de7ed8e838ec23f1423239267e19880e.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "8d538173e492124b4c26af102809e0b5"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/arvores_0.jpg"
-dest_files=["res://.godot/imported/arvores_0.jpg-de7ed8e838ec23f1423239267e19880e.ctex"]
+dest_files=["res://.godot/imported/arvores_0.jpg-de7ed8e838ec23f1423239267e19880e.bptc.ctex", "res://.godot/imported/arvores_0.jpg-de7ed8e838ec23f1423239267e19880e.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

@@ -15,6 +15,9 @@ public partial class CombatHud : OverlayScreen
 	const int PieceSize = 72;
 	const int Margin = 12;
 
+	// No celular o direcional fica à esquerda na luta; a bolsa começa depois dele.
+	static float LeftReserve => DeviceInfo.IsTouch ? TouchStick.Side + 24 : 0;
+
 	readonly ICombatPresenter presenter;
 	readonly VoiceService voice;
 	readonly AttackRhythm rhythm;
@@ -105,7 +108,7 @@ public partial class CombatHud : OverlayScreen
 		row.AddThemeConstantOverride("separation", 8);
 		row.AddChild(column);
 		row.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide, LayoutPresetMode.Minsize);
-		row.OffsetLeft = Margin;
+		row.OffsetLeft = Margin + LeftReserve;
 		row.OffsetRight = -Margin;
 		row.OffsetBottom = -Margin;
 		row.GrowVertical = GrowDirection.Begin;

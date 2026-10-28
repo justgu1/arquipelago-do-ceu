@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cdi4g008a4u6b"
-path="res://.godot/imported/automato-voador_0.jpg-6a5355302373f171b53710625b2613cd.ctex"
+path.bptc="res://.godot/imported/automato-voador_0.jpg-6a5355302373f171b53710625b2613cd.bptc.ctex"
+path.astc="res://.godot/imported/automato-voador_0.jpg-6a5355302373f171b53710625b2613cd.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "51e8ec1c8d44098add474316ee50bd03"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/criaturas/automato-voador_0.jpg"
-dest_files=["res://.godot/imported/automato-voador_0.jpg-6a5355302373f171b53710625b2613cd.ctex"]
+dest_files=["res://.godot/imported/automato-voador_0.jpg-6a5355302373f171b53710625b2613cd.bptc.ctex", "res://.godot/imported/automato-voador_0.jpg-6a5355302373f171b53710625b2613cd.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

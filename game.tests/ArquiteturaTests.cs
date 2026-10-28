@@ -51,7 +51,7 @@ public class ArquiteturaTests
 	static readonly string[] UsamRelogio =
 	[
 		"game/GodotRandomSource.cs", "game/Voice/GodotSpeechEngine.cs", "game/Lobby/CameraController.cs", "game/Lobby/GuideIdle.cs",
-		"game/Lobby/LobbyAmbience.cs", "game/Character/DynamicCape.cs", "game/GameExit.cs", "game/Dev/",
+		"game/Lobby/LobbyAmbience.cs", "game/Character/DynamicCape.cs", "game/GameExit.cs", "game/Performance/FrameProbe.cs", "game/Performance/Startup.cs", "game/Dev/",
 	];
 
 	[Fact]

@@ -19,6 +19,24 @@ public class MissionLoaderTests
 
 	static MissionLoader Loader() => MissionLoader.Create(File.ReadAllText(MissionFiles.SchemaPath)).Value!;
 
+	// O conteúdo do próprio build já passa no schema na CI; só o de fora precisa ser validado a cada leitura.
+	[Fact]
+	public void Sem_validar_o_schema_a_Missao_fora_da_faixa_carrega_mas_com_validacao_e_recusada()
+	{
+		var json = Valid.Replace("\"difficulty\": 2", "\"difficulty\": 9");
+
+		Assert.False(Loader().Parse("fora.json", json).IsOk);
+		Assert.True(Loader().Parse("fora.json", json, validateSchema: false).IsOk);
+	}
+
+	[Fact]
+	public void Sem_validar_o_schema_a_Mecanica_desconhecida_continua_recusada()
+	{
+		var json = Valid.Replace("compor_numero", "mecanica_inventada");
+
+		Assert.False(Loader().Parse("x.json", json, validateSchema: false).IsOk);
+	}
+
 	// Tira o campo (de uma linha só) do JSON de exemplo.
 	static string Without(string field) => Regex.Replace(Valid, $"\"{field}\": (\\[[^\\]]*\\]|\"[^\"]*\"),\\s*", "");
 

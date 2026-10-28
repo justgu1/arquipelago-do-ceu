@@ -14,14 +14,15 @@ public partial class FreeDrawLayer : Control
 {
 	const float TapDistance = 14f;
 	const float InkWidth = 10f;
-	const float GuideDotRadius = 5f;
+	static float GuideDotRadius => DeviceInfo.IsTouch ? 7f : 5f;
 	const float StartRadius = 12f;
 	const float ArrowLength = 34f;
 	const float ArrowSize = 12f;
 	// O pontilhado fica acima da HUD, no meio da cena.
 	const float GuideWidth = 0.5f;
-	const float GuideHeight = 0.3f;
-	const float GuideCenterY = 0.66f;
+	// No celular o pontilhado cresce e sobe: o dedo cobre mais da tela, e a bolsa de peças ocupa a parte de baixo.
+	static float GuideHeight => DeviceInfo.IsTouch ? 0.4f : 0.3f;
+	static float GuideCenterY => DeviceInfo.IsTouch ? 0.6f : 0.66f;
 
 	static readonly Color Ink = Color.FromHtml("#F2B632");
 	static readonly Color InkEdge = Color.FromHtml("#3D2C25");

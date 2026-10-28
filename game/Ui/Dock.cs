@@ -3,42 +3,57 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// O canto inferior esquerdo: o botão do Inventário (com o selo "novo", em texto) e o nome do Papel de agora.
-// O botão do Papel troca entre o Matemático e o Escriba no Lobby; dentro de uma Dungeon fica desligado, porque cada torre tem um Papel só.
-public partial class Dock : HBoxContainer
+// O canto inferior esquerdo: o Inventário (selo "novo" em texto) e o Papel de agora, que troca entre Matemático e Escriba no Lobby.
+// Numa Dungeon o Papel fica travado (uma torre, um Papel). No celular vira o TouchCluster; no PC, dois botões de texto.
+public partial class Dock : Control
 {
 	const int ButtonHeight = 72;
 	const int ButtonWidth = 220;
 	const int Margin = 12;
 
-	readonly Button inventory;
-	readonly Button role;
+	readonly TouchCluster? cluster;
+	readonly Button? inventory;
+	readonly Button? role;
 	string roleName = "";
+	string inventoryText = "Inventário";
 
 	public Dock()
 	{
 		Name = "Dock";
+		MouseFilter = MouseFilterEnum.Ignore;
+		SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+		if (DeviceInfo.IsTouch)
+		{
+			cluster = new TouchCluster();
+			cluster.InventoryPressed += () => InventoryRequested?.Invoke();
+			cluster.RolePressed += () => RoleSwitchRequested?.Invoke();
+			AddChild(cluster);
+			return;
+		}
+
+		var row = new HBoxContainer { MouseFilter = MouseFilterEnum.Ignore };
 		inventory = BookStyle.Button("Inventário", () => InventoryRequested?.Invoke(), "InventoryButton", ButtonHeight);
 		inventory.CustomMinimumSize = new Vector2(ButtonWidth, ButtonHeight);
 		inventory.TooltipText = "Abrir o Inventário [I]";
-		AddThemeConstantOverride("separation", 8);
-		AddChild(inventory);
+		row.AddThemeConstantOverride("separation", 8);
+		row.AddChild(inventory);
 		role = BookStyle.Button("", () => RoleSwitchRequested?.Invoke(), "RoleButton", ButtonHeight);
 		role.Icon = Icons.For("swap", 28);
 		role.IconAlignment = HorizontalAlignment.Right;
 		role.AddThemeFontSizeOverride("font_size", 20);
 		role.TooltipText = "Trocar de Papel";
-		AddChild(role);
-		SetAnchorsPreset(LayoutPreset.BottomLeft);
-		GrowVertical = GrowDirection.Begin;
-		OffsetLeft = Margin;
-		OffsetBottom = -Margin;
-		OffsetTop = -Margin - ButtonHeight;
+		row.AddChild(role);
+		AddChild(row);
+		row.SetAnchorsPreset(LayoutPreset.BottomLeft);
+		row.GrowVertical = GrowDirection.Begin;
+		row.OffsetLeft = Margin;
+		row.OffsetBottom = -Margin;
+		row.OffsetTop = -Margin - ButtonHeight;
 	}
 
 	public event Action? InventoryRequested;
 
-	public string InventoryText => inventory.Text;
+	public string InventoryText => inventoryText;
 
 	public event Action? RoleSwitchRequested;
 
@@ -47,12 +62,14 @@ public partial class Dock : HBoxContainer
 	public void SetRole(string name)
 	{
 		roleName = name;
-		role.Text = name;
+		if (role is not null) role.Text = name;
 	}
 
 	// Dentro de uma Dungeon o Papel é o da torre: o botão só mostra o nome.
 	public void LockRole()
 	{
+		cluster?.LockRole();
+		if (role is null) return;
 		role.Disabled = true;
 		role.Icon = null;
 		role.TooltipText = "Esta torre tem um Papel só";
@@ -61,8 +78,13 @@ public partial class Dock : HBoxContainer
 	// Com itens ainda não vistos o botão diz quantos são, em texto: o selo nunca é só uma cor.
 	public void SetNewCount(int count)
 	{
-		inventory.Text = count > 0 ? $"Inventário · {(count == 1 ? "1 novo" : $"{count} novos")}" : "Inventário";
+		inventoryText = count > 0 ? $"Inventário · {(count == 1 ? "1 novo" : $"{count} novos")}" : "Inventário";
+		if (inventory is not null) inventory.Text = inventoryText;
+		if (cluster is not null) cluster.SetInventoryBadge(count > 0 ? count.ToString(System.Globalization.CultureInfo.InvariantCulture) : "");
 	}
 
-	public void Press() => inventory.EmitSignal(BaseButton.SignalName.Pressed);
+	// Na luta o celular mantém só o direcional: a bolsa de peças ocupa o resto da parte de baixo.
+	public void SetInCombat(bool fighting) => cluster?.SetCompact(fighting);
+
+	public void Press() => InventoryRequested?.Invoke();
 }

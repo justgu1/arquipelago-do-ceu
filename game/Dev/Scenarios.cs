@@ -52,6 +52,9 @@ static class Scenarios
 				await d.Hold(Controls.Up, 4.0);
 				await d.Shot("04-contra-a-borda");
 				break;
+			case "benchmark" or "torre-parada" or "mercador-parado":
+				await DungeonScenarios.Mobile(d, name);
+				break;
 			case "torre":
 				await DungeonScenarios.Walkthrough(d);
 				break;

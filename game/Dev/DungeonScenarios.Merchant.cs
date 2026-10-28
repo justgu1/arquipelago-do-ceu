@@ -7,6 +7,19 @@ namespace ArquipelagoDoCeu;
 // Cenário `mercador` do piloto: o Mercador do Lobby compra, vende em lote, recompra e rotaciona, sempre com confirmação.
 static partial class DungeonScenarios
 {
+	// Abre a tela do Mercador com moedas e um item escolhido, e para: para quem testa no celular mexer pelo adb.
+	public static async Task ParkedMerchant(DevDriver d)
+	{
+		await EnsureProfile(d);
+		d.Port.Progress.Wallet.Add(d.Port.ProfileId, 40);
+		await WalkTo(d, 0, 11);
+		await d.Tap(Controls.Interact);
+		await d.Wait(0.8);
+		var offer = d.Port.Merchant.Stock(d.Port.ProfileId)[0];
+		Named<Button>(d, "Offer_" + offer.Id)?.EmitSignal(BaseButton.SignalName.Pressed);
+		await d.Wait(900);
+	}
+
 	public static async Task Merchant(DevDriver d)
 	{
 		await EnsureProfile(d);

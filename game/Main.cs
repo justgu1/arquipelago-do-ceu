@@ -61,6 +61,7 @@ public partial class Main : Node3D
 		title.Text = rules.GameName;
 		GD.Print($"Regras carregadas: {rules.GameName}");
 
+		Startup.Mark("regras e torres");
 		var store = new SaveStore(ProjectSettings.GlobalizePath(SaveOpener.ChoosePath()));
 		var save = SaveOpener.Open(store);
 		if (!save.IsOk) { Stop(save.Error!); return; }
@@ -83,17 +84,21 @@ public partial class Main : Node3D
 		speech = new GodotSpeechEngine();
 		voice = new VoiceService(speech, settings);
 
+		Startup.Mark("save, serviços e catálogos");
 		Controls.Register();
 		lobby = GD.Load<PackedScene>("res://Lobby/Lobby.tscn").Instantiate<Lobby>();
 		lobby.Rules = rules.Lobby;
 		AddChild(lobby);
+		Startup.Mark("Lobby montado");
 		player = new Player(lobby.Grid, lobby.Camera, lobby.GroundHeight) { Visible = false };
 		AddChild(player);
 		player.PlaceAt(lobby.StartPoint);
 		AddChild(new CameraController(lobby.Camera, player, rules.Lobby.Camera, () => player.ReduceMotion) { Battle = () => training.HasTarget ? training.CreatureGround : null });
 		AddChild(portrait);
 		portrait.Warm();
+		Startup.Mark("retrato do Personagem");
 		SetUpTraining();
+		Startup.Mark("treino e Missões");
 
 		BuildLobbyHud();
 		ApplyTheme();
@@ -107,6 +112,7 @@ public partial class Main : Node3D
 		}
 		if (OS.IsDebugBuild()) DevDriver.AttachIfRequested(this, new PilotPort(progress, rewardService, gear, inventory, merchant, RefreshDock, master, training, () => current?.Id ?? "", UnlockedLevel));
 
+		Startup.Mark("HUD e fluxo");
 		GD.Print("Cena inicial pronta.");
 	}
 
@@ -118,9 +124,11 @@ public partial class Main : Node3D
 		notice = rootUi.Notice;
 		GetViewport().SizeChanged += FitUiRoot;
 		FitUiRoot();
+		Player.TapToWalk = !DeviceInfo.IsTouch;
 	}
 
-	void FitUiRoot() => rootUi.Fit(GetViewport(), uiScale, compensateStretch: true);
+	// No celular a interface cresce até o botão caber no dedo e encolhe pelas margens da tela (câmera e cantos arredondados).
+	void FitUiRoot() => rootUi.Fit(GetViewport(), DeviceInfo.IsTouch ? ArquipelagoDoCeu.Touch.TouchScale.Effective(DeviceInfo.Dpi, uiScale, DisplayServer.WindowGetSize().Y) : uiScale, compensateStretch: true, DeviceInfo.SafeInsets());
 
 
 	void Stop(string text)
@@ -313,6 +321,7 @@ public partial class Main : Node3D
 	public override void _Notification(int what)
 	{
 		if (what == NotificationWMCloseRequest) _ = QuitAsync();
+		OnMobileNotification(what);
 	}
 
 	// O Personagem do Lobby usa sempre a aparência gravada do Perfil ativo.
@@ -364,7 +373,7 @@ public partial class Main : Node3D
 	{
 		if (player is null || inDungeon) return;
 		lobbyHud?.SetNotice(notice.Text);
-		lobbyHud?.SetPlayState(player.Enabled && !training.HasTarget);
+		lobbyHud?.SetPlayState(player.Enabled && !training.HasTarget, fighting: player.Enabled && training.HasTarget);
 		dummy.SetCaptionContext(true, player.Enabled && training.InTargetRange());
 		var target = player.Enabled
 			? InteractionFinder.Nearest(player.GroundPosition, lobby.Interactables, rules.Lobby.InteractionReach + equipmentBonuses.InteractionReachBonus)?.Id

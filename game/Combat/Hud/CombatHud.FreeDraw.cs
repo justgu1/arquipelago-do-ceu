@@ -61,7 +61,7 @@ public partial class CombatHud
 			bar.AddChild(button);
 		}
 		bar.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide, LayoutPresetMode.Minsize);
-		bar.OffsetLeft = Margin;
+		bar.OffsetLeft = Margin + LeftReserve;
 		bar.OffsetRight = -Margin;
 		bar.OffsetBottom = -Margin;
 		bar.GrowVertical = GrowDirection.Begin;
@@ -70,7 +70,7 @@ public partial class CombatHud
 
 	public bool Writing => writing;
 
-	string WriteLabel => writing ? "Andar [Esc]" : "Escrever [Enter]";
+	string WriteLabel => DeviceInfo.IsTouch ? (writing ? "Andar" : "Escrever") : (writing ? "Andar [Esc]" : "Escrever [Enter]");
 
 	// Com letras, o teclado só escreve depois de escolher escrever (como na forca); sem isso, WASD anda.
 	void SetWriting(bool on)

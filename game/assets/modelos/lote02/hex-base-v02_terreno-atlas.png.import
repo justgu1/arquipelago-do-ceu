@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://csmsypgudynu1"
-path="res://.godot/imported/hex-base-v02_terreno-atlas.png-d48bdd27a93887bc0dc87bd97e9a4993.ctex"
+path.bptc="res://.godot/imported/hex-base-v02_terreno-atlas.png-d48bdd27a93887bc0dc87bd97e9a4993.bptc.ctex"
+path.astc="res://.godot/imported/hex-base-v02_terreno-atlas.png-d48bdd27a93887bc0dc87bd97e9a4993.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "cd40a251a7779059fe13d768cba80d33"
@@ -14,12 +16,12 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/modelos/lote02/hex-base-v02_terreno-atlas.png"
-dest_files=["res://.godot/imported/hex-base-v02_terreno-atlas.png-d48bdd27a93887bc0dc87bd97e9a4993.ctex"]
+dest_files=["res://.godot/imported/hex-base-v02_terreno-atlas.png-d48bdd27a93887bc0dc87bd97e9a4993.bptc.ctex", "res://.godot/imported/hex-base-v02_terreno-atlas.png-d48bdd27a93887bc0dc87bd97e9a4993.astc.ctex"]
 
 [params]
 
-compress/mode=0
-compress/high_quality=false
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0

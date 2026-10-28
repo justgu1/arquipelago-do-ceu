@@ -58,6 +58,7 @@ public partial class Main
 		var ids = towers.All.Select(t => t.Id).ToList();
 		ChooseRole(ids[(System.Math.Max(0, ids.IndexOf(role)) + 1) % ids.Count]);
 		voice.Say($"Papel: {RoleName(role)}.", interrupt: true);
+		Notify($"Papel: {RoleName(role)}");
 	}
 
 	// No Inventário a troca fecha a tela e a abre de novo, já com o equipamento do outro Papel.
@@ -118,7 +119,7 @@ public partial class Main
 	void RefreshLobbyVisibility()
 	{
 		var playing = player is not null && player.Enabled;
-		lobbyHud?.SetPlayState(playing && !inDungeon);
+		lobbyHud?.SetPlayState(playing && !inDungeon, fighting: playing && !inDungeon && training.HasTarget);
 		title.Visible = !inDungeon && current is null;
 		notice.Visible = !inDungeon && current is null;
 	}
