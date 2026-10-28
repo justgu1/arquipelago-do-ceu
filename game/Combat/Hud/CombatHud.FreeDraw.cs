@@ -24,6 +24,9 @@ public partial class CombatHud
 
 	public event Action<string?>? Requested;
 
+	// A leitura ficou em dúvida entre duas respostas. O combate de sempre só pede para tentar de novo; o novo trata como falha sem custo.
+	public event Action? Unclear;
+
 	// Um toque curto no vazio não é traço: o Personagem anda até ali.
 	public event Action<Vector2>? Tapped;
 
@@ -155,6 +158,7 @@ public partial class CombatHud
 				return;
 			case GuessKind.Ambiguous:
 				Notice("Fiquei na dúvida. Tente de novo.");
+				Unclear?.Invoke();
 				return;
 		}
 		if (pending.Count > 0)

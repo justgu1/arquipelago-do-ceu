@@ -99,7 +99,6 @@ public partial class TrainingArea : Node
 
 	public bool HasTarget => panel is not null;
 	public Vector2 CreatureGround => motion.Ground;
-	void UpdateEnergyDock() { if (energyView is not null) energyView.OffsetTop = EnergyTop ?? (panel is null ? 154 : 12); }
 
 	// Clicar na criatura a escolhe: o raio do clique passa perto do centro do Boneco.
 	public bool HitsDummy(Godot.Vector2 screenPoint) => dummy.IsPickedBy(stage.Camera, screenPoint);
@@ -202,7 +201,7 @@ public partial class TrainingArea : Node
 		}
 		if (session is null && InDungeon) return;
 		if (session is null) showOverlay(new TrainingSetupScreen(towers.All.Select(t => (t.Id, t.Role)).ToList(), TrainingSetup.Levels(unlockedLevel(), towers.MaxLevel), TryStart));
-		else OpenPanel();
+		else if (fog is null || fog.Phase == FogPhase.Qte) OpenPanel();
 	}
 
 	// O treino é de um Papel; o equipamento dele é o que vale na luta.
@@ -224,7 +223,7 @@ public partial class TrainingArea : Node
 		uiRoot.AddChild(energyView);
 		UpdateEnergy();
 		dummy.ShowChallenge(session);
-		OpenPanel();
+		if (!BeginFog()) OpenPanel();
 		return null;
 	}
 
@@ -233,7 +232,7 @@ public partial class TrainingArea : Node
 		if (session is null || panel is not null) return;
 		var opened = AnswerPanels.Create(session, rules, voice, InTargetRange, Creature, rhythm, new PanelEvents(
 			reactions.Attacked, reactions.NameChecked, reactions.WordChecked, reactions.ChangeChecked, OnComposing, player.WalkTo, text => dummy.Say(text, true), dummy.SetRequest,
-			Hint: () => { if (session is not null) Tell($"Dica: {session.Hint()}"); },
+			Hint: () => { if (session is not null) { fog?.NoteHint(); Tell($"Dica: {session.Hint()}"); } },
 			Read: () => { if (session is not null) Tell(session.Mission.Prompt); }));
 
 		panel = opened;
@@ -296,7 +295,7 @@ public partial class TrainingArea : Node
 		if (outcome.HintOffered) text += $" Dica: {session.Hint()}";
 		Say($"{headline} Travessura!", text, good: false);
 
-		if (outcome.Prank != Prank.Hidden) return;
+		if (QteFailed() || outcome.Prank != Prank.Hidden) return;
 		var mine = epoch;
 		// A peça escondida volta sozinha; o tempo é real, mesmo com o jogo em câmera lenta.
 		GetTree().CreateTimer(rules.Combat.PrankSeconds, true, false, true).Timeout += () =>
@@ -311,7 +310,7 @@ public partial class TrainingArea : Node
 	internal void Won()
 	{
 		if (session is not null) BattleEnded?.Invoke(session.Conclude(calmed: true));
-		if (fightWon is null) { NextChallengeSoon(); return; }
+		if (fightWon is null) { TrainingWon(); return; }
 		reacting = true;
 		bubbles.Clear();
 		var mine = ++epoch;
@@ -373,6 +372,7 @@ public partial class TrainingArea : Node
 		bubbles.Reset();
 		if (ownsEnergyView) energyView?.QueueFree();
 		energyView = null;
+		EndFog();
 		dummy.Idle();
 		time.End();
 		time.Calm(false);
@@ -390,7 +390,7 @@ public partial class TrainingArea : Node
 		if (session is null || reacting || !canAct()) return;
 		rhythm.UseCreature(Creature.Kind);
 		// Modo calmo e Puzzle: o Boneco não lança bolhas e só reage a erros.
-		if (!bubbles.Tick(delta, stopped: settings.Current.CalmMode || !Bubbles)) return;
+		if (!bubbles.Tick(delta, stopped: settings.Current.CalmMode || !Bubbles || fog is not null)) return;
 		session.BubbleHit();
 		UpdateEnergy();
 		if (session.IsOver) Finish("A névoa ficou forte demais desta vez. Vamos recarregar a energia?");

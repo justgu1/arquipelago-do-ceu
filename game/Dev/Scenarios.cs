@@ -379,6 +379,9 @@ static class Scenarios
 			case "e2e-2":
 				await E2E.Reopen(d);
 				break;
+			case "e2e-nevoa":
+				await NevoaScenario.Play(d);
+				break;
 			case "mouse":
 				await d.ClickHex(3, -4);
 				await d.Wait(0.9);

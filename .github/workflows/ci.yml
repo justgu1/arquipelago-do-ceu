@@ -56,6 +56,8 @@ jobs:
         run: dotnet test game.tests -p:CollectCoverage=true "-p:Include=[ArquipelagoDoCeu.Core]*" -p:Threshold=90 -p:ThresholdType=line
       - name: Comentários de no máximo 2 linhas
         run: node tools/check_comments.mjs
+      - name: Scripts do Blender (bloco comum em dia e aceitos pelo modo seguro)
+        run: node tools/blender/sincronizar.mjs --verificar
       - name: Commits convencionais
         if: github.event_name == 'pull_request'
         run: node tools/check_commits.mjs "origin/${{ github.base_ref }}"

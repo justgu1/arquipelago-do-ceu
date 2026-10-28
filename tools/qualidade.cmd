@@ -20,6 +20,9 @@ dotnet test game.tests -p:CollectCoverage=true "-p:Include=[ArquipelagoDoCeu.Cor
 echo == Comentários
 node tools\check_comments.mjs || exit /b 1
 
+echo == Scripts do Blender
+node tools\blender\sincronizar.mjs --verificar || exit /b 1
+
 echo == Commits
 node tools\check_commits.mjs %BASE% || exit /b 1
 

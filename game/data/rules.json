@@ -179,6 +179,20 @@
       "markRatio": 0.15,
       "guideAlwaysUpToYear": 1
     },
+    "fog": {
+      "stages": 2,
+      "stageFog": 30,
+      "damage": [2, 3, 4],
+      "rechargeSeconds": [2, 3, 4],
+      "weakMultiplier": 2,
+      "otherMultiplier": 0.5,
+      "returnFraction": 0.5,
+      "qteSeconds": 25,
+      "calmRechargeSeconds": 1,
+      "shiftWarningSeconds": 2.5,
+      "perfectTimeLeft": 0.3,
+      "closeTimeLeft": 0.1
+    },
     "targetRange": 5,
     "operators": [
       "+"

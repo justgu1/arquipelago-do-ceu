@@ -17,6 +17,8 @@ public partial class TrainingArea
 		UpdateEnergy();
 	}
 
+	void UpdateEnergyDock() { if (energyView is not null) energyView.OffsetTop = EnergyTop ?? (panel is null ? 154 : 12); }
+
 	internal void UpdateEnergy()
 	{
 		if (session is not null) energyView?.Set(session.Energy.Current, session.Energy.Max);
