@@ -20,13 +20,14 @@ public partial class Lobby
 shader_type spatial;
 render_mode cull_disabled;
 uniform sampler2D leaf_texture : source_color;
+uniform vec3 leaf_color : source_color = vec3(1.0);
 uniform float wind_time = 0.0;
 uniform float wind_strength = 1.0;
 void vertex() {
     float sway = sin(wind_time * 1.3 + VERTEX.y * 3.5 + VERTEX.z * 2.0);
     VERTEX.x += sway * 0.008 * wind_strength * smoothstep(0.0, 0.6, VERTEX.y);
 }
-void fragment() { ALBEDO = texture(leaf_texture, UV).rgb; ROUGHNESS = 0.85; }
+void fragment() { ALBEDO = texture(leaf_texture, UV).rgb * leaf_color; ROUGHNESS = 0.85; }
 " };
 		foreach (var mesh in model.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
 		{
@@ -36,6 +37,7 @@ void fragment() { ALBEDO = texture(leaf_texture, UV).rgb; ROUGHNESS = 0.85; }
 				if (mesh.GetActiveMaterial(s) is not StandardMaterial3D source) continue;
 				var material = new ShaderMaterial { Shader = shader };
 				material.SetShaderParameter("leaf_texture", source.AlbedoTexture);
+				material.SetShaderParameter("leaf_color", source.AlbedoColor);
 				mesh.SetSurfaceOverrideMaterial(s, material);
 				landmarkWind.Add(material);
 			}

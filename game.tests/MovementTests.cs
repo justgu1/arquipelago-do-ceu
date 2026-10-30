@@ -341,4 +341,30 @@ public sealed class PlacementTests
 		Assert.False(mover.HasDestination);
 		Assert.False(mover.IsMoving);
 	}
+
+	// --- obstáculos redondos
+
+	[Fact]
+	public void Obstaculo_redondo_deixa_encostar_perto_do_centro_do_hexagono_bloqueado()
+	{
+		var obstaculo = new HexCell(1, 0);
+		var grade = new HexGrid(HexGrid.Island(3, []).Cells, [obstaculo], props: new Dictionary<HexCell, float> { [obstaculo] = 0.5f });
+		var centro = HexGrid.ToWorld(obstaculo);
+
+		Assert.True(grade.IsFree(centro + new Vector2(-0.8f, 0f), 0.2f));
+		Assert.False(grade.IsFree(centro + new Vector2(-0.3f, 0f), 0.2f));
+		Assert.False(grade.IsWalkable(obstaculo));
+	}
+
+	[Fact]
+	public void Obstaculo_redondo_barra_quem_anda_para_dentro_dele()
+	{
+		var obstaculo = new HexCell(1, 0);
+		var grade = new HexGrid(HexGrid.Island(3, []).Cells, [obstaculo], props: new Dictionary<HexCell, float> { [obstaculo] = 0.5f });
+		var perto = HexGrid.ToWorld(obstaculo) + new Vector2(-0.9f, 0f);
+
+		var depois = grade.Move(perto, new Vector2(0.6f, 0f), 0.1f);
+
+		Assert.True(Vector2.Distance(depois, HexGrid.ToWorld(obstaculo)) > 0.5f);
+	}
 }

@@ -3,7 +3,7 @@ namespace ArquipelagoDoCeu.Rules;
 // A velocidade de caminhada da criança: nenhuma criatura anda mais depressa que isto.
 public static class ChildSpeed
 {
-	public const float Walk = 1.1f;
+	public const float Walk = 1.8f;
 }
 
 // Como as criaturas e o Boneco se movem pela Sala, em dados: patrulham perto de casa, se aproximam devagar quando a criança chega

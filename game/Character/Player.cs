@@ -12,7 +12,7 @@ namespace ArquipelagoDoCeu;
 public partial class Player : Node3D
 {
 	const float Speed = ArquipelagoDoCeu.Rules.ChildSpeed.Walk;
-	const float RunSpeed = 3.3f;
+	const float RunSpeed = 4.2f;
 	float currentSpeed;
 	public float SpeedMultiplier { get; set; } = 1f;
 	public void ApplyEquipment(ArquipelagoDoCeu.Equipment.EquipmentLoadout loadout) => view.ApplyEquipment(loadout);
@@ -22,7 +22,7 @@ public partial class Player : Node3D
 	readonly System.Func<Vector2, float>? groundHeight;
 	readonly Camera3D camera;
 	readonly MovementController mover;
-	readonly CharacterView view = new() { UseSpectrumTest = true };
+	readonly CharacterView view = new();
 
 	public Player(HexGrid grid, Camera3D camera, System.Func<Vector2, float>? groundHeight = null)
 	{
@@ -114,7 +114,7 @@ public partial class Player : Node3D
 		if (displacement.LengthSquared() > .0000001f) actualFacing = Vector2.Normalize(displacement);
 		Place();
 		Turn(dt);
-		view.SetLocomotion(effectiveSpeed, effectiveSpeed > Speed * 1.15f);
+		view.SetLocomotion(effectiveSpeed, effectiveSpeed > Speed * 1.3f);
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -122,10 +122,6 @@ public partial class Player : Node3D
 		if (!Enabled) return;
 		switch (@event)
 		{
-			case InputEventKey { PhysicalKeycode: Key.F8, Pressed: true, Echo: false }:
-				view.ToggleCapeMode();
-				GetViewport().SetInputAsHandled();
-				break;
 			case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } click when TapToWalk:
 				WalkTo(click.Position);
 				break;

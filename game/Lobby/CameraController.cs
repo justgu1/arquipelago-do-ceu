@@ -97,23 +97,11 @@ public partial class CameraController : Node
 		return points[0].DistanceTo(points[1]);
 	}
 
-	void ZoomAt(Godot.Vector2 cursor, float factor)
+	// O zoom é sempre no centro, onde está o Personagem: puxar o foco para o cursor brigava com o acompanhamento e a imagem pulava até recentrar.
+	void ZoomAt(float factor)
 	{
 		if (GetViewport().GuiGetHoveredControl() is not null) return;
-		var plane = new Plane(Vector3.Up, 0f);
-		var before = plane.IntersectsRay(camera.ProjectRayOrigin(cursor), camera.ProjectRayNormal(cursor));
 		rig.ZoomFactor(factor);
-		Apply();
-		var after = plane.IntersectsRay(camera.ProjectRayOrigin(cursor), camera.ProjectRayNormal(cursor));
-		if (before is { } a && after is { } b)
-		{
-			var offset = a - b;
-			var middle = GetViewport().GetVisibleRect().Size * .5f;
-			var focus = plane.IntersectsRay(camera.ProjectRayOrigin(middle), camera.ProjectRayNormal(middle));
-			if (factor < 1f && focus is { } f) offset += (a - f) * .25f;
-			rig.Pan(new Vector2(offset.X, offset.Z));
-			Apply();
-		}
 		GetViewport().SetInputAsHandled();
 	}
 
@@ -121,11 +109,11 @@ public partial class CameraController : Node
 	{
 		switch (@event)
 		{
-			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelUp } wheel:
-				ZoomAt(wheel.Position, 1f / 1.12f);
+			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelUp }:
+				ZoomAt(1f / 1.12f);
 				break;
-			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelDown } wheel:
-				ZoomAt(wheel.Position, 1.12f);
+			case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.WheelDown }:
+				ZoomAt(1.12f);
 				break;
 			default:
 				if (@event.IsActionPressed(Controls.ZoomIn)) rig.ZoomSteps(1f);

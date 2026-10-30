@@ -44,7 +44,8 @@ public partial class Lobby
 	void AddBridges()
 	{
 		foreach (var bridge in map.Bridges.Values)
-			if (!CorridorKit.Add(this, bridge)) AddPlankBridge(bridge);
+			if (CorridorKit.Add(this, bridge)) bridgeDeck.AddRange(CorridorKit.Deck(bridge));
+			else AddPlankBridge(bridge);
 	}
 
 	void AddPlankBridge(IReadOnlyList<HexCell> bridge)

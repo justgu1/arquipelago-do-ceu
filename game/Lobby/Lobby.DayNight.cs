@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ArquipelagoDoCeu.World;
 using Godot;
 
@@ -21,6 +22,9 @@ public partial class Lobby
 	DayCycle? cycle;
 	float dayClock;
 
+	// De 0 (noite) a 1 (pleno dia), para quem vive no Lobby reagir ao ciclo.
+	public float Light { get; private set; } = 1f;
+
 	public void SetFixedDay(bool fixedValue)
 	{
 		fixedDay = fixedValue;
@@ -35,6 +39,7 @@ public partial class Lobby
 		if (!fixedDay) dayClock += (float)GetProcessDeltaTime();
 
 		var light = cycle.Daylight(dayClock);
+		Light = light;
 		environment.BackgroundColor = NightSky.Lerp(DaySky, light);
 		environment.AmbientLightColor = NightAmbient.Lerp(DayAmbient, light);
 		environment.AmbientLightEnergy = Mathf.Lerp(0.45f, 0.7f, light);
@@ -48,6 +53,14 @@ public partial class Lobby
 			bulb.Visible = on;
 			lamp.LightEnergy = reducedEffects ? 0.5f : 1.2f;
 		}
+	}
+
+	// Os moradores passeiam pelos caminhos e à noite se juntam ao lado dos lampiões.
+	void AddLife()
+	{
+		var roads = plan.Path.Where(Grid.IsWalkable).ToList();
+		var gathering = LampCells.SelectMany(c => c.Neighbors()).Where(Grid.IsWalkable).Distinct().ToList();
+		AddChild(new LobbyLife(this, roads, gathering));
 	}
 
 	void AddLamps()
