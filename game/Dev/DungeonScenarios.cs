@@ -206,8 +206,8 @@ static partial class DungeonScenarios
 	static async Task<DungeonRun?> Enter(DevDriver d, bool letters = false, bool shortcut = false)
 	{
 		await EnsureProfile(d);
-		if (letters) await WalkTo(d, 5, -11);
-		else await WalkTo(d, -11, 6);
+		var (q, r) = d.NearObject(letters ? "torre-portugues" : "torre-matematica");
+		await WalkTo(d, q, r);
 		await d.Shot("00-perto-da-torre");
 		await d.Tap(Controls.Interact);
 		await d.Wait(0.5);
