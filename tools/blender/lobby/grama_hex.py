@@ -285,36 +285,51 @@ def construir_pedra():
     apagar("PedraHex")
     fundir("PedraHex", [prisma("S_laje", 1.0, -0.5, 0.0, M["pedra"], CHANFRO)])
 
-# Caminho de tijolos de pedra (TijoloHex): argamassa escura e tijolos em relevo, em fileiras desencontradas, dois tons alternados.
-# Os tijolos são cortados pela borda do hexágono, então vão até a beirada e continuam na laje vizinha, sem moldura de argamassa em volta.
-# A altura da fiada divide o vão vertical entre lajes (1,732) em seis, e o comprimento divide o horizontal (1,5) em três: as fiadas se alinham de uma laje para a outra.
+# Caminho de tijolos irregulares (TijoloHexA, B e C): terra batida e tijolos de pedra espalhados, de tamanhos, giros e alturas diferentes, que passam um pouco da borda.
+# O desenho sem fiada regular se adapta às curvas, e as três variações (escolhidas pelo jogo, laje a laje) impedem que o caminho pareça carimbado.
 M.update(argamassa=mat("argamassa", "#8F7F63", 0.95), tijolo_a=mat("tijolo_a", "#BCA173", 0.9), tijolo_b=mat("tijolo_b", "#A98E62", 0.9))
-APOTEMA = 0.8660254
-FIADA = 2 * APOTEMA / 6
-COMPRIMENTO = 0.5
-JUNTA = 0.045
 
-def cortar_no_hexagono(bm):
-    for k in range(6):
-        ang = math.radians(30 + 60 * k)
-        n = Vector((math.cos(ang), math.sin(ang), 0.0))
-        bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), plane_co=n * APOTEMA, plane_no=n, clear_outer=True)
-    return len(bm.verts) > 0
+def sorteio(semente):
+    estado = [semente]
+    def proximo():
+        estado[0] = (estado[0] * 1103515245 + 12345) % 2147483648
+        return estado[0] / 2147483648
+    return proximo
 
-def construir_tijolo():
-    apagar("TijoloHex")
-    p = [prisma("T_argamassa", 1.0, -0.5, -0.008, M["argamassa"], CHANFRO)]
-    for fila in range(-3, 3):
-        y = (fila + 0.5) * FIADA
-        desloc = 0.0 if fila % 2 == 0 else COMPRIMENTO / 2
-        for col in range(-3, 4):
-            x = col * COMPRIMENTO + desloc
-            bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1.0)
-            for v in bm.verts: v.co = Vector((x + v.co.x * (COMPRIMENTO - JUNTA), y + v.co.y * (FIADA - JUNTA), -0.004 + v.co.z * 0.016))
-            if not cortar_no_hexagono(bm): bm.free(); continue
-            p.append(objeto(f"T_tijolo{fila}_{col}", bm, [M["tijolo_a" if (fila + col) % 2 == 0 else "tijolo_b"]], None, False))
-    fundir("TijoloHex", p)
+def construir_tijolo(letra, semente):
+    nome = "TijoloHex" + letra
+    apagar(nome)
+    acaso = sorteio(semente)
+    p = [prisma(f"{nome}_terra", 1.0, -0.5, -0.008, M["argamassa"], CHANFRO)]
+    colocados = []
+    tentativas = 0
+    while len(colocados) < 17 and tentativas < 400:
+        tentativas += 1
+        ang = acaso() * 2 * math.pi; raio = 0.98 * math.sqrt(acaso())
+        x, y = raio * math.cos(ang), raio * math.sin(ang)
+        comp = 0.24 + acaso() * 0.12; larg = 0.12 + acaso() * 0.07
+        if any((x - cx) ** 2 + (y - cy) ** 2 < ((comp + cc) * 0.42) ** 2 for cx, cy, cc in colocados): continue
+        colocados.append((x, y, comp))
+        girar = (acaso() - 0.5) * 1.4 + (math.pi / 2 if acaso() > 0.67 else 0.0)
+        alto = 0.014 + acaso() * 0.016
+        p.append(cubo(f"{nome}_t{len(colocados)}", (x, y, -0.006 + alto / 2), (comp, larg, alto), M["tijolo_a" if acaso() < 0.5 else "tijolo_b"], None, 0.0, (0, 0, girar), smooth=False))
+    fundir(nome, p)
+
+# Tijolos soltos (TijolosSoltos): três tijolos e uns cascalhos, tortos, para o caminho "vazar" para a grama ao lado em vez de parar na borda do hexágono.
+def construir_soltos():
+    apagar("TijolosSoltos")
+    p = [
+        cubo("S_t1", (-0.12, 0.02, 0.02), (0.3, 0.15, 0.04), M["tijolo_a"], None, 0.0, (0, 0, 0.35)),
+        cubo("S_t2", (0.14, -0.1, 0.02), (0.28, 0.14, 0.04), M["tijolo_b"], None, 0.0, (0, 0, -0.5)),
+        cubo("S_t3", (0.05, 0.16, 0.02), (0.26, 0.13, 0.04), M["tijolo_a"], None, 0.0, (0, 0, 1.1)),
+        cubo("S_c1", (0.32, 0.1, 0.012), (0.08, 0.07, 0.024), M["argamassa"], None, 0.0, (0, 0, 0.7)),
+        cubo("S_c2", (-0.3, -0.12, 0.012), (0.07, 0.06, 0.024), M["argamassa"], None, 0.0, (0, 0, -0.2)),
+    ]
+    fundir("TijolosSoltos", p)
 
 construir_grama()
 construir_pedra()
-construir_tijolo()
+construir_tijolo("A", 11)
+construir_tijolo("B", 23)
+construir_tijolo("C", 37)
+construir_soltos()

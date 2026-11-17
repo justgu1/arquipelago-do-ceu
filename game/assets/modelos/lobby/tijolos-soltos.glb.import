@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dnokg5gfrsjqj"
-path="res://.godot/imported/tijolo-hex.glb-2564bebba970507141233c816c50f17e.scn"
+uid="uid://brsioh0hllbkk"
+path="res://.godot/imported/tijolos-soltos.glb-3aca80dd056d9a11b18943df64c4702f.scn"
 
 [deps]
 
-source_file="res://assets/modelos/lobby/tijolo-hex.glb"
-dest_files=["res://.godot/imported/tijolo-hex.glb-2564bebba970507141233c816c50f17e.scn"]
+source_file="res://assets/modelos/lobby/tijolos-soltos.glb"
+dest_files=["res://.godot/imported/tijolos-soltos.glb-3aca80dd056d9a11b18943df64c4702f.scn"]
 
 [params]
 
