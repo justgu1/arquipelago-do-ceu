@@ -27,7 +27,7 @@ public partial class FloorMap
 		unit = Mathf.Min((size.X - 2 * Padding) / (maxX - minX + 2f), (size.Y - 2 * Padding) / (maxY - minY + 2f));
 		shift = new Vector2(size.X / 2f - (minX + maxX) / 2f * unit, size.Y / 2f - (minY + maxY) / 2f * unit);
 		foreach (var room in layout.Rooms) positions[room.Room] = Place(room.Spot);
-		Radius = Mathf.Clamp(unit * 2.2f, 9f, 17f);
+		Radius = labeled ? 20f : Mathf.Clamp(unit * 2.2f, 9f, 17f);
 	}
 
 	static Vector2 Project(HexCell cell)

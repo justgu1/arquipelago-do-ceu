@@ -173,3 +173,26 @@ public partial class LevelDoneScreen : OverlayScreen
 		footer.AddChild(UiKit.BigButton("Voltar ao Lobby", () => { Close(); leave(); }, 420));
 	}
 }
+
+// A Energia acabou na Dungeon: a névoa ficou forte, mas nada de importante se perde.
+public partial class DefeatScreen : OverlayScreen
+{
+	readonly string tower;
+	readonly Action leave;
+
+	public DefeatScreen(string tower, Action leave)
+	{
+		this.tower = tower;
+		this.leave = leave;
+	}
+
+	public override void _Ready()
+	{
+		base._Ready();
+		var box = UiKit.Card(this, "A névoa ficou forte demais", out var footer);
+		box.AddChild(UiKit.Hint($"Sua Energia acabou na {tower}. Tudo bem: você aprendeu coisas novas e guardou o que achou. Só os itens temporários ficam para trás. Descanse no Lobby e tente de novo quando quiser!"));
+		var back = UiKit.BigButton("Voltar ao Lobby", () => { Close(); leave(); }, 420);
+		footer.AddChild(back);
+		back.GrabFocus();
+	}
+}

@@ -61,11 +61,12 @@ public partial class MapScreen : OverlayScreen
 		var heading = UiKit.Heading(title);
 		box.AddChild(heading);
 
-		var map = new FloorMap(expedition.Floor, new Vector2(760f, 400f)) { Source = expedition, Here = expedition.CurrentRoom, Cleared = new System.Collections.Generic.HashSet<int>(expedition.Cleared), Complete = floorDone };
+		var map = new FloorMap(expedition.Floor, new Vector2(780f, 380f), labeled: true) { Source = expedition, Here = expedition.CurrentRoom, Cleared = new System.Collections.Generic.HashSet<int>(expedition.Cleared), Complete = floorDone };
 		map.SetPlayer(playerAt);
 		map.RoomPointed += room => speakRoom(room);
 		box.AddChild(map);
 
+		box.AddChild(RoomLegend());
 		box.AddChild(Legend());
 		var footer = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
 		footer.AddThemeConstantOverride("separation", 12);
@@ -102,6 +103,25 @@ public partial class MapScreen : OverlayScreen
 		base._UnhandledInput(@event);
 	}
 
+	// Cada tipo de Sala com a mesma marca do mapa (forma, cor e letra) e o nome por extenso.
+	static Control RoomLegend()
+	{
+		var row = new HFlowContainer { Alignment = FlowContainer.AlignmentMode.Center };
+		row.AddThemeConstantOverride("h_separation", 16);
+		foreach (var kind in Generation.RoomTypes.Default.All)
+		{
+			var item = new HBoxContainer();
+			item.AddThemeConstantOverride("separation", 5);
+			item.AddChild(new RoomIcon(kind));
+			var label = new Label { Text = kind.Name };
+			label.AddThemeFontSizeOverride("font_size", 18);
+			label.AddThemeColorOverride("font_color", UiKit.TextColor);
+			item.AddChild(label);
+			row.AddChild(item);
+		}
+		return row;
+	}
+
 	static Control Legend()
 	{
 		var row = new HFlowContainer { Alignment = FlowContainer.AlignmentMode.Center };
@@ -125,6 +145,25 @@ public partial class MapScreen : OverlayScreen
 		if (unpaused) return;
 		unpaused = true;
 		if (GetTree() is { } tree) tree.Paused = false;
+	}
+
+	sealed partial class RoomIcon : Control
+	{
+		readonly Generation.RoomType kind;
+
+		public RoomIcon(Generation.RoomType kind)
+		{
+			this.kind = kind;
+			CustomMinimumSize = new Vector2(30f, 30f);
+		}
+
+		public override void _Draw()
+		{
+			var c = new Vector2(15f, 15f);
+			FloorMap.Badge(this, kind, c, 13f, Colors.Black);
+			FloorMap.Badge(this, kind, c, 11f, FloorMap.ColorOf(kind));
+			DrawString(ThemeDB.FallbackFont, c + new Vector2(-6f, 6f), kind.Letter, HorizontalAlignment.Center, 12, 17, Colors.Black);
+		}
 	}
 
 	// Cada marca do mapa tem um ícone desenhado, e nunca só uma cor.
@@ -171,10 +210,14 @@ public partial class MapScreen : OverlayScreen
 		}
 	}
 
-	// As mãos do Personagem nos cantos de cima da folha, com os braços saindo pela borda de baixo da tela.
+	// As mãos do Personagem seguram os cantos de cima da folha: o braço sobe pelas laterais, a palma fica por fora da borda,
+	// os quatro dedos se fecham por cima dela e o polegar apoia no alto.
 	sealed partial class Hands : Control
 	{
-		static readonly Color Skin = Color.FromHtml("#E8B48A");
+		static readonly Color Skin = Color.FromHtml("#F0BE94");
+		static readonly Color SkinShade = Color.FromHtml("#D99A70");
+		static readonly Color Sleeve = Color.FromHtml("#7A5AA8");
+		static readonly Color Cuff = Color.FromHtml("#F4EBD6");
 
 		readonly Control sheet;
 
@@ -182,7 +225,7 @@ public partial class MapScreen : OverlayScreen
 		{
 			this.sheet = sheet;
 			MouseFilter = MouseFilterEnum.Ignore;
-			SetAnchorsPreset(LayoutPreset.FullRect);
+			SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
 		}
 
 		public override void _Process(double delta) => QueueRedraw();
@@ -190,14 +233,50 @@ public partial class MapScreen : OverlayScreen
 		public override void _Draw()
 		{
 			var rect = sheet.GetGlobalRect();
-			foreach (var corner in new[] { rect.Position + new Vector2(6f, 6f), rect.Position + new Vector2(rect.Size.X - 6f, 6f) })
+			foreach (var left in new[] { true, false })
 			{
-				var foot = new Vector2(corner.X < rect.GetCenter().X ? corner.X - 70f : corner.X + 70f, Size.Y + 20f);
-				DrawLine(corner, foot, Colors.Black, 26f, true);
-				DrawLine(corner, foot, Skin, 20f, true);
-				DrawCircle(corner, 17f, Colors.Black);
-				DrawCircle(corner, 14f, Skin);
+				var inward = left ? 1f : -1f;
+				var corner = new Vector2(left ? rect.Position.X + 2f : rect.End.X - 2f, rect.Position.Y + 10f);
+				DrawArm(corner, inward);
+				DrawHand(corner, inward);
 			}
+		}
+
+		void DrawArm(Vector2 corner, float inward)
+		{
+			var wrist = corner + new Vector2(-inward * 20f, 52f);
+			var foot = new Vector2(wrist.X - inward * 60f, Size.Y + 30f);
+			Capsule(foot, wrist, 46f, Colors.Black);
+			Capsule(foot, wrist, 38f, Sleeve);
+			var toward = (foot - wrist).Normalized();
+			Capsule(wrist + toward * 12f, wrist + toward * 22f, 48f, Colors.Black);
+			Capsule(wrist + toward * 12f, wrist + toward * 22f, 40f, Cuff);
+		}
+
+		void DrawHand(Vector2 corner, float inward)
+		{
+			var palm = corner + new Vector2(-inward * 12f, 26f);
+			DrawCircle(palm, 27f, Colors.Black);
+			DrawCircle(palm, 24f, Skin);
+			for (var i = 0; i < 4; i++)
+			{
+				var start = corner + new Vector2(-inward * 8f, 8f + i * 12f);
+				var end = corner + new Vector2(inward * (18f - (i == 3 ? 5f : 0f)), 8f + i * 12f);
+				Capsule(start, end, 15f, Colors.Black);
+				Capsule(start, end, 11f, Skin);
+				DrawLine(start + new Vector2(inward * 12f, 5f), end + new Vector2(0f, 5f), SkinShade, 1.5f);
+			}
+			var thumbBase = palm + new Vector2(inward * 4f, -14f);
+			var thumbTip = corner + new Vector2(inward * 12f, -14f);
+			Capsule(thumbBase, thumbTip, 17f, Colors.Black);
+			Capsule(thumbBase, thumbTip, 13f, Skin);
+		}
+
+		void Capsule(Vector2 from, Vector2 to, float width, Color color)
+		{
+			DrawLine(from, to, color, width, true);
+			DrawCircle(from, width / 2f, color);
+			DrawCircle(to, width / 2f, color);
 		}
 	}
 }

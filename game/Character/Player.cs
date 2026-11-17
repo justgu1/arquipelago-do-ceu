@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ArquipelagoDoCeu.Combat;
 using ArquipelagoDoCeu.Profiles;
 using ArquipelagoDoCeu.World;
 using Godot;
@@ -68,11 +69,11 @@ public partial class Player : Node3D
 	}
 
 	// Vira o Personagem para um ponto do chão e dispara o ataque; parado, ele fica olhando para lá.
-	public void Attack(Vector2 target)
+	public void Attack(Vector2 target, BasicAttack? attack = null)
 	{
 		var way = target - mover.Position;
 		if (way.LengthSquared() > 0.0001f) faceTarget = Vector2.Normalize(way);
-		view.PlayAttack();
+		view.PlayAttack(attack);
 	}
 
 	public bool ReduceMotion

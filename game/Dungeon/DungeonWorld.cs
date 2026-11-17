@@ -82,7 +82,9 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		AddChild(Creature);
 		AddChild(barrier);
 
+		Creature.CreatureShown += MatchCreatureTo;
 		Creature.Reacted += kind => creatureModel?.React(kind);
+		Creature.TirednessChanged += tiredness => { if (creatureModel is not null) creatureModel.Tiredness = tiredness; };
 	}
 
 	CreatureModel? creatureModel;
@@ -91,9 +93,19 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	// Os modelos da torre, na ordem em que aparecem de Sala em Sala; sem eles vale o Boneco.
 	public IReadOnlyList<string> CreatureSet { get; set; } = [];
 
+	// A palavra do desafio manda no modelo: só mostra um animal ou objeto se ele for o nome escondido; sem modelo da palavra vale o Boneco.
+	string? wordImage;
+
+	public void MatchCreatureTo(string? image)
+	{
+		wordImage = image;
+		if (currentId >= 0) ShowCreatureModel(currentId);
+	}
+
 	void ShowCreatureModel(int roomId)
 	{
 		var name = CreatureSet.Count > 0 ? CreatureSet[roomId % CreatureSet.Count] : "boneco";
+		if (wordImage is { } image) name = CreatureSet.Contains($"criaturas/{image}") ? $"criaturas/{image}" : "boneco";
 		if (name == shownCreature) return;
 		if (creatureModel is not null) RemoveChild(creatureModel.Node);
 		creatureModel?.Node.QueueFree();

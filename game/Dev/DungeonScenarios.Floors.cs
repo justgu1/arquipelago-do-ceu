@@ -26,6 +26,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget, "escolher a criatura abriu a montagem do Escriba");
 		var level = expedition.Plan.Level;
 		d.Expect(level == 2 ? d.Hud?.Presenter is WordPresenter : d.Hud?.Presenter is NamePresenter, $"o Escriba do {level}º ano abriu a HUD certa");
@@ -70,6 +71,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		await d.Tap(Controls.Map);
 		await d.Wait(0.3);
 		d.Expect(run.Combat.HasTarget && !d.HasVisible("Vencida"), "durante o combate o mapa não abre");
@@ -147,6 +149,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		expedition.Energy.Lose(expedition.Energy.Max - 1);
 		await d.OvershootWithKeys();
 		await d.Wait(1.0);
@@ -198,6 +201,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(d.Hud?.Presenter is MathPresenter, "em combate a bolsa de números aparece");
 		await d.Shot("02-combate");
 		var concept = run.Combat.CurrentMission!.Concept;
@@ -291,6 +295,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		await d.Shot("01-luta");
 		expedition.Energy.Lose(expedition.Energy.Max - 1);
 		await d.OvershootWithKeys();

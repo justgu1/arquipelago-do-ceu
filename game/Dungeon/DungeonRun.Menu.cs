@@ -8,6 +8,16 @@ public partial class DungeonRun
 		? ["criaturas/tartaruga", "criaturas/besouro", "criaturas/coruja"]
 		: ["criaturas/mapa", "criaturas/pato", "criaturas/sapo"];
 
+	// Sem Energia: uma tela gentil explica o que aconteceu e o que ficou guardado, e só então a criança volta ao Lobby.
+	internal void OnLost()
+	{
+		if (left) return;
+		var screen = new DefeatScreen(ctx.TowerName, () => Leave(""));
+		endScreen = screen;
+		if (ctx.ShowOverlay is { } show) show(screen);
+		else Leave("A névoa ficou forte demais desta vez. Vamos recarregar a energia?");
+	}
+
 	void OpenMenu()
 	{
 		if (left || !enabled || hud.InCombat() || ctx.ShowOverlay is not { } show) return;

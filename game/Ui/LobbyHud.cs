@@ -74,7 +74,7 @@ public partial class LobbyHud : Control
 	}
 
 	// Com uma luta aberta ou fora do jogo livre, o HUD some; a luta tem a própria tela.
-	// No celular o direcional fica na luta de treino, para desviar das bolhas; só os botões em volta e o resto do HUD somem.
+	// No celular o direcional fica na luta de treino, para desviar dos ataques da criatura; só os botões em volta e o resto do HUD somem.
 	public void SetPlayState(bool enabled, bool fighting = false)
 	{
 		var keepStick = fighting && DeviceInfo.IsTouch;

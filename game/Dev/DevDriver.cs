@@ -54,6 +54,7 @@ public partial class DevDriver : Node
 		var scenario = args.FirstOrDefault(a => a.StartsWith("--driver="))?["--driver=".Length..];
 		if (scenario is null || !OS.IsDebugBuild()) return;
 		var output = args.FirstOrDefault(a => a.StartsWith("--saida="))?["--saida=".Length..] ?? ".";
+		TrainingArea.PilotPeace = !args.Contains("--ataques");
 		parent.AddChild(new DevDriver { scenario = scenario, outputDir = output, Port = port });
 	}
 

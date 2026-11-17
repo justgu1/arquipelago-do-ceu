@@ -29,9 +29,11 @@ public sealed class FogFight
 	int attempts;
 	bool hinted;
 
-	public FogFight(FogRules rules, bool calm, Pcg32 rng)
+	// `stages` troca o número de Etapas da luta (o Desafio épico e o Guardião têm uma a mais); sem valor valem as dos dados.
+	public FogFight(FogRules rules, bool calm, Pcg32 rng, int? stages = null)
 	{
 		this.rules = rules;
+		Stages = Math.Max(1, stages ?? rules.Stages);
 		this.rng = rng;
 		Calm = calm;
 		Weakness = (BasicAttack)rng.NextInt(3);
@@ -45,7 +47,7 @@ public sealed class FogFight
 
 	public int Stage { get; private set; } = 1;
 
-	public int Stages => rules.Stages;
+	public int Stages { get; }
 
 	public int Fog { get; private set; }
 
@@ -58,6 +60,12 @@ public sealed class FogFight
 
 	// Quanto falta da janela do QTE, em segundos. Sem relógio no Modo calmo.
 	public float QteLeft { get; private set; }
+
+	// De 0 a 1: o cansaço da criatura. Sobe a cada golpe que ela leva, alonga a Recarga dos ataques dela e passa com o tempo e a cada Etapa.
+	public float Tiredness { get; private set; }
+
+	// Zerada a Névoa, a criatura fica estonteada enquanto a criança responde ao QTE: não ataca.
+	public bool Stunned => Phase == FogPhase.Qte;
 
 	public bool HasClock => !Calm;
 
@@ -82,6 +90,7 @@ public sealed class FogFight
 		var damage = Math.Max(1, (int)Math.Round(rules.Damage[(int)attack] * (weak ? rules.WeakMultiplier : rules.OtherMultiplier), MidpointRounding.AwayFromZero));
 		Fog = Math.Max(0, Fog - damage);
 		cooldown[(int)attack] = RechargeTotal(attack);
+		Tiredness = Math.Min(1f, Tiredness + rules.Creature.TirednessPerStrike);
 		if (Fog > 0) return new StrikeResult(damage, weak, false);
 
 		Phase = FogPhase.Qte;
@@ -100,13 +109,14 @@ public sealed class FogFight
 		if (Phase != FogPhase.Qte) return null;
 		var left = Calm ? 1f : QteLeft / rules.QteSeconds;
 		var prize = hinted || left < rules.CloseTimeLeft ? Prize.Close : attempts == 1 && left >= rules.PerfectTimeLeft ? Prize.Perfect : Prize.Hit;
-		if (Stage >= rules.Stages)
+		if (Stage >= Stages)
 		{
 			Phase = FogPhase.Won;
 			return new QtePass(prize, true);
 		}
 
 		Stage++;
+		Tiredness = 0f;
 		attempts = 0;
 		Fog = rules.StageFog;
 		Phase = FogPhase.Fog;
@@ -130,6 +140,7 @@ public sealed class FogFight
 		if (Phase == FogPhase.Fog)
 		{
 			for (var i = 0; i < cooldown.Length; i++) cooldown[i] = Math.Max(0f, cooldown[i] - seconds);
+			Tiredness = Math.Max(0f, Tiredness - rules.Creature.TirednessDecayPerSecond * seconds);
 			return TickShift(seconds);
 		}
 		if (Phase != FogPhase.Qte || Calm) return FogEvent.None;

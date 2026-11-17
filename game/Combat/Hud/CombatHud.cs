@@ -25,7 +25,7 @@ public partial class CombatHud : OverlayScreen
 	readonly CreatureWords creature;
 	readonly List<Button> pieceButtons = [];
 	readonly Label heading = BookStyle.Text("", 20);
-	readonly Label prompt = BookStyle.Text("", 24);
+	readonly Label prompt = BookStyle.Text("", 20);
 	readonly Label message = BookStyle.Text("", 18);
 	readonly Label assembled = BookStyle.Text("", 22);
 	readonly Label recharging = BookStyle.Text("", 18);
@@ -83,7 +83,7 @@ public partial class CombatHud : OverlayScreen
 	void SetMessage(string text)
 	{
 		message.Text = text;
-		message.Visible = text.Length > 0;
+		message.Visible = text.Length > 0 && text != presenter.Prompt;
 	}
 
 	// Perde o alvo sem responder: as peças voltam para a mão e o desenho some.
@@ -101,34 +101,37 @@ public partial class CombatHud : OverlayScreen
 	{
 		if (presenter.FreeDraw) return BuildCompactBar();
 		var column = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ShrinkEnd, MouseFilter = MouseFilterEnum.Ignore };
-		column.AddThemeConstantOverride("separation", 8);
+		column.AddThemeConstantOverride("separation", 4);
 		column.AddChild(BuildRequest());
 		column.AddChild(BuildTray());
-		var row = new HBoxContainer { MouseFilter = MouseFilterEnum.Ignore };
-		row.AddThemeConstantOverride("separation", 8);
-		row.AddChild(column);
-		row.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide, LayoutPresetMode.Minsize);
-		row.OffsetLeft = Margin + LeftReserve;
-		row.OffsetRight = -Margin;
-		row.OffsetBottom = -Margin;
-		row.GrowVertical = GrowDirection.Begin;
-		return row;
+		var panel = BookStyle.Panel(column);
+		panel.Name = "Bottom";
+		panel.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide, LayoutPresetMode.Minsize);
+		panel.OffsetLeft = Margin + LeftReserve;
+		panel.OffsetRight = -Margin;
+		panel.OffsetBottom = -Margin;
+		panel.GrowVertical = GrowDirection.Begin;
+		return panel;
 	}
 
+	// Um painel só e baixo: o pedido em cima e as peças com os botões embaixo, para a cena continuar à vista.
 	Control BuildRequest()
 	{
-		var texts = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+		var texts = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, Name = "Request" };
+		texts.AddThemeConstantOverride("separation", 0);
 		texts.AddChild(heading);
 		texts.AddChild(prompt);
 		texts.AddChild(message);
-		texts.AddChild(BookStyle.Text(presenter.KeyHelp, 14));
-		var row = new HBoxContainer();
-		row.AddThemeConstantOverride("separation", 12);
+		texts.AddChild(BookStyle.Text(presenter.KeyHelp, 13));
+		assembled.AddThemeFontSizeOverride("font_size", 18);
+		var status = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
+		status.AddChild(assembled);
+		status.AddChild(recharging);
+		var row = new HBoxContainer { Name = "Status" };
+		row.AddThemeConstantOverride("separation", 16);
 		row.AddChild(texts);
-		row.AddChild(BookStyle.Button("Ouvir", () => ReadRequested?.Invoke(), "Read", PieceSize));
-		var panel = BookStyle.Panel(row);
-		panel.Name = "Request";
-		return panel;
+		row.AddChild(status);
+		return row;
 	}
 
 	Control BuildTray()
@@ -136,30 +139,24 @@ public partial class CombatHud : OverlayScreen
 		pieces = new HFlowContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, Alignment = FlowContainer.AlignmentMode.Center, Name = "Pieces" };
 		pieces.AddThemeConstantOverride("h_separation", 8);
 		pieces.AddThemeConstantOverride("v_separation", 8);
-		var side = new VBoxContainer { CustomMinimumSize = new Vector2(330, 0) };
-		side.AddChild(assembled);
-		side.AddChild(recharging);
-		side.AddChild(BuildActions());
-		var row = new HBoxContainer();
+		var row = new HBoxContainer { Name = "Tray" };
 		row.AddThemeConstantOverride("separation", 16);
 		row.AddChild(pieces);
-		row.AddChild(side);
-		var panel = BookStyle.Panel(row);
-		panel.Name = "Tray";
-		return panel;
+		row.AddChild(BuildActions());
+		return row;
 	}
 
-	HFlowContainer BuildActions()
+	HBoxContainer BuildActions()
 	{
-		var actions = new HFlowContainer();
-		actions.AddThemeConstantOverride("h_separation", 8);
-		actions.AddThemeConstantOverride("v_separation", 8);
-		undo = BookStyle.Button("Apagar", Undo, "Undo", PieceSize);
+		var actions = new HBoxContainer { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+		actions.AddThemeConstantOverride("separation", 6);
+		undo = BookStyle.Button("Apagar", Undo, "Undo", ButtonSize);
 		actions.AddChild(undo);
-		actions.AddChild(BookStyle.Button("Dica", AskHint, "Hint", PieceSize));
-		if (presenter.ExtraLabel is { } extra) actions.AddChild(BookStyle.Button(extra, Extra, "Extra", PieceSize));
-		if (presenter.ConfirmLabel is { } confirm) actions.AddChild(BookStyle.Button(confirm, Confirm, "Confirm", PieceSize));
-		actions.AddChild(BookStyle.Button("Soltar alvo", Abandon, "Release", PieceSize));
+		actions.AddChild(BookStyle.Button("Dica", AskHint, "Hint", ButtonSize));
+		actions.AddChild(BookStyle.Button("Ouvir", () => ReadRequested?.Invoke(), "Read", ButtonSize));
+		if (presenter.ExtraLabel is { } extra) actions.AddChild(BookStyle.Button(extra, Extra, "Extra", ButtonSize));
+		if (presenter.ConfirmLabel is { } confirm) actions.AddChild(BookStyle.Button(confirm, Confirm, "Confirm", ButtonSize));
+		actions.AddChild(BookStyle.Button("Soltar alvo", Abandon, "Release", ButtonSize));
 		return actions;
 	}
 

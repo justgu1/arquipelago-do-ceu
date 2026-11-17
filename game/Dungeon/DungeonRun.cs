@@ -39,7 +39,7 @@ public partial class DungeonRun : Node
 	// Uma Expedição dá no máximo uma carga de rotação ao Mercador, mesmo que passe pelo épico e pelos Andares profundos.
 	bool completedCounted;
 	bool enabled = true;
-	OverlayScreen? levelDone;
+	OverlayScreen? endScreen;
 	// O Atalho de Nível: os Desafios sorteados, na ordem, e qual está em jogo.
 	IReadOnlyList<TrainingSetup> shortcut = [];
 	int shortcutIndex;
@@ -176,8 +176,8 @@ public partial class DungeonRun : Node
 		world.ShowTarget(needsFight, puzzle);
 		if (!needsFight) return;
 
-		// A porta do Puzzle não ataca: sem bolhas, só o Desafio e a Energia que os erros custam.
-		combat.Bubbles = !puzzle && !InShortcut;
+		combat.UsesFog = !puzzle && !InShortcut;
+		combat.FogStages = current.Kind == RoomTypes.Epic ? combat.BossStages : null;
 		combat.StopOnMistake = InShortcut ? OnShortcutFailed : null;
 		combat.Creature = puzzle ? CreatureWords.Gate : CreatureWords.Wild;
 		world.Creature.Title = combat.Creature.Title;
@@ -258,7 +258,7 @@ public partial class DungeonRun : Node
 		var text = $"Nível {ctx.Level} concluído! Você venceu o Desafio épico da {ctx.TowerName}." + (extra is null ? "" : " " + extra);
 		Say(text);
 		var screen = new LevelDoneScreen(ctx.TowerName, ctx.Level, item, () => Leave(""));
-		levelDone = screen;
+		endScreen = screen;
 		if (ctx.ShowOverlay is { } show) show(screen);
 		else GetTree().CreateTimer(EndSeconds, true, false, true).Timeout += () => Leave("");
 	}
@@ -278,8 +278,6 @@ public partial class DungeonRun : Node
 		Say($"Você ganhou o Item de troca da {ctx.TowerName}! Leve-o à {ctx.TowerNameOf(ctx.Towers.Beneficiary(ctx.Tower)?.Id ?? ctx.OtherTower)} para abrir o Marco de lá.");
 		return true;
 	}
-
-	internal void OnLost() => Leave("A névoa ficou forte demais desta vez. Vamos recarregar a energia?");
 
 	// --- Portas e escada
 
@@ -389,7 +387,7 @@ public partial class DungeonRun : Node
 		if (left) return;
 		left = true;
 		// Sair por outro botão com a escolha do Nível concluído aberta: a tela não pode ficar para trás.
-		if (levelDone is not null && IsInstanceValid(levelDone)) levelDone.Close();
+		if (endScreen is not null && IsInstanceValid(endScreen)) endScreen.Close();
 		combat.EndFight();
 		Engine.TimeScale = 1.0;
 		hud.Close();

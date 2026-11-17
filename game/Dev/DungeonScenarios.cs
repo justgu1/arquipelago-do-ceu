@@ -39,6 +39,7 @@ static partial class DungeonScenarios
 				run.Player.PlaceAt(new Vector2(0f, 1.5f));
 				await d.Wait(0.3);
 				await d.Tap(Controls.Target);
+				await d.OpenChallenge();
 				d.Expect(run.Combat.HasTarget, "escolher a criatura abriu a montagem da resposta");
 				await d.Shot("02-luta-na-sala");
 				await d.PressKey(Key.Escape);
@@ -82,11 +83,12 @@ static partial class DungeonScenarios
 
 		await GoTo(d, run, r => r.Kind == RoomTypes.Puzzle && !expedition.IsCleared(r.Id));
 		d.Expect(expedition.Current.Kind == RoomTypes.Puzzle, "chegou a uma Sala de Puzzle");
-		d.Expect(!run.Combat.Bubbles, "o Puzzle não lança bolhas");
+		d.Expect(!run.Combat.UsesFog, "o Puzzle não tem Névoa nem ataques da criatura");
 		d.Expect(run.World.Creature.Visible, "a porta mostra o escudo a resolver");
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget, "escolher a porta abriu a montagem da resposta");
 		await d.Shot("02-puzzle");
 		await d.PressKey(Key.Escape);
@@ -168,6 +170,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget, "escolher a criatura abriu a montagem da resposta");
 		await d.Shot("01-atalho");
 

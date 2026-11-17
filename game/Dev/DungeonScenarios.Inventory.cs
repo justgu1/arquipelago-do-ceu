@@ -105,6 +105,7 @@ static partial class DungeonScenarios
 		run.Player.PlaceAt(new System.Numerics.Vector2(0f, 1.5f));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget && Named<Button>(d, "InventoryButton") is null, "na luta o dock do Inventário some");
 		await d.Tap(Controls.Inventory);
 		d.Expect(Named<Control>(d, "InventoryScreen") is null, "a tecla I não abre o Inventário na luta");

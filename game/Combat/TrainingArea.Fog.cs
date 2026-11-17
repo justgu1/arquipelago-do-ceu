@@ -4,8 +4,8 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// O combate em duas camadas (ADR 0009), em protótipo: só no treino do Escriba por sílabas, com F10 ligada (FogMode).
-// A Névoa zerada abre a HUD de resposta de sempre como QTE; fora dessa condição nada aqui roda.
+// O combate em duas camadas (ADR 0009), de toda criatura: os Ataques básicos tiram a Névoa, a criatura ataca de volta e, zerada a Névoa,
+// a HUD de resposta abre como QTE enquanto ela fica estonteada.
 public partial class TrainingArea
 {
 	const float FinalBlowSeconds = 3f;
@@ -18,26 +18,12 @@ public partial class TrainingArea
 	int energyAtQte;
 	int finalBlows;
 
-	// A luta da Névoa em andamento; nula no combate de sempre. O piloto de testes a lê.
+	// A luta da Névoa em andamento; nula no Puzzle e no Atalho, que só pedem a resposta. O piloto de testes a lê.
 	internal FogFight? Fight => fog;
-
-	// No treino de sempre vem logo o próximo Desafio; no combate novo vencer o Desafio é passar no QTE.
-	void TrainingWon()
-	{
-		if (fog is null) NextChallengeSoon();
-		else QtePassed();
-	}
-
-	bool BeginFog()
-	{
-		if (!FogMode.On || InDungeon || session?.Name is not { Kind: NameKind.Syllables }) return false;
-		StartFogFight();
-		return true;
-	}
 
 	void StartFogFight()
 	{
-		fog = new FogFight(rules.Combat.Fog, settings.Current.CalmMode, random.NewStream());
+		fog = new FogFight(rules.Combat.Fog, settings.Current.CalmMode, random.NewStream(), FogStages);
 		if (fogHud is null)
 		{
 			fogHud = new FogHud(fog);
@@ -64,7 +50,7 @@ public partial class TrainingArea
 	void FogAttack(BasicAttack attack)
 	{
 		if (fog is null || fogBusy || !canAct() || fog.Strike(attack) is not { } hit) return;
-		AttackAnimation();
+		AttackAnimation(attack);
 		dummy.Ray(player.GlobalPosition + Vector3.Up, hit.Weak);
 		dummy.Reduced(fog.Fog);
 		dummy.Say(hit.Weak ? $"Ponto fraco! −{hit.Damage} de Névoa" : $"−{hit.Damage} de Névoa", hit.Weak);
@@ -73,6 +59,7 @@ public partial class TrainingArea
 
 	void EnterQte()
 	{
+		dummy.SetStunned(true);
 		energyAtQte = session!.Energy.Current;
 		dummy.ShowChallenge(session);
 		OpenPanel();
@@ -84,6 +71,7 @@ public partial class TrainingArea
 	void QtePassed()
 	{
 		if (fog?.QtePassed() is not { } pass || session is null) return;
+		dummy.SetStunned(false);
 		DropTarget();
 		var target = Math.Min(session.Energy.Max, energyAtQte + FogFight.EnergyFor(pass.Prize, rules.Combat.Energy));
 		var diff = target - session.Energy.Current;
@@ -92,6 +80,7 @@ public partial class TrainingArea
 		UpdateEnergy();
 
 		var note = pass.Prize switch { Prize.Perfect => "Golpe perfeito!", Prize.Close => "Passou! Sem pressa também vale.", _ => "Acertou!" };
+		if (pass.FinalBlow) BattleEnded?.Invoke(session.Conclude(calmed: true));
 		if (pass.FinalBlow) FinalBlow(note);
 		else NextStage(note);
 	}
@@ -100,6 +89,8 @@ public partial class TrainingArea
 	void NextStage(string note)
 	{
 		fogBusy = true;
+		// Uma Etapa nova começa com a criatura descansada: a espera alongada pelo cansaço da anterior não pode passar para ela.
+		creatureAttacks.Clear();
 		dummy.Say(note, true);
 		session!.NextChallenge();
 		var mine = ++epoch;
@@ -127,6 +118,11 @@ public partial class TrainingArea
 		cutscene = null;
 		Engine.TimeScale = time.Scale;
 		if (session is null || fog is null) return;
+		if (fightWon is not null)
+		{
+			CompleteRoomFight();
+			return;
+		}
 		session.NextChallenge();
 		StartFogFight();
 		fogBusy = false;
@@ -138,6 +134,7 @@ public partial class TrainingArea
 	{
 		if (fog is null) return false;
 		fog.QteFailed();
+		dummy.SetStunned(false);
 		DropTarget();
 		BackToFog();
 		dummy.Say("A Névoa voltou um pouco. Tire de novo!", false);
@@ -159,13 +156,60 @@ public partial class TrainingArea
 		QteUnclear();
 	}
 
+	// Numa Sala a criatura libertada encerra a luta: a Sala vale como vencida.
+	void CompleteRoomFight()
+	{
+		var won = fightWon;
+		var solved = session!.Mission;
+		EndFight();
+		ChallengeSolved?.Invoke(solved);
+		won!();
+	}
+
 	void EndFog()
 	{
+		dummy.SetStunned(false);
 		fog = null;
 		fogBusy = false;
 		if (cutscene is not null && IsInstanceValid(cutscene)) cutscene.QueueFree();
 		cutscene = null;
 		fogHud?.QueueFree();
 		fogHud = null;
+	}
+
+	// Num treino vem logo o próximo Desafio; numa Sala, vencer o Desafio vence a Sala.
+	internal void Won()
+	{
+		if (fog is not null) { QtePassed(); return; }
+		if (session is not null) BattleEnded?.Invoke(session.Conclude(calmed: true));
+		if (fightWon is null) { NextChallengeSoon(); return; }
+		reacting = true;
+		creatureAttacks.Clear();
+		var mine = ++epoch;
+		GetTree().CreateTimer(ReactionSeconds, true, false, true).Timeout += () =>
+		{
+			if (epoch != mine || session is null) return;
+			var won = fightWon;
+			var solved = session.Mission;
+			EndFight();
+			ChallengeSolved?.Invoke(solved);
+			won();
+		};
+	}
+
+	void NextChallengeSoon()
+	{
+		reacting = true;
+		creatureAttacks.Clear();
+		var mine = epoch;
+		GetTree().CreateTimer(ReactionSeconds, true, false, true).Timeout += () =>
+		{
+			if (epoch != mine || session is null) return;
+			reacting = false;
+			session.NextChallenge();
+			dummy.ShowChallenge(session);
+			AnswerPanels.Refresh(panel);
+			Tell($"Novo Desafio: {session.Mission.Prompt}");
+		};
 	}
 }

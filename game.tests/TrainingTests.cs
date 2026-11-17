@@ -73,7 +73,7 @@ public class EnergyTests
 	}
 
 	[Fact]
-	public void Acerto_recupera_1_golpe_perfeito_recupera_2_erro_e_bolha_tiram_1()
+	public void Acerto_recupera_1_golpe_perfeito_recupera_2_erro_e_golpe_da_criatura_tiram_1()
 	{
 		var session = TrainingFixtures.Math(TrainingFixtures.MathMission("a", 9), TrainingFixtures.MathMission("b", 8));
 
@@ -84,7 +84,7 @@ public class EnergyTests
 		session.Hit(perfect: false);
 		Assert.Equal(4, session.Energy.Current);
 
-		session.BubbleHit();
+		session.CreatureHit();
 		Assert.Equal(3, session.Energy.Current);
 
 		session.Hit(perfect: true);
@@ -105,12 +105,12 @@ public class EnergyTests
 	}
 
 	[Fact]
-	public void Bolha_que_zera_a_Energia_encerra_a_sessao()
+	public void Golpe_da_criatura_que_zera_a_Energia_encerra_a_sessao()
 	{
 		var session = TrainingFixtures.Math(TrainingFixtures.MathMission("a", 9));
 
 		var empty = false;
-		for (var i = 0; i < 5; i++) empty = session.BubbleHit();
+		for (var i = 0; i < 5; i++) empty = session.CreatureHit();
 
 		Assert.True(empty);
 		Assert.True(session.IsOver);
@@ -514,119 +514,12 @@ public class NameBattleTests
 	}
 }
 
-public class BubbleTests
-{
-	static readonly BubbleRules Rules = TrainingFixtures.Rules.Bubble;
-	static readonly Vector2 Dummy = Vector2.Zero;
-
-	// Avança o relógio em passos de 0,1 s até o evento pedido; devolve o tempo gasto.
-	static float Until(BubbleAttack bubble, BubbleEvent wanted, Func<float, Vector2> player)
-	{
-		var t = 0f;
-		for (var i = 0; i < 2000; i++)
-		{
-			t += 0.1f;
-			if (bubble.Update(0.1f, Dummy, player(t)) == wanted) return t;
-		}
-		throw new Xunit.Sdk.XunitException($"O evento {wanted} não aconteceu.");
-	}
-
-	static Func<float, Vector2> Still(Vector2 at) => _ => at;
-
-	[Fact]
-	public void A_bolha_so_sai_depois_de_um_aviso()
-	{
-		var bubble = new BubbleAttack(Rules);
-		var player = Still(new Vector2(5, 0));
-
-		var warned = Until(bubble, BubbleEvent.Warned, player);
-		Assert.Equal(BubblePhase.Warning, bubble.Phase);
-
-		var launched = Until(bubble, BubbleEvent.Launched, player);
-		Assert.InRange(warned, Rules.IntervalSeconds - 0.15f, Rules.IntervalSeconds + 0.15f);
-		Assert.InRange(launched, Rules.WarningSeconds - 0.15f, Rules.WarningSeconds + 0.15f);
-	}
-
-	[Fact]
-	public void A_bolha_e_lenta_e_da_tempo_de_desviar()
-	{
-		var bubble = new BubbleAttack(Rules);
-		var player = Still(new Vector2(5, 0));
-		Until(bubble, BubbleEvent.Launched, player);
-
-		var flight = Until(bubble, BubbleEvent.Hit, player);
-
-		Assert.InRange(flight, (5f - Rules.Radius) / Rules.Speed - 0.2f, (5f - Rules.Radius) / Rules.Speed + 0.2f);
-		Assert.True(flight > 2f);
-	}
-
-	[Fact]
-	public void Sair_do_caminho_evita_a_bolha()
-	{
-		var bubble = new BubbleAttack(Rules);
-		Until(bubble, BubbleEvent.Launched, Still(new Vector2(5, 0)));
-
-		Until(bubble, BubbleEvent.Missed, Still(new Vector2(5, Rules.Radius * 3)));
-
-		Assert.Equal(BubblePhase.Waiting, bubble.Phase);
-	}
-
-	[Fact]
-	public void A_mira_trava_quando_o_aviso_comeca_e_a_bolha_nao_persegue_a_crianca()
-	{
-		var bubble = new BubbleAttack(Rules);
-		Until(bubble, BubbleEvent.Warned, Still(new Vector2(5, 0)));
-		Until(bubble, BubbleEvent.Launched, Still(new Vector2(5, 9)));
-
-		bubble.Update(0.1f, Dummy, new Vector2(5, 9));
-
-		Assert.Equal(0f, bubble.Aim.Y);
-		Assert.Equal(0f, bubble.Position.Y);
-		Assert.Equal(Vector2.UnitX, bubble.DirectionFrom(Dummy));
-	}
-
-	[Fact]
-	public void Sair_do_caminho_durante_o_aviso_ja_basta_para_desviar()
-	{
-		var bubble = new BubbleAttack(Rules);
-		Until(bubble, BubbleEvent.Warned, Still(new Vector2(5, 0)));
-		var aside = Still(new Vector2(5, Rules.Radius * 3));
-
-		Until(bubble, BubbleEvent.Launched, aside);
-		Until(bubble, BubbleEvent.Missed, aside);
-	}
-
-
-	[Fact]
-	public void A_mesma_regra_gera_sempre_o_mesmo_tempo()
-	{
-		var player = Still(new Vector2(5, 0));
-		var first = Until(new BubbleAttack(Rules), BubbleEvent.Hit, player);
-		var second = Until(new BubbleAttack(Rules), BubbleEvent.Hit, player);
-
-		Assert.Equal(first, second);
-	}
-
-	[Fact]
-	public void Reset_desfaz_a_bolha_no_ar()
-	{
-		var bubble = new BubbleAttack(Rules);
-		Until(bubble, BubbleEvent.Launched, Still(new Vector2(5, 0)));
-
-		bubble.Reset();
-
-		Assert.Equal(BubblePhase.Waiting, bubble.Phase);
-	}
-}
-
 public class CombatRulesDataTests
 {
 	[Theory]
 	[InlineData("\"mistakesForHint\": 2", "\"mistakesForHint\": 0")]
 	[InlineData("\"prankSeconds\": 4", "\"prankSeconds\": 99")]
 	[InlineData("\"hit\": 1,", "\"hit\": 0,")]
-	[InlineData("\"speed\": 1.5", "\"speed\": 9")]
-	[InlineData("\"warningSeconds\": 1.6", "\"warningSeconds\": 0.1")]
 	public void Valor_fora_do_limite_e_recusado(string from, string to)
 	{
 		var result = GameRules.Parse(TestJson.Rules.Replace(from, to));
@@ -637,7 +530,7 @@ public class CombatRulesDataTests
 
 	[Theory]
 	[InlineData("\"energy\":")]
-	[InlineData("\"bubble\":")]
+	[InlineData("\"creatureHit\":")]
 	[InlineData("\"mistakesForHint\":")]
 	public void Dado_ausente_e_recusado(string key)
 	{
@@ -700,7 +593,7 @@ public sealed class TrainingProgressTests : IDisposable
 		training.Hit(perfect: false);
 		training.Hint();
 		training.Hit(perfect: true);
-		training.BubbleHit();
+		training.CreatureHit();
 		training.NextChallenge();
 		while (!training.IsOver) training.Mistake();
 	}

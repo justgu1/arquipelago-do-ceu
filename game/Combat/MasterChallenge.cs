@@ -77,6 +77,7 @@ public partial class MasterChallenge : Node
 		uiRoot.AddChild(energyView);
 		training.EnergyTop = 154;
 		training.Creature = CreatureWords.Guardian;
+		training.FogStages = training.BossStages;
 		BeginRound();
 		return null;
 	}
@@ -134,6 +135,7 @@ public partial class MasterChallenge : Node
 	{
 		training.Creature = CreatureWords.Dummy;
 		training.EnergyTop = null;
+		training.FogStages = null;
 		energyView?.QueueFree();
 		energyView = null;
 		energy = null;

@@ -181,17 +181,49 @@
     },
     "fog": {
       "stages": 2,
-      "stageFog": 30,
-      "damage": [2, 3, 4],
-      "rechargeSeconds": [2, 3, 4],
+      "stageFog": 40,
+      "damage": [
+        3,
+        4,
+        6
+      ],
+      "rechargeSeconds": [
+        0.8,
+        1.2,
+        1.8
+      ],
       "weakMultiplier": 2,
       "otherMultiplier": 0.5,
       "returnFraction": 0.5,
       "qteSeconds": 25,
-      "calmRechargeSeconds": 1,
+      "calmRechargeSeconds": 0.6,
       "shiftWarningSeconds": 2.5,
       "perfectTimeLeft": 0.3,
-      "closeTimeLeft": 0.1
+      "closeTimeLeft": 0.1,
+      "creature": {
+        "attacks": [
+          {
+            "cooldownSeconds": 6,
+            "warningSeconds": 1.5
+          },
+          {
+            "cooldownSeconds": 8,
+            "warningSeconds": 1.8
+          },
+          {
+            "cooldownSeconds": 10,
+            "warningSeconds": 2
+          }
+        ],
+        "lungeWidth": 1.6,
+        "lungeRange": 9,
+        "slamRadius": 1.6,
+        "spinRadius": 3,
+        "minGapSeconds": 3,
+        "tirednessPerStrike": 0.12,
+        "tirednessDecayPerSecond": 0.02,
+        "maxSlowdown": 1.5
+      }
     },
     "targetRange": 5,
     "operators": [
@@ -209,36 +241,12 @@
       "hit": 1,
       "perfect": 2,
       "mistake": 1,
-      "bubble": 1
-    },
-    "bubble": {
-      "intervalSeconds": 8,
-      "warningSeconds": 1.6,
-      "speed": 1.5,
-      "radius": 0.8,
-      "range": 9
+      "creatureHit": 1
     },
     "rhythm": {
       "player": {
         "rechargeSeconds": 0.8
-      },
-      "creatures": [
-        {
-          "kind": "dummy",
-          "intervalSeconds": 8,
-          "warningSeconds": 1.6
-        },
-        {
-          "kind": "wild",
-          "intervalSeconds": 7,
-          "warningSeconds": 1.6
-        },
-        {
-          "kind": "guardian",
-          "intervalSeconds": 6,
-          "warningSeconds": 1.6
-        }
-      ]
+      }
     },
     "movement": {
       "patrolSpeed": 0.6,

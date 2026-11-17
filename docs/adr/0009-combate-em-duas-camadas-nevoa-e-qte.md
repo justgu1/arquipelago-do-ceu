@@ -1,6 +1,6 @@
 # O combate tem duas camadas: Ataques básicos tiram a Névoa e o QTE educacional faz a luta avançar
 
-O combate de hoje (a criança desenha a resposta, o mundo desacelera e o fim do traço ataca) foi considerado bom no desenho, mas sem desafio e sem empolgação. Em 27/10/2026 os sócios decidiram a direção abaixo, **a validar num protótipo descartável do Escriba contra o Boneco antes de virar implementação definitiva** (ver `docs/agents/roteiro-de-playtest.md`). As referências são God of War 1 e Metal Gear Rising, adaptadas sem violência.
+O combate de hoje (a criança desenha a resposta, o mundo desacelera e o fim do traço ataca) foi considerado bom no desenho, mas sem desafio e sem empolgação. Em 27/10/2026 os sócios decidiram a direção abaixo, e em 30/10/2026, depois de jogar o protótipo, passaram a valer para o jogo todo (ver `docs/agents/roteiro-de-playtest.md` para o playtest com crianças). As referências são God of War 1 e Metal Gear Rising, adaptadas sem violência.
 
 ## A decisão
 
@@ -21,6 +21,17 @@ Só resposta errada, reconhecida com segurança, custa 1 de Energia. Fim da jane
 
 Até aqui valia "nada depende de velocidade ou precisão motora para avançar". Passa a valer: **nenhuma resposta educacional depende de velocidade no Modo calmo**. No modo normal o QTE tem uma janela de tempo generosa (em dados) e a Recarga dos Ataques básicos conta; o ritmo é parte do desafio, que "sempre precisa existir". No Modo calmo não há relógio no QTE, a Recarga cai para cerca de 1 s e o desafio vem da composição (fraquezas, traços das criaturas, sílabas ou peças a mais). O Modo calmo é a garantia de acessibilidade.
 
+## Atualização de 30/10/2026: o combate novo é o único
+
+O protótipo agradou e o combate de antes (a resposta aberta desde o começo, com Bolha de névoa e Lance) foi removido. As mudanças:
+
+- **No jogo todo.** Vale no treino e nas Dungeons, no Escriba e no Matemático, no Desafio épico e no Guardião. O Puzzle (porta) e o Atalho de Nível só pedem a resposta, sem Névoa. A chave F10 deixou de existir.
+- **Ataques básicos mais rápidos.** A Recarga cai para cerca de 0,8, 1,2 e 1,8 s (Precisa, Diagonal e Carregado), o dano sobe e a Névoa da Etapa é 40, para a Etapa durar poucos golpes. Cada tipo ganhou a sua animação no Personagem.
+- **A criatura ataca de volta, e a Bolha e o Lance deixam de existir.** Ela tem três ataques básicos, cada um com Recarga e aviso próprios, e escolhe entre os que estão prontos sem repetir o anterior: a Investida (uma faixa até a criança), o Pulo (um círculo onde a criança estava) e o Giro (um anel em volta dela). A mira trava no aviso, que usa forma, texto e som; sair da área é desviar, e ser alcançada custa 1 de Energia. Não há ataque no Modo calmo.
+- **Cansaço cumulativo da criatura.** Cada Ataque básico que ela leva sobe o cansaço (0 a 1); cansada, ela espera até 2,5 vezes mais para atacar de novo e fica mais baixa e lenta. Ele cai com o tempo e zera quando a Etapa acaba.
+- **Estonteada no QTE.** Zerada a Névoa, a criatura fica parada, com estrelas girando sobre ela, enquanto a criança responde; ao passar ou falhar ela se recupera.
+- **Dados.** Tudo isso está em `combat.fog` (`creature.attacks`, cansaço e Recarga); `combat.bubble` e os ritmos por tipo de criatura foram removidos.
+
 ## O que não muda
 
 Ambiguidade nunca custa Energia, a dica nunca custa, a Energia máxima e a derrota são as mesmas, e o conteúdo educacional e a dificuldade por Nível não mudam. Toda ação funciona com toque, mouse e teclado: os Ataques básicos ficam em botões do lado oposto ao do movimento, ou em teclas.
@@ -31,4 +42,4 @@ Manter o combate de hoje, que dá só um lance a cada 20 a 30 s, não resolve a 
 
 ## Em aberto
 
-Se o anel do Lance continua (o Boneco do treino não lança, então o protótipo não o testa), os valores de Recarga, de fração devolvida e de janela de tempo, e o QTE do Matemático (o do Escriba é o que o protótipo prova primeiro).
+Os valores de Recarga, de cansaço, dos ataques da criatura, de fração devolvida e de janela de tempo, que o playtest com crianças vai ajustar; e as cutscenes de ataque por criatura, que hoje são movimentos feitos por código (os modelos não têm esqueleto).

@@ -250,11 +250,66 @@ public class FogFightTests
 		Assert.Equal(0, FogFight.EnergyFor(Prize.Close, energy));
 	}
 
+	const string Creature = "\"creature\": { \"attacks\": [{ \"cooldownSeconds\": 6, \"warningSeconds\": 1.5 }, { \"cooldownSeconds\": 8, \"warningSeconds\": 1.8 }, { \"cooldownSeconds\": 10, \"warningSeconds\": 2 }], \"lungeWidth\": 1.6, \"lungeRange\": 9, \"slamRadius\": 1.6, \"spinRadius\": 3, \"minGapSeconds\": 3, \"tirednessPerStrike\": 0.12, \"tirednessDecayPerSecond\": 0.02, \"maxSlowdown\": 1.5 }";
+
+	[Fact]
+	public void Cada_golpe_cansa_a_criatura_e_o_cansaco_passa_com_o_tempo_e_a_cada_Etapa()
+	{
+		var fight = Start();
+
+		fight.Strike(fight.Weakness);
+		var after = fight.Tiredness;
+		Assert.Equal(Rules.Creature.TirednessPerStrike, after);
+
+		fight.Tick(1f);
+		Assert.True(fight.Tiredness < after);
+
+		ClearStage(fight);
+		fight.QtePassed();
+		Assert.Equal(0f, fight.Tiredness);
+	}
+
+	[Fact]
+	public void O_cansaco_nunca_passa_de_1()
+	{
+		var fight = Start(rules: Rules with { StageFog = 200 });
+
+		for (var i = 0; i < 50 && fight.Phase == FogPhase.Fog; i++)
+		{
+			fight.Tick(10f);
+			fight.Strike(BasicAttack.Precise);
+		}
+
+		Assert.InRange(fight.Tiredness, 0f, 1f);
+	}
+
+	[Fact]
+	public void A_criatura_fica_estonteada_so_enquanto_o_QTE_esta_aberto()
+	{
+		var fight = Start();
+		Assert.False(fight.Stunned);
+
+		ClearStage(fight);
+		Assert.True(fight.Stunned);
+
+		fight.QteFailed();
+		Assert.False(fight.Stunned);
+	}
+
+	[Fact]
+	public void O_Desafio_epico_pode_ter_uma_Etapa_a_mais_que_os_dados()
+	{
+		var fight = new FogFight(Rules, calm: false, new Pcg32(7), stages: 3);
+
+		Assert.Equal(3, fight.Stages);
+		Assert.Equal(Rules.Stages, Start().Stages);
+	}
+
 	[Fact]
 	public void As_regras_da_nevoa_vem_dos_dados_e_valores_ruins_sao_recusados()
 	{
 		var valid = TestJson.Rules;
-		const string fog = "\"fog\": { \"stages\": 3, \"stageFog\": 20, \"damage\": [1, 2, 3], \"rechargeSeconds\": [2, 3, 4], \"weakMultiplier\": 2, \"otherMultiplier\": 0.5, \"returnFraction\": 0.5, \"qteSeconds\": 20, \"calmRechargeSeconds\": 1, \"shiftWarningSeconds\": 2, \"perfectTimeLeft\": 0.3, \"closeTimeLeft\": 0.1 },";
+		const string fog = "\"fog\": { \"stages\": 3, \"stageFog\": 20, \"damage\": [1, 2, 3], \"rechargeSeconds\": [2, 3, 4], \"weakMultiplier\": 2, \"otherMultiplier\": 0.5, \"returnFraction\": 0.5, \"qteSeconds\": 20, \"calmRechargeSeconds\": 1, \"shiftWarningSeconds\": 2, \"perfectTimeLeft\": 0.3, \"closeTimeLeft\": 0.1, " + Creature + " },";
 
 		Assert.Equal(Rules, GameRules.Parse(valid).Value!.Combat.Fog);
 		var parsed = GameRules.Parse(valid.Replace("\"combat\": {", "\"combat\": { " + fog));
@@ -264,5 +319,41 @@ public class FogFightTests
 		Assert.False(GameRules.Parse(valid.Replace("\"combat\": {", "\"combat\": { " + fog.Replace("[2, 3, 4]", "[2, 3, 40]"))).IsOk);
 		Assert.False(GameRules.Parse(valid.Replace("\"combat\": {", "\"combat\": { " + fog.Replace("\"closeTimeLeft\": 0.1", "\"closeTimeLeft\": 0.4").Replace("\"perfectTimeLeft\": 0.3", "\"perfectTimeLeft\": 0.2"))).IsOk);
 		Assert.False(GameRules.Parse(valid.Replace("\"combat\": {", "\"combat\": { \"fog\": { \"stages\": 2 },")).IsOk);
+	}
+
+	// A criatura tem os limites do JSON checados na borda: um ritmo que o jogo não consegue cumprir é recusado.
+	[Fact]
+	public void Regras_da_criatura_ruins_sao_recusadas()
+	{
+		var valid = TestJson.Rules;
+		const string fog = "\"fog\": { \"stages\": 3, \"stageFog\": 20, \"damage\": [1, 2, 3], \"rechargeSeconds\": [2, 3, 4], \"weakMultiplier\": 2, \"otherMultiplier\": 0.5, \"returnFraction\": 0.5, \"qteSeconds\": 20, \"calmRechargeSeconds\": 1, \"shiftWarningSeconds\": 2, \"perfectTimeLeft\": 0.3, \"closeTimeLeft\": 0.1, " + Creature + " },";
+		bool Accepts(string creature) => GameRules.Parse(valid.Replace("\"combat\": {", "\"combat\": { " + fog.Replace(Creature, creature))).IsOk;
+
+		Assert.True(Accepts(Creature));
+		Assert.False(Accepts(Creature.Replace("\"warningSeconds\": 2 }", "\"warningSeconds\": 10 }")));
+		Assert.False(Accepts(Creature.Replace("{ \"cooldownSeconds\": 8, \"warningSeconds\": 1.8 }, ", "")));
+		Assert.False(Accepts(Creature.Replace("\"minGapSeconds\": 3", "\"minGapSeconds\": 0.1")));
+		Assert.False(Accepts(Creature.Replace("\"lungeWidth\": 1.6, ", "")));
+		Assert.False(Accepts(Creature.Replace("\"cooldownSeconds\": 6, ", "")));
+		Assert.False(Accepts(Creature.Replace("[{ \"cooldownSeconds\": 6, \"warningSeconds\": 1.5 }", "[null")));
+	}
+
+	// O Default só vale sem o campo no JSON de teste; ele não pode se afastar do balanceamento que o jogo realmente usa.
+	[Fact]
+	public void O_padrao_da_nevoa_e_o_dos_dados_do_jogo()
+	{
+		var json = File.ReadAllText(Path.Combine(MissionFiles.RepositoryRoot(), "game", "data", "rules.json"));
+
+		var real = GameRules.Parse(json).Value!.Combat.Fog;
+
+		Assert.Equal(FogRules.Default.Stages, real.Stages);
+		Assert.Equal(FogRules.Default.StageFog, real.StageFog);
+		Assert.Equal(FogRules.Default.Damage, real.Damage);
+		Assert.Equal(FogRules.Default.RechargeSeconds, real.RechargeSeconds);
+		Assert.Equal(FogRules.Default.QteSeconds, real.QteSeconds);
+		Assert.Equal(FogRules.Default.WeakMultiplier, real.WeakMultiplier);
+		Assert.Equal(FogRules.Default.OtherMultiplier, real.OtherMultiplier);
+		Assert.Equal(FogRules.Default.Creature.Attacks, real.Creature.Attacks);
+		Assert.Equal(FogRules.Default.Creature.MinGapSeconds, real.Creature.MinGapSeconds);
 	}
 }
