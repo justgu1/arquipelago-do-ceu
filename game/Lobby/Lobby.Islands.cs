@@ -25,11 +25,20 @@ public partial class Lobby
 		if (planned.IsOk) plan = planned.Value!;
 		else GD.PushError(planned.Error!);
 		foreach (var cell in map.Main) tiles[new Vector2I(cell.Q, cell.R)] = TileFor(cell);
+		MarkPlaza();
 		foreach (var cell in map.Islands.Values.SelectMany(c => c)) tiles[new Vector2I(cell.Q, cell.R)] = Hash01(cell.Q * 31 + cell.R * 17) < 0.2f ? Kind.Flowers : Kind.Grass;
 		foreach (var cell in map.Bridges.Values.SelectMany(c => c))
 		{
 			tiles[new Vector2I(cell.Q, cell.R)] = Kind.Plank;
 		}
+	}
+
+	// A praça: lajes de pedra em volta do Guia e do Álbum, no caminho do Lobby, nunca por cima da lagoa.
+	void MarkPlaza()
+	{
+		var centers = Rules.Objects.Where(o => o.Id is "guia" or "album").Select(o => new HexCell(o.Q, o.R)).ToList();
+		foreach (var cell in map.Main.Where(c => !plan.Lake.Contains(c) && centers.Any(center => c.DistanceTo(center) <= 2)))
+			tiles[new Vector2I(cell.Q, cell.R)] = Kind.Plaza;
 	}
 
 	// A lagoa no centro, o caminho em anel com os braços e as praças, e grama (com flores aqui e ali) no resto.

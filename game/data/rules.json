@@ -311,50 +311,50 @@
   "lobby": {
     "interactionReach": 2.2,
     "dayCycleSeconds": 480,
-    "islandRadius": 8,
+    "islandRadius": 11,
     "carved": [],
     "islands": [
       {
         "id": "matematica",
-        "q": -13,
-        "r": 9,
-        "radius": 2,
+        "q": -17,
+        "r": 12,
+        "radius": 3,
         "from": [
-          -8,
-          4
+          -11,
+          5
         ],
         "solid": true
       },
       {
         "id": "portugues",
-        "q": 9,
-        "r": -13,
-        "radius": 2,
+        "q": 12,
+        "r": -17,
+        "radius": 3,
         "from": [
-          4,
-          -8
+          5,
+          -11
         ],
         "solid": true
       },
       {
         "id": "mercador",
         "q": 0,
-        "r": 13,
-        "radius": 2,
+        "r": 17,
+        "radius": 3,
         "from": [
           0,
-          8
+          11
         ]
       }
     ],
     "camera": {
-      "size": 28,
+      "size": 34,
       "minSize": 8,
-      "maxSize": 44,
+      "maxSize": 52,
       "zoomStep": 3,
       "followSharpness": 4,
       "deadZone": 1.5,
-      "maxPan": 24
+      "maxPan": 34
     },
     "places": [
       {
@@ -362,16 +362,16 @@
         "name": "Torre dos Números",
         "sign": "Aberta: chegue perto e entre",
         "model": "torre-numeros",
-        "x": -19.5,
-        "z": 4.33
+        "x": -25.5,
+        "z": 6.06
       },
       {
         "id": "portugues",
         "name": "Torre das Letras",
         "sign": "Aberta: chegue perto e entre",
         "model": "torre-letras",
-        "x": 13.5,
-        "z": -14.72
+        "x": 18,
+        "z": -19.05
       },
       {
         "id": "ciencias",
@@ -415,15 +415,15 @@
         "id": "torre-matematica",
         "name": "Torre dos Números",
         "prompt": "Entrar na Torre dos Números",
-        "q": -12,
-        "r": 8
+        "q": -16,
+        "r": 11
       },
       {
         "id": "torre-portugues",
         "name": "Torre das Letras",
         "prompt": "Entrar na Torre das Letras",
-        "q": 8,
-        "r": -12
+        "q": 11,
+        "r": -16
       },
       {
         "id": "mercador",
@@ -431,7 +431,7 @@
         "prompt": "Falar com o Mercador",
         "model": "mercado",
         "q": 0,
-        "r": 12
+        "r": 16
       },
       {
         "id": "mestre",
@@ -531,6 +531,38 @@
         {
           "x": 0.25,
           "z": -0.43
+        },
+        {
+          "x": 0.2,
+          "z": -0.92
+        },
+        {
+          "x": 0.72,
+          "z": -0.66
+        },
+        {
+          "x": -0.52,
+          "z": -0.86
+        },
+        {
+          "x": 0.93,
+          "z": -0.12
+        },
+        {
+          "x": 0.08,
+          "z": 0.95
+        },
+        {
+          "x": 0.76,
+          "z": 0.62
+        },
+        {
+          "x": -0.92,
+          "z": 0.5
+        },
+        {
+          "x": -0.72,
+          "z": -0.72
         }
       ]
     }

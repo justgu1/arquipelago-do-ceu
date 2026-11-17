@@ -1,3 +1,4 @@
+using System.Linq;
 using ArquipelagoDoCeu.World;
 using Godot;
 
@@ -15,6 +16,7 @@ public partial class Lobby
 		{
 			var center = HexToWorld(cell.X, cell.Y);
 			if (kind == Kind.Plank) continue;
+			if (kind == Kind.Plaza) { AddPlazaTile(center); continue; }
 			if (kind != Kind.Water) { AddLote02Tile(center, PathMask(cell)); continue; }
 			center.Y = -.24f;
 			var info = new Color((int)kind / 3f, PathMask(cell) / 63f, Hash01(cell.X * 7 + cell.Y * 13), 1f);
@@ -45,6 +47,33 @@ public partial class Lobby
 		}
 		var shader = GD.Load<Shader>("res://Lobby/terrain.gdshader");
 		AddChild(new MeshInstance3D { Mesh = st.Commit(), MaterialOverride = new ShaderMaterial { Shader = shader } });
+	}
+
+	// A laje de pedra clara da praça, a mesma do piso das Dungeons, mas quente como o resto do Lobby.
+	void AddPlazaTile(Vector3 center)
+	{
+		if (LoadModel("cenario/piso-dungeon-a") is not { } tile)
+		{
+			AddLote02Tile(center, 0);
+			return;
+		}
+		AddChild(tile);
+		tile.Position = center;
+		foreach (var mesh in tile.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
+			for (var s = 0; s < mesh.Mesh.GetSurfaceCount(); s++)
+				if (mesh.Mesh.SurfaceGetMaterial(s) is StandardMaterial3D source)
+					mesh.SetSurfaceOverrideMaterial(s, PlazaMaterial(source.ResourceName));
+	}
+
+	static readonly System.Collections.Generic.Dictionary<string, Material> PlazaMaterials = [];
+
+	static Material PlazaMaterial(string name)
+	{
+		if (PlazaMaterials.TryGetValue(name, out var cached) && IsInstanceValid(cached)) return cached;
+		var tint = name == "pedra_cl" ? "#DCCBA6" : "#C9B58C";
+		var material = new StandardMaterial3D { AlbedoColor = Color.FromHtml(tint), Roughness = 0.9f };
+		PlazaMaterials[name] = material;
+		return material;
 	}
 
 	static void Vertex(SurfaceTool st, Vector3 position, Vector3 normal, Color color, Vector2 uv)

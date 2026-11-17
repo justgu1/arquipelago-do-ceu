@@ -31,7 +31,7 @@ public partial class Lobby : Node3D, ICombatStage
 	// O Mobile não desenha SSAO e avisa a cada vez que ele é ligado; só o Forward+ e o Compatibility o têm.
 	static bool SsaoAvailable => RenderingServer.GetCurrentRenderingMethod() != "mobile";
 
-	enum Kind { Grass = 0, Flowers = 1, Path = 2, Water = 3, Plank = 4 }
+	enum Kind { Grass = 0, Flowers = 1, Path = 2, Water = 3, Plank = 4, Plaza = 5 }
 
 	// Vizinhos em coordenadas axiais; a ordem é a mesma dos bits da máscara no shader.
 	static readonly Vector2I[] Neighbors = [new(1, 0), new(1, -1), new(0, -1), new(-1, 0), new(-1, 1), new(0, 1)];

@@ -166,7 +166,7 @@ static class LobbyChecks
 		foreach (var (field, value, min, max) in new (string, float?, float, float)[]
 		{
 			("size", camera.Size, 4f, 100f), ("minSize", camera.MinSize, 4f, 100f), ("maxSize", camera.MaxSize, 4f, 100f), ("zoomStep", camera.ZoomStep, 0.5f, 20f),
-			("followSharpness", camera.FollowSharpness, 0.5f, 30f), ("deadZone", camera.DeadZone, 0f, 10f), ("maxPan", camera.MaxPan, 0f, 30f),
+			("followSharpness", camera.FollowSharpness, 0.5f, 30f), ("deadZone", camera.DeadZone, 0f, 10f), ("maxPan", camera.MaxPan, 0f, 60f),
 		})
 		{
 			if (value is null) return Required($"lobby.camera.{field}");
