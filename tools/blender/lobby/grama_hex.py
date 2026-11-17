@@ -285,29 +285,34 @@ def construir_pedra():
     apagar("PedraHex")
     fundir("PedraHex", [prisma("S_laje", 1.0, -0.5, 0.0, M["pedra"], CHANFRO)])
 
-# Caminho de tijolos de pedra (TijoloHex): argamassa escura e tijolos em relevo, em fileiras desencontradas (aparelho em fiada), dois tons alternados.
-# Só entram tijolos inteiros dentro do hexágono; o resto da borda fica de argamassa, e as lajes vizinhas continuam as fiadas sem desenho de moldura.
+# Caminho de tijolos de pedra (TijoloHex): argamassa escura e tijolos em relevo, em fileiras desencontradas, dois tons alternados.
+# Os tijolos são cortados pela borda do hexágono, então vão até a beirada e continuam na laje vizinha, sem moldura de argamassa em volta.
+# A altura da fiada divide o vão vertical entre lajes (1,732) em seis, e o comprimento divide o horizontal (1,5) em três: as fiadas se alinham de uma laje para a outra.
 M.update(argamassa=mat("argamassa", "#8F7F63", 0.95), tijolo_a=mat("tijolo_a", "#BCA173", 0.9), tijolo_b=mat("tijolo_b", "#A98E62", 0.9))
-TIJOLO_L = 0.56
-TIJOLO_A = 0.25
+APOTEMA = 0.8660254
+FIADA = 2 * APOTEMA / 6
+COMPRIMENTO = 0.5
 JUNTA = 0.045
 
-def dentro(x, y, folga=0.02):
-    ax, ay = abs(x), abs(y)
-    return ay <= 0.866 - folga and ax * 0.866 + ay * 0.5 <= 0.866 - folga
+def cortar_no_hexagono(bm):
+    for k in range(6):
+        ang = math.radians(30 + 60 * k)
+        n = Vector((math.cos(ang), math.sin(ang), 0.0))
+        bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), plane_co=n * APOTEMA, plane_no=n, clear_outer=True)
+    return len(bm.verts) > 0
 
 def construir_tijolo():
     apagar("TijoloHex")
     p = [prisma("T_argamassa", 1.0, -0.5, -0.008, M["argamassa"], CHANFRO)]
-    passo_y = TIJOLO_A + JUNTA
-    for fila in range(-3, 4):
-        y = fila * passo_y
-        desloc = 0.0 if fila % 2 == 0 else TIJOLO_L / 2
+    for fila in range(-3, 3):
+        y = (fila + 0.5) * FIADA
+        desloc = 0.0 if fila % 2 == 0 else COMPRIMENTO / 2
         for col in range(-3, 4):
-            x = col * (TIJOLO_L + JUNTA) + desloc
-            cantos = ((x - TIJOLO_L / 2, y - TIJOLO_A / 2), (x + TIJOLO_L / 2, y - TIJOLO_A / 2), (x - TIJOLO_L / 2, y + TIJOLO_A / 2), (x + TIJOLO_L / 2, y + TIJOLO_A / 2))
-            if not all(dentro(cx, cy) for cx, cy in cantos): continue
-            p.append(cubo(f"T_tijolo{fila}_{col}", (x, y, -0.004), (TIJOLO_L, TIJOLO_A, 0.016), M["tijolo_a" if (fila + col) % 2 == 0 else "tijolo_b"], None, 0.0, smooth=False))
+            x = col * COMPRIMENTO + desloc
+            bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1.0)
+            for v in bm.verts: v.co = Vector((x + v.co.x * (COMPRIMENTO - JUNTA), y + v.co.y * (FIADA - JUNTA), -0.004 + v.co.z * 0.016))
+            if not cortar_no_hexagono(bm): bm.free(); continue
+            p.append(objeto(f"T_tijolo{fila}_{col}", bm, [M["tijolo_a" if (fila + col) % 2 == 0 else "tijolo_b"]], None, False))
     fundir("TijoloHex", p)
 
 construir_grama()
