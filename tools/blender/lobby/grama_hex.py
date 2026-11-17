@@ -1,3 +1,4 @@
+# Lajes do chão do Lobby: GramaHex (grama) e PedraHex (caminho e praça), as duas com o mesmo raio, a mesma altura e o mesmo chanfro mínimo, para encaixarem sem degrau nem fresta.
 # Hexágono de grama do Lobby (GramaHex): laje de terra com uma camada de grama chanfrada por cima e um filete de terra clara entre as duas, no mesmo acabamento das lajes das Dungeons.
 # Hexágono flat-top de raio 1,0 (sem folga: os vizinhos se encostam), topo em z = 0 e 0,5 de espessura. O material grama é tingido pelo jogo, hexágono a hexágono.
 # >>> comum (copiado de tools/blender/comum.py por sincronizar.mjs; não edite aqui)
@@ -258,7 +259,8 @@ def fundir(nome, pecas):
 # <<< comum
 
 LOD = 0.8
-M = dict(grama=mat("grama", "#5FB04A", 0.9), terra=mat("terra", "#9A6B43", 0.95), terra_cl=mat("terra_cl", "#C79A63", 0.95))
+M = dict(grama=mat("grama", "#5FB04A", 0.9), terra=mat("terra", "#9A6B43", 0.95), terra_cl=mat("terra_cl", "#C79A63", 0.95), pedra=mat("pedra", "#C9B58C", 0.9))
+CHANFRO = 0.012
 
 def prisma(name, raio, z0, z1, material, chanfro=0.0):
     bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=raio, radius2=raio, depth=z1 - z0)
@@ -268,7 +270,12 @@ def prisma(name, raio, z0, z1, material, chanfro=0.0):
 
 def construir_grama():
     apagar("GramaHex")
-    p = [prisma("G_terra", 1.0, -0.5, -0.1, M["terra"], 0.03), prisma("G_filete", 1.0, -0.12, -0.04, M["terra_cl"], 0.0), prisma("G_grama", 1.0, -0.06, 0.0, M["grama"], 0.035)]
+    p = [prisma("G_terra", 1.0, -0.5, -0.1, M["terra"], CHANFRO), prisma("G_filete", 1.0, -0.12, -0.04, M["terra_cl"], 0.0), prisma("G_grama", 1.0, -0.06, 0.0, M["grama"], CHANFRO)]
     fundir("GramaHex", p)
 
+def construir_pedra():
+    apagar("PedraHex")
+    fundir("PedraHex", [prisma("S_laje", 1.0, -0.5, 0.0, M["pedra"], CHANFRO)])
+
 construir_grama()
+construir_pedra()

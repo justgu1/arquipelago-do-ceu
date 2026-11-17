@@ -14,7 +14,7 @@ public static class PaperTexture
 		if (shared is not null && GodotObject.IsInstanceValid(shared)) return (StyleBoxTexture)shared.Duplicate();
 		shared = new StyleBoxTexture { Texture = ImageTexture.CreateFromImage(Build()) };
 		shared.SetTextureMarginAll(Edge);
-		shared.SetContentMarginAll(12);
+		shared.SetContentMarginAll(16);
 		return (StyleBoxTexture)shared.Duplicate();
 	}
 

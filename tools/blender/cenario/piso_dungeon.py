@@ -1,5 +1,5 @@
 # Piso hexagonal das Salas das Dungeons (PisoA): laje de pedra lisa com chanfro e um miolo apenas mais claro, sem rachaduras nem desenho, para o chão não parecer carimbado.
-# O jogo varia o tom de cada laje e mistura nela a cor da função da Sala. Hexágono flat-top de raio 0,96, topo em z = 0 e 0,5 de espessura.
+# O jogo varia o tom de cada laje e mistura nela a cor da função da Sala. Hexágono flat-top de raio 1,0, sem folga, para as lajes se encostarem por inteiro, topo em z = 0 e 0,5 de espessura.
 # Os materiais pedra e pedra_cl têm nome fixo: o jogo troca a cor de cada um por tema (DungeonTheme).
 # >>> comum (copiado de tools/blender/comum.py por sincronizar.mjs; não edite aqui)
 import bpy, bmesh, math
@@ -262,7 +262,7 @@ LOD = 0.8
 M = dict(
     pedra=mat("pedra", "#9A93B5", 0.9), pedra_cl=mat("pedra_cl", "#B9B2D2", 0.9), pedra_esc=mat("pedra_esc", "#6F6890", 0.95), faixa=mat("faixa", "#EBC24E", 0.5, 0.3),
 )
-R = 0.96
+R = 1.0
 
 def prisma(name, raio, z0, z1, material, chanfro=0.0):
     bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=raio, radius2=raio, depth=z1 - z0)
@@ -272,7 +272,7 @@ def prisma(name, raio, z0, z1, material, chanfro=0.0):
 
 def piso(nome):
     apagar(nome)
-    p = [prisma(f"{nome}_laje", R, -0.5, 0.0, M["pedra"], 0.05), prisma(f"{nome}_miolo", R * 0.86, 0.0, 0.025, M["pedra_cl"], 0.012)]
+    p = [prisma(f"{nome}_laje", R, -0.5, 0.0, M["pedra"], 0.012), prisma(f"{nome}_miolo", R * 0.86, 0.0, 0.004, M["pedra_cl"])]
     fundir(nome, p)
 
 piso("PisoA")

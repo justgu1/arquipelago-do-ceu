@@ -24,6 +24,7 @@ MODELOS = {
     "torre-livro": (("TorreLivro", None),),
     "lote02/hex-base-v02": (("Hex", None),),
     "lobby/grama-hex": (("GramaHex", None),),
+    "lobby/pedra-hex": (("PedraHex", None),),
     "lote02/margem-reta": (("MargemReta", None),),
     "lote02/margem-convexa": (("MargemConvexa", None),),
     "lote02/margem-ponta-d": (("MargemPontaD", None),),
