@@ -295,7 +295,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var along = way.LengthSquared() > 0.0001f ? way.Normalized() : Vector3.Forward;
 		var side = new Vector3(-along.Z, 0f, along.X) * 0.8f;
 		var across = Mathf.Atan2(side.X, side.Z) - Mathf.Pi / 2f;
-		if (RoomProps.Add(room, "cenario/porta-arco", 2.1f, door.Ground, Mathf.Atan2(along.X, along.Z)) is { } arch) Theme.Tint(arch);
+		if (RoomProps.Add(room, "cenario/porta-arco", 2f, door.Ground, Mathf.Atan2(along.X, along.Z)) is { } arch) Theme.Tint(arch);
 		else
 		{
 			foreach (var offset in new[] { side, -side })

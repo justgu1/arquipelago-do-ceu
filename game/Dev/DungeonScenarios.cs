@@ -98,6 +98,10 @@ static partial class DungeonScenarios
 		await d.Wait(0.3);
 		d.Expect(expedition.IsCleared(expedition.CurrentRoom) && expedition.Energy.Current == energy, "resolver o Puzzle abre a porta");
 		await d.Shot("03-porta-aberta");
+		var open = run.World.Doors.First(door => !door.Locked);
+		run.Player.PlaceAt(new Vector2(open.Ground.X, open.Ground.Z));
+		await d.Wait(1.5);
+		await d.Shot("04-boca-do-corredor");
 	}
 
 	// A troca de Itens: o Marco barra sem o Item da outra torre; vencer a Sala do Item o dá, e então o Marco abre.

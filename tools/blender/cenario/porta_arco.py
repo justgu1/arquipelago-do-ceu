@@ -262,7 +262,7 @@ M = dict(
     pedra=mat("pedra", "#9A93B5", 0.9), pedra_cl=mat("pedra_cl", "#B9B2D2", 0.9), pedra_esc=mat("pedra_esc", "#6F6890", 0.95),
     ouro=mat("faixa", "#EBC24E", 0.5, 0.3), musgo=mat("d_musgo", "#5E9C4A", 0.9),
 )
-RI, RO, ZC = 1.0, 1.3, 0.9
+RI, RO, ZC = 0.8, 1.1, 1.0
 DEPTH = 0.5
 
 def construir_porta_arco():
@@ -271,7 +271,7 @@ def construir_porta_arco():
     rm = (RI + RO) / 2
     for lado in (-1, 1):
         x = lado * rm
-        p.append(cubo(f"PA_plinto{lado}", (lado * 1.17, 0, 0.12), (0.62, DEPTH + 0.16, 0.24), M["pedra_esc"], None, 0.03))
+        p.append(cubo(f"PA_plinto{lado}", (lado * rm, 0, 0.12), (RO - RI + 0.16, DEPTH + 0.16, 0.24), M["pedra_esc"], None, 0.03))
         p.append(cubo(f"PA_pilar{lado}", (x, 0, 0.24 + (ZC - 0.24) / 2), (RO - RI, DEPTH, ZC - 0.24), M["pedra"], None, 0.03))
         for z in (0.5, 0.72):
             p.append(cubo(f"PA_faixa{lado}_{z}", (x, 0, z), (RO - RI + 0.06, DEPTH + 0.05, 0.06), M["ouro"], None, 0.01))
