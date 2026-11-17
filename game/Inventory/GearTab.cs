@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ArquipelagoDoCeu.Equipment;
+using ArquipelagoDoCeu.Rules;
 using Godot;
 
 namespace ArquipelagoDoCeu;
@@ -99,7 +100,7 @@ public sealed partial class GearTab : Node
 		entryButtons.Clear();
 		var entries = host.Library.Entries(worn, mastery, host.OwnedGear()).ToDictionary(e => e.Item.Id);
 		var wornIds = entries.Values.Where(e => e.Equipped).Select(e => e.Item.Id).ToHashSet();
-		var pack = Backpack.Fill(host.OwnedGear(), wornIds, host.BackpackSlots());
+		var pack = BackpackLoad.Fill(host.OwnedGear(), wornIds, host.BackpackSlots());
 		inChest = [.. pack.InChest];
 		library.AddChild(Header("Mochila", $"{pack.InPack.Count} de {pack.Slots} lugares · Nível {host.BackpackLevel()}"));
 		var grid = Grid();

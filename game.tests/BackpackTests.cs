@@ -11,7 +11,7 @@ public class BackpackTests
 	[Fact]
 	public void O_que_esta_vestido_nao_ocupa_slot()
 	{
-		var contents = Backpack.Fill(Owned, new HashSet<string> { "a", "b" }, 6);
+		var contents = BackpackLoad.Fill(Owned, new HashSet<string> { "a", "b" }, 6);
 
 		Assert.Equal(["c", "d", "e"], contents.InPack);
 		Assert.Empty(contents.InChest);
@@ -21,7 +21,7 @@ public class BackpackTests
 	[Fact]
 	public void O_que_passa_do_limite_vai_para_o_bau_e_nada_se_perde()
 	{
-		var contents = Backpack.Fill(Owned, new HashSet<string>(), 3);
+		var contents = BackpackLoad.Fill(Owned, new HashSet<string>(), 3);
 
 		Assert.Equal(["a", "b", "c"], contents.InPack);
 		Assert.Equal(["d", "e"], contents.InChest);
@@ -34,7 +34,7 @@ public class BackpackTests
 	{
 		var sold = Owned.Where(id => id != "b").ToList();
 
-		var contents = Backpack.Fill(sold, new HashSet<string>(), 3);
+		var contents = BackpackLoad.Fill(sold, new HashSet<string>(), 3);
 
 		Assert.Equal(["a", "c", "d"], contents.InPack);
 		Assert.Equal(["e"], contents.InChest);

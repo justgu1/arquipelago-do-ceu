@@ -18,7 +18,7 @@ public sealed record GameRules(
 	CombatRules Combat,
 	DungeonRules Dungeon,
 	LobbyRules Lobby,
-	ArquipelagoDoCeu.Equipment.BackpackRules Backpack)
+	BackpackRules Backpack)
 {
 	// Limites que impedem um arquivo editado à mão de deixar o jogo injogável (Energia 0, por exemplo).
 	const int MaxEnergyLimit = 99;
@@ -46,7 +46,7 @@ public sealed record GameRules(
 			?? CombatChecks.Check(dto.Combat)
 			?? DungeonChecks.Check(dto.Dungeon)
 			?? LobbyChecks.CheckLobby(dto.Lobby)
-			?? ArquipelagoDoCeu.Equipment.Backpack.Check(dto.Backpack);
+			?? BackpackLoad.Check(dto.Backpack);
 		if (error is not null) return Fail(error);
 
 		return Result<GameRules>.Ok(new GameRules(
@@ -63,7 +63,7 @@ public sealed record GameRules(
 			CombatChecks.Build(dto.Combat!) with { DefaultMaxEnergy = dto.MaxEnergy!.Value },
 			DungeonChecks.Build(dto.Dungeon!),
 			LobbyChecks.BuildLobby(dto.Lobby!),
-			ArquipelagoDoCeu.Equipment.Backpack.Build(dto.Backpack)));
+			BackpackLoad.Build(dto.Backpack)));
 	}
 
 	static string? CheckNames(Dto dto)
@@ -126,7 +126,7 @@ public sealed record GameRules(
 		CombatDto? Combat,
 		DungeonDto? Dungeon,
 		LobbyDto? Lobby,
-		ArquipelagoDoCeu.Equipment.BackpackRulesDto? Backpack = null);
+		BackpackRulesDto? Backpack = null);
 
 	sealed record ProfileDto(int? MaxNicknameLength, int? MaxProfiles);
 

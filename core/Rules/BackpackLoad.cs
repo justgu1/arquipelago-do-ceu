@@ -1,4 +1,4 @@
-namespace ArquipelagoDoCeu.Equipment;
+namespace ArquipelagoDoCeu.Rules;
 
 // A mochila: quantos equipamentos a criança carrega fora do corpo, por Nível. O que está vestido não ocupa slot.
 // O que passa do limite não se perde: fica no Baú do Lobby e volta à mochila quando abre espaço.
@@ -14,7 +14,7 @@ public sealed record BackpackContents(IReadOnlyList<string> InPack, IReadOnlyLis
 	public int Free => Math.Max(0, Slots - InPack.Count);
 }
 
-public static class Backpack
+public static class BackpackLoad
 {
 	const int SlotsLimit = 60;
 
