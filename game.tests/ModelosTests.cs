@@ -46,4 +46,20 @@ public class ModelosTests
 
 		Assert.Empty(faltando);
 	}
+
+	// O tema da torre (DungeonTheme) troca a cor dos materiais do kit pelo nome: se o nome mudar no Blender, o tema deixa de pintar a peça sem avisar.
+	[Theory]
+	[InlineData("cenario/piso-dungeon-a.glb", "pedra", "pedra_cl", "faixa")]
+	[InlineData("cenario/piso-dungeon-b.glb", "pedra", "pedra_cl", "faixa")]
+	[InlineData("cenario/parede-baixa.glb", "pedra", "pedra_cl", "pedra_esc", "faixa")]
+	[InlineData("cenario/coluna-dungeon.glb", "pedra", "pedra_cl", "pedra_esc", "faixa")]
+	[InlineData("cenario/coluna-braseiro.glb", "pedra", "pedra_esc", "faixa", "chama")]
+	public void O_kit_de_dungeon_traz_os_materiais_que_o_tema_pinta(string modelo, params string[] materiais)
+	{
+		var texto = System.Text.Encoding.Latin1.GetString(File.ReadAllBytes(Path.Combine(Modelos, modelo)));
+
+		var faltando = materiais.Where(m => !Regex.IsMatch(texto, @"""name""\s*:\s*""" + m + @"""")).ToList();
+
+		Assert.Empty(faltando);
+	}
 }

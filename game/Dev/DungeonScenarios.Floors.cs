@@ -153,6 +153,8 @@ static partial class DungeonScenarios
 		expedition.Energy.Lose(expedition.Energy.Max - 1);
 		await d.OvershootWithKeys();
 		await d.Wait(1.0);
+		await d.Press("Voltar ao Lobby");
+		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "Energia zerada encerrou a Expedição");
 
 		var again = await Enter(d);
@@ -301,8 +303,12 @@ static partial class DungeonScenarios
 		await d.OvershootWithKeys();
 		await d.Wait(1.0);
 
+		d.Expect(d.Button("Voltar ao Lobby") is not null, "a tela de derrota apareceu, com o botão de voltar");
+		await d.Shot("02-tela-de-derrota");
+		await d.Press("Voltar ao Lobby");
+		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "Energia zerada encerrou a Expedição");
 		d.Expect(d.Player is { Visible: true }, "a criança voltou ao Lobby");
-		await d.Shot("02-de-volta-ao-lobby");
+		await d.Shot("03-de-volta-ao-lobby");
 	}
 }

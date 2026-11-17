@@ -124,7 +124,7 @@ public partial class CombatHud : OverlayScreen
 		texts.AddChild(message);
 		texts.AddChild(BookStyle.Text(presenter.KeyHelp, 13));
 		assembled.AddThemeFontSizeOverride("font_size", 18);
-		var status = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
+		var status = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center, CustomMinimumSize = new Vector2(320, 0) };
 		status.AddChild(assembled);
 		status.AddChild(recharging);
 		var row = new HBoxContainer { Name = "Status" };

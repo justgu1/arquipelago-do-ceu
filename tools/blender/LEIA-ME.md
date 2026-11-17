@@ -123,8 +123,10 @@ Os scripts de `cenario/` seguem o mesmo molde dos do Lobby e saem pelo `exportar
 | `cenario/porta_arco.py` | `cenario/porta-arco` | pilares, arco de aduelas e pedra-chave dourada; a passagem atravessa o eixo Y e o jogo a gira para o corredor |
 | `cenario/fonte_descanso.py` | `cenario/fonte-descanso` | bacia, taça e gota dourada; o jogo a escurece depois de usada |
 | `cenario/escada_pedra.py` | `cenario/escada-pedra` | cinco degraus com muretas e lampiões; sobe para +Y |
+| `cenario/piso_dungeon.py` | `cenario/piso-dungeon-a`, `piso-dungeon-b` | laje hexagonal (raio 0,96, topo em z = 0) com anel `faixa` e miolo claro; a B leva rachaduras. O jogo alterna as duas pelas coordenadas |
+| `cenario/coluna_dungeon.py` | `cenario/coluna-dungeon`, `coluna-braseiro` | coluna de seis faces de 1,5; a de braseiro tem 1,85 e a brasa no material `chama` (emissivo) |
 | `cenario/pilar_torre.py` | `cenario/pilar-torre` | pilar curto com faixas douradas, 1,5 de altura |
-| `cenario/parede_baixa.py` | `cenario/parede-baixa` | um hexágono de comprimento no eixo X, com ameias |
+| `cenario/parede_baixa.py` | `cenario/parede-baixa` | um lado de hexágono (1 de comprimento no eixo X, 0,75 de altura), de blocos em duas fileiras |
 | `cenario/pedestal_mestre.py` | `cenario/pedestal-mestre` | três degraus redondos e anéis de luz; centrado na origem |
 | `cenario/caixote_madeira.py` | `obstaculos/caixote-madeira` | cantos de latão e engrenagem estampada em -Y |
 | `cenario/pilha_livros.py` | `obstaculos/pilha-de-livros` | livros coloridos inclinados e folhas soltas |
@@ -136,3 +138,5 @@ Os scripts de `cenario/` seguem o mesmo molde dos do Lobby e saem pelo `exportar
 ```text
 blender -b --factory-startup --python cenario/porta_arco.py --python cenario/fonte_descanso.py --python cenario/escada_pedra.py --python cenario/pilar_torre.py --python cenario/parede_baixa.py --python cenario/pedestal_mestre.py --python cenario/caixote_madeira.py --python cenario/pilha_livros.py --python cenario/pilha_engrenagens.py --python cenario/orbe_numero.py --python cenario/medalhao_engrenagem.py --python cenario/placa_letra.py --python exportar_lobby.py -- ../../game/assets/modelos
 ```
+
+O chão, as paredes e as colunas usam materiais de **nome fixo** (`pedra`, `pedra_cl`, `pedra_esc`, `faixa`, `chama`): o jogo troca a cor de cada um pelo tema da torre (`DungeonTheme`) e pinta a `faixa` do chão com a cor da função da Sala. `ModelosTests` confere esses nomes.

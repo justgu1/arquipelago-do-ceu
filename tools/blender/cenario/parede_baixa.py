@@ -1,4 +1,5 @@
-# Parede baixa de castelo das Dungeons: um hexágono de comprimento (eixo X), meia altura, com ameias e faixa dourada. Encaixa nas duas pontas. Base em z = 0.
+# Parede baixa das Salas das Dungeons: um lado de hexágono (1 de comprimento no eixo X, 0,3 de espessura, 0,75 de altura), de blocos em duas fileiras desencontradas, com plinto e tampo.
+# Encaixa nas duas pontas com a coluna. Base em z = 0. Os materiais pedra, pedra_cl, pedra_esc e faixa têm nome fixo: o jogo troca a cor deles por tema (DungeonTheme).
 # >>> comum (copiado de tools/blender/comum.py por sincronizar.mjs; não edite aqui)
 import bpy, bmesh, math
 from mathutils import Vector, Matrix
@@ -257,18 +258,21 @@ def fundir(nome, pecas):
 # <<< comum
 
 LOD = 0.8
-M = dict(pedra=mat("w_pedra", "#9A93B5", 0.85), pedra_cl=mat("w_pedra_cl", "#B9B2D2", 0.85), pedra_esc=mat("w_pedra_esc", "#6F6890", 0.9), ouro=mat("w_ouro", "#EBC24E", 0.35, 0.6))
+M = dict(
+    pedra=mat("pedra", "#9A93B5", 0.9), pedra_cl=mat("pedra_cl", "#B9B2D2", 0.9), pedra_esc=mat("pedra_esc", "#6F6890", 0.95), faixa=mat("faixa", "#EBC24E", 0.5, 0.3),
+)
+ESP = 0.3
 
 def construir_parede():
     apagar("ParedeBaixa")
     p = []
-    p.append(cubo("W_corpo", (0, 0, 0.3), (2.0, 0.4, 0.6), M["pedra"], None, 0.04))
-    p.append(cubo("W_base", (0, 0, 0.06), (2.0, 0.5, 0.12), M["pedra_esc"], None, 0.03))
-    p.append(cubo("W_faixa", (0, 0, 0.5), (2.02, 0.44, 0.05), M["ouro"], None, 0.01))
-    for k, x in enumerate((-0.75, -0.25, 0.25, 0.75)):
-        p.append(cubo(f"W_ameia{k}", (x, 0, 0.7), (0.34, 0.4, 0.24), M["pedra_cl"], None, 0.03))
-    for k, x in enumerate((-0.5, 0.0, 0.5)):
-        p.append(cubo(f"W_tijolo{k}", (x, -0.21, 0.3), (0.4, 0.02, 0.18), M["pedra_cl"], None, 0.01))
+    p.append(cubo("W_plinto", (0, 0, 0.07), (1.0, ESP + 0.06, 0.14), M["pedra_esc"], None, 0.025))
+    for k, x in enumerate((-0.33, 0.0, 0.33)):
+        p.append(cubo(f"W_bloco_a{k}", (x, 0, 0.27), (0.32, ESP, 0.24), M["pedra"] if k % 2 else M["pedra_cl"], None, 0.025))
+    for k, x in enumerate((-0.25, 0.25)):
+        p.append(cubo(f"W_bloco_b{k}", (x, 0, 0.5), (0.48, ESP, 0.22), M["pedra_cl"] if k % 2 else M["pedra"], None, 0.025))
+    p.append(cubo("W_tampo", (0, 0, 0.68), (1.0, ESP + 0.07, 0.1), M["pedra_cl"], None, 0.03))
+    p.append(cubo("W_friso", (0, 0, 0.62), (1.01, ESP + 0.02, 0.025), M["faixa"], None, 0.006))
     fundir("ParedeBaixa", p)
 
 construir_parede()

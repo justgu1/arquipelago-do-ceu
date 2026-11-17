@@ -77,7 +77,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		};
 		AddChild(Camera);
 		Frame(System.Numerics.Vector2.Zero, 13f);
-		AddChild(new DirectionalLight3D { LightColor = Color.FromHtml("#FFE4BC"), LightEnergy = 1.1f, ShadowEnabled = true, RotationDegrees = new Vector3(-50f, -30f, 0f) });
+		AddChild(sun);
+		ApplyTheme();
 		AddChild(room);
 		AddChild(Creature);
 		AddChild(barrier);
@@ -116,7 +117,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		AddChild(creatureModel.Node);
 		creatureModel.Fit();
 	}
-	IReadOnlyList<MeshInstance3D> walls = [];
+	IReadOnlyList<RoomWalls.Piece> walls = [];
 
 	// Onde a criança está no chão da Sala; as paredes na frente dela ou da criatura ficam transparentes.
 	public System.Func<System.Numerics.Vector2>? PlayerAt { get; set; }
@@ -183,7 +184,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var blocked = new HashSet<HexCell>();
 		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
 		var corridors = new HashSet<HexCell>();
-		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId));
+		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId), Theme);
 
 		foreach (var neighbor in floor.Neighbors(roomId).OrderBy(n => n))
 		{
@@ -200,22 +201,22 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			if (locked)
 			{
 				blocked.Add(cells[0]);
-				RoomMeshes.AddFloor(room, [(cells[0], 0f)], Color.FromHtml("#6B6578"), false);
+				RoomMeshes.AddFloor(room, [(cells[0], 0f)], Color.FromHtml("#6B6578"), false, Theme);
 				continue;
 			}
 
 			walkable.UnionWith(cells);
 			corridors.UnionWith(cells);
 			if (CorridorKit.Add(room, cells)) corridorDeck.AddRange(CorridorKit.Deck(cells));
-			else RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false);
+			else RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false, Theme);
 			walkable.UnionWith(other.Cells.Select(Local));
-			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor));
+			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor), Theme);
 			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
 			var entry = GroundOf(Local(other.Cells.First(c => c.DistanceTo(layout.CorridorBetween(roomId, neighbor)![^1]) == 1)));
 			entries[neighbor] = new System.Numerics.Vector2(entry.X, entry.Z);
 		}
 		Grid.Reset(walkable, blocked);
-		walls = RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
+		walls = RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet(), Theme);
 
 		// Com escada na Sala o nome sobe, para os textos não ficarem um em cima do outro.
 		var hasStairs = kind.Stairs == RoomStairs.Up || stairsDown || deepStairs;

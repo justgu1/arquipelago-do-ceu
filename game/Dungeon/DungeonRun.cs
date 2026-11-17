@@ -101,7 +101,7 @@ public partial class DungeonRun : Node
 		ctx.ConfigurePlayer(player);
 		AddChild(player);
 
-		world.ReduceMotion = player.ReduceMotion;
+		world.ReduceMotion = player.ReduceMotion; world.Theme = DungeonTheme.For(ctx.Discipline);
 		combat = new TrainingArea(ctx.Rules, world, player, world.Creature, ctx.Voice, ctx.Settings, ctx.UiRoot,
 			() => ctx.Level, () => player.Enabled && !left, _ => { }, Say, ctx.Random, ctx.Towers);
 		combat.InDungeon = true;
