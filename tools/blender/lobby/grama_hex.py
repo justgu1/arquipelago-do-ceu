@@ -259,11 +259,15 @@ def fundir(nome, pecas):
 # <<< comum
 
 LOD = 0.8
-M = dict(grama=mat("grama", "#5FB04A", 0.9), terra=mat("terra", "#9A6B43", 0.95), terra_cl=mat("terra_cl", "#C79A63", 0.95), pedra=mat("pedra", "#C9B58C", 0.9))
+M = dict(grama=mat("grama", "#5FB04A", 0.9), terra=mat("terra", "#9A6B43", 0.95), terra_cl=mat("terra_cl", "#C79A63", 0.95), pedra=mat("pedra", "#C9B58C", 0.9), pedra_cl=mat("pedra_cl", "#DCCBA6", 0.9),
+    grama_cl=mat("grama_cl", "#7CCB5C", 0.9), grama_esc=mat("grama_esc", "#4A9A3C", 0.9))
 CHANFRO = 0.012
+# Tufos (posição, altura, giro): sempre os mesmos, espalhados sem tocar a borda, para a grama ter relevo e a laje não parecer uma chapa.
+TUFOS = ((-0.45, 0.1, 0.13), (0.3, 0.55, 0.11), (0.5, -0.3, 0.14), (-0.1, -0.5, 0.1))
 
 def prisma(name, raio, z0, z1, material, chanfro=0.0):
     bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=raio, radius2=raio, depth=z1 - z0)
+    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=Matrix.Rotation(math.pi / 6, 3, "Z"), verts=bm.verts)
     bmesh.ops.translate(bm, vec=Vector((0, 0, (z0 + z1) / 2)), verts=bm.verts)
     if chanfro > 0: bmesh.ops.bevel(bm, geom=list(bm.edges), offset=chanfro, segments=1, affect="EDGES")
     return objeto(name, bm, [material], None, False)
@@ -271,11 +275,41 @@ def prisma(name, raio, z0, z1, material, chanfro=0.0):
 def construir_grama():
     apagar("GramaHex")
     p = [prisma("G_terra", 1.0, -0.5, -0.1, M["terra"], CHANFRO), prisma("G_filete", 1.0, -0.12, -0.04, M["terra_cl"], 0.0), prisma("G_grama", 1.0, -0.06, 0.0, M["grama"], CHANFRO)]
+    for k, (x, y, h) in enumerate(TUFOS):
+        for lamina in range(2):
+            a = lamina * 2.1 + k
+            p.append(cano(f"G_tufo{k}_{lamina}", (x, y, 0.0), (x + 0.07 * math.cos(a), y + 0.07 * math.sin(a), h), 0.035, M["grama_cl"] if lamina % 2 else M["grama"], None, 6, 0.0))
     fundir("GramaHex", p)
 
 def construir_pedra():
     apagar("PedraHex")
     fundir("PedraHex", [prisma("S_laje", 1.0, -0.5, 0.0, M["pedra"], CHANFRO)])
 
+# Caminho de tijolos de pedra (TijoloHex): argamassa escura e tijolos em relevo, em fileiras desencontradas (aparelho em fiada), dois tons alternados.
+# Só entram tijolos inteiros dentro do hexágono; o resto da borda fica de argamassa, e as lajes vizinhas continuam as fiadas sem desenho de moldura.
+M.update(argamassa=mat("argamassa", "#8F7F63", 0.95), tijolo_a=mat("tijolo_a", "#BCA173", 0.9), tijolo_b=mat("tijolo_b", "#A98E62", 0.9))
+TIJOLO_L = 0.56
+TIJOLO_A = 0.25
+JUNTA = 0.045
+
+def dentro(x, y, folga=0.02):
+    ax, ay = abs(x), abs(y)
+    return ay <= 0.866 - folga and ax * 0.866 + ay * 0.5 <= 0.866 - folga
+
+def construir_tijolo():
+    apagar("TijoloHex")
+    p = [prisma("T_argamassa", 1.0, -0.5, -0.008, M["argamassa"], CHANFRO)]
+    passo_y = TIJOLO_A + JUNTA
+    for fila in range(-3, 4):
+        y = fila * passo_y
+        desloc = 0.0 if fila % 2 == 0 else TIJOLO_L / 2
+        for col in range(-3, 4):
+            x = col * (TIJOLO_L + JUNTA) + desloc
+            cantos = ((x - TIJOLO_L / 2, y - TIJOLO_A / 2), (x + TIJOLO_L / 2, y - TIJOLO_A / 2), (x - TIJOLO_L / 2, y + TIJOLO_A / 2), (x + TIJOLO_L / 2, y + TIJOLO_A / 2))
+            if not all(dentro(cx, cy) for cx, cy in cantos): continue
+            p.append(cubo(f"T_tijolo{fila}_{col}", (x, y, -0.004), (TIJOLO_L, TIJOLO_A, 0.016), M["tijolo_a" if (fila + col) % 2 == 0 else "tijolo_b"], None, 0.0, smooth=False))
+    fundir("TijoloHex", p)
+
 construir_grama()
 construir_pedra()
+construir_tijolo()

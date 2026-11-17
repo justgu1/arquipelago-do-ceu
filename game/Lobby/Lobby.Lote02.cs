@@ -10,7 +10,7 @@ namespace ArquipelagoDoCeu;
 // Camada visual reversivel do lote 02; a grade e os objetos de interacao continuam no Lobby.
 public partial class Lobby
 {
-	readonly Dictionary<int, Material> pathMaterials = new();
+	readonly Dictionary<string, Material> pathMaterials = new();
 	readonly List<Node3D> lote02Roots = new();
 
 	// O chão do Lobby é plano; só o piso em arco das pontes sobe, e o Personagem anda sobre ele.
@@ -43,17 +43,18 @@ public partial class Lobby
 		var tile = AddKitModel("lobby/grama-hex", center);
 		foreach (var mesh in tile.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
 			for (var s = 0; s < mesh.Mesh.GetSurfaceCount(); s++)
-				if (mesh.Mesh.SurfaceGetMaterial(s) is StandardMaterial3D { ResourceName: "grama" } source)
+				if (mesh.Mesh.SurfaceGetMaterial(s) is StandardMaterial3D source && source.ResourceName.StartsWith("grama", System.StringComparison.Ordinal))
 					mesh.SetSurfaceOverrideMaterial(s, GrassMaterial(source, tone));
 	}
 
 	Material GrassMaterial(StandardMaterial3D source, int tone)
 	{
-		if (pathMaterials.TryGetValue(tone, out var cached)) return cached;
+		var key = $"{source.ResourceName}{tone}";
+		if (pathMaterials.TryGetValue(key, out var cached)) return cached;
 		var copy = (StandardMaterial3D)source.Duplicate();
 		var color = source.AlbedoColor * GrassTones[tone];
 		copy.AlbedoColor = new Color(color.R, color.G, color.B);
-		pathMaterials[tone] = copy;
+		pathMaterials[key] = copy;
 		return copy;
 	}
 

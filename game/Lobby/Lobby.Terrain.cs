@@ -52,7 +52,7 @@ public partial class Lobby
 	// A laje de pedra clara da praça, a mesma do piso das Dungeons, mas quente como o resto do Lobby.
 	void AddPlazaTile(Vector3 center, int tone, bool road)
 	{
-		if (LoadModel("lobby/pedra-hex") is not { } tile)
+		if (LoadModel(road ? "lobby/tijolo-hex" : "lobby/pedra-hex") is not { } tile)
 		{
 			AddLote02Tile(center, tone);
 			return;
@@ -72,7 +72,13 @@ public partial class Lobby
 	{
 		var key = $"{name}{tone}{road}";
 		if (PlazaMaterials.TryGetValue(key, out var cached) && IsInstanceValid(cached)) return cached;
-		var stone = road ? "#BFA374" : "#D4C29C";
+		var stone = name switch
+		{
+			"argamassa" => "#8F7F63",
+			"tijolo_a" => "#BCA173",
+			"tijolo_b" => "#A98E62",
+			_ => road ? "#B39A6C" : "#CBB991",
+		};
 		var tint = Color.FromHtml(stone) * Colors.White.Lerp(GrassTones[tone], 0.35f);
 		var material = new StandardMaterial3D { AlbedoColor = new Color(tint.R, tint.G, tint.B), Roughness = 0.9f };
 		PlazaMaterials[key] = material;

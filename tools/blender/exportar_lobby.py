@@ -25,6 +25,7 @@ MODELOS = {
     "lote02/hex-base-v02": (("Hex", None),),
     "lobby/grama-hex": (("GramaHex", None),),
     "lobby/pedra-hex": (("PedraHex", None),),
+    "lobby/tijolo-hex": (("TijoloHex", None),),
     "lote02/margem-reta": (("MargemReta", None),),
     "lote02/margem-convexa": (("MargemConvexa", None),),
     "lote02/margem-ponta-d": (("MargemPontaD", None),),

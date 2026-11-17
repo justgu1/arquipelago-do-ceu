@@ -266,6 +266,7 @@ R = 1.0
 
 def prisma(name, raio, z0, z1, material, chanfro=0.0):
     bm = bmesh.new(); bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=raio, radius2=raio, depth=z1 - z0)
+    bmesh.ops.rotate(bm, cent=(0, 0, 0), matrix=Matrix.Rotation(math.pi / 6, 3, "Z"), verts=bm.verts)
     bmesh.ops.translate(bm, vec=Vector((0, 0, (z0 + z1) / 2)), verts=bm.verts)
     if chanfro > 0: bmesh.ops.bevel(bm, geom=list(bm.edges), offset=chanfro, segments=1, affect="EDGES")
     return objeto(name, bm, [material], None, False)
