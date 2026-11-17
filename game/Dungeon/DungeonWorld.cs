@@ -185,6 +185,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var blocked = new HashSet<HexCell>();
 		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
 		var corridors = new HashSet<HexCell>();
+		var corridorPieces = new List<RoomWalls.Piece>();
 		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId), Theme);
 
 		foreach (var neighbor in floor.Neighbors(roomId).OrderBy(n => n))
@@ -208,9 +209,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 
 			walkable.UnionWith(cells);
 			corridors.UnionWith(cells);
-			// O corredor é um vão de pedra de um hexágono de largura, com parede dos dois lados (entra no chão para as paredes o cercarem).
-			RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false, Theme);
-			foreach (var c in cells) floorHeights[c] = 0f;
+			AddCorridor(cells, corridorPieces);
 			walkable.UnionWith(other.Cells.Select(Local));
 			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor), Theme);
 			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
@@ -219,7 +218,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		}
 		var furniture = Furnish(here, floor.Number, walkable, blocked, floorHeights);
 		Grid.Reset(walkable, blocked);
-		walls = [.. RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet(), Theme), .. furniture];
+		walls = [.. RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet(), Theme), .. furniture, .. corridorPieces];
 
 		// Com escada na Sala o nome sobe, para os textos não ficarem um em cima do outro.
 		var hasStairs = kind.Stairs == RoomStairs.Up || stairsDown || deepStairs;

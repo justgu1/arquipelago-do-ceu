@@ -30,7 +30,7 @@ public class FloorLayoutTests
 		var spread = Average(2);
 
 		Assert.True(compact < spread * 0.7, $"corredor médio: {compact:0.0} na versão 3 contra {spread:0.0} na 2");
-		Assert.True(compact <= 7, $"corredor médio da versão 3 = {compact:0.0}");
+		Assert.True(compact <= 6, $"corredor médio da versão 3 = {compact:0.0}");
 	}
 
 	// Corredor da versão 3 em diante: trechos retos em qualquer das seis direções, no máximo duas curvas (reto, L ou U) e nenhum trecho de menos de dois hexágonos.

@@ -17,6 +17,16 @@ public sealed record DungeonTheme(string Void, string Ambient, string Sun, strin
 
 	static readonly Dictionary<string, Material> Cache = [];
 
+	// A pedra lisa de uma laje feita por código (o piso dos corredores).
+	public Material StoneMaterial()
+	{
+		var key = $"laje|{Stone}";
+		if (Cache.TryGetValue(key, out var cached) && GodotObject.IsInstanceValid(cached)) return cached;
+		var material = new StandardMaterial3D { AlbedoColor = Color.FromHtml(StoneLight).Lerp(Color.FromHtml(Stone), 0.5f), Roughness = 0.9f };
+		Cache[key] = material;
+		return material;
+	}
+
 	// Troca a cor dos materiais do modelo pelas do tema; `trim` pinta a faixa e `wash` (a cor da função da Sala) tinge de leve a pedra do chão.
 	// `tone` clareia ou escurece a pedra, para as lajes não saírem todas iguais.
 	public void Tint(Node3D model, Color? trim = null, Color? wash = null, float tone = 1f)

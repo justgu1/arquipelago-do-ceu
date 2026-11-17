@@ -15,6 +15,8 @@ public static class FloorLayouts
 	const int Jitter = 2;
 	// Na versão compacta a distância entre duas Salas vem do tamanho delas mais um corredor curto, e não de um número fixo.
 	const int CorridorLength = 1;
+	// Nas primeiras tentativas as Salas se aproximam até isto; se o Andar não fecha assim, volta ao espaçamento seguro.
+	const int ShrinkBy = 4;
 	const int CompactJitter = 0;
 	// Hexágonos vazios que separam uma Sala de qualquer outra coisa: sem isso a criança passaria de uma para outra sem cruzar a porta.
 	const int Gap = 2;
@@ -30,7 +32,7 @@ public static class FloorLayouts
 		var rng = new Pcg32(seed, 91);
 		for (var attempt = 0; attempt < Attempts; attempt++)
 		{
-			var placed = PlaceRooms(floor, forms, rng, style);
+			var placed = PlaceRooms(floor, forms, rng, style, attempt < Attempts / 2 ? ShrinkBy : 0);
 			if (placed is not null && Connect(floor, placed, style == LayoutStyle.Compact) is { } corridors)
 				return Result<FloorLayout>.Ok(new FloorLayout(placed, corridors));
 		}
@@ -38,7 +40,7 @@ public static class FloorLayouts
 	}
 
 	// Em largura a partir da entrada: cada Sala cai ao lado do espaço da que a levou até ela.
-	static List<PlacedRoom>? PlaceRooms(Floor floor, RoomForms forms, Pcg32 rng, LayoutStyle style)
+	static List<PlacedRoom>? PlaceRooms(Floor floor, RoomForms forms, Pcg32 rng, LayoutStyle style, int shrink)
 	{
 		var varied = style != LayoutStyle.Legacy;
 		var placed = new Dictionary<int, PlacedRoom>
@@ -52,7 +54,7 @@ public static class FloorLayouts
 			var parent = queue.Dequeue();
 			foreach (var child in floor.Neighbors(parent).Order().Where(n => !placed.ContainsKey(n)))
 			{
-				var room = TryPlace(child, placed.Values, placed[parent], forms, rng, style);
+				var room = TryPlace(child, placed.Values, placed[parent], forms, rng, style, shrink);
 				if (room is null) return null;
 				placed[child] = room;
 				queue.Enqueue(child);
@@ -61,7 +63,7 @@ public static class FloorLayouts
 		return floor.Rooms.Count == placed.Count ? placed.Values.OrderBy(r => r.Room).ToList() : null;
 	}
 
-	static PlacedRoom? TryPlace(int id, IEnumerable<PlacedRoom> others, PlacedRoom parent, RoomForms forms, Pcg32 rng, LayoutStyle style)
+	static PlacedRoom? TryPlace(int id, IEnumerable<PlacedRoom> others, PlacedRoom parent, RoomForms forms, Pcg32 rng, LayoutStyle style, int shrink)
 	{
 		var form = style != LayoutStyle.Legacy ? forms.Pick(rng) : forms.Legacy;
 		var (pitch, jitter) = style == LayoutStyle.Compact ? (Extent(parent.Form) + Extent(form) + Gap + CorridorLength, CompactJitter) : (Pitch, Jitter);
@@ -71,11 +73,16 @@ public static class FloorLayouts
 		foreach (var direction in order)
 		{
 			var step = Directions[direction];
-			var origin = new HexCell(
-				parent.Origin.Q + step.Q * pitch + rng.NextInt(2 * jitter + 1) - jitter,
-				parent.Origin.R + step.R * pitch + rng.NextInt(2 * jitter + 1) - jitter);
-			var room = new PlacedRoom(id, form, origin);
-			if (taken.All(t => Apart(room, t))) return room;
+			// No compacto tenta da menor distância para a maior, para o corredor sair curto (o `Extent` é o pior caso e costuma sobrar).
+			var (first, last) = style == LayoutStyle.Compact ? (pitch - shrink, pitch) : (pitch, pitch);
+			for (var distance = first; distance <= last; distance++)
+			{
+				var origin = new HexCell(
+					parent.Origin.Q + step.Q * distance + rng.NextInt(2 * jitter + 1) - jitter,
+					parent.Origin.R + step.R * distance + rng.NextInt(2 * jitter + 1) - jitter);
+				var room = new PlacedRoom(id, form, origin);
+				if (taken.All(t => Apart(room, t))) return room;
+			}
 		}
 		return null;
 	}

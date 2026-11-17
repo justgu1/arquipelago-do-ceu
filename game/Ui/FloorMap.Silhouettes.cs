@@ -12,6 +12,7 @@ namespace ArquipelagoDoCeu;
 public partial class FloorMap
 {
 	const float Padding = 16f;
+	const float LabelPadding = 34f;
 
 	float unit = 1f;
 	Vector2? playerAt;
@@ -24,7 +25,8 @@ public partial class FloorMap
 		var points = layout.Rooms.SelectMany(r => r.Cells).Concat(layout.Corridors.SelectMany(c => c.Cells)).Select(Project).ToList();
 		var (minX, maxX) = (points.Min(p => p.X), points.Max(p => p.X));
 		var (minY, maxY) = (points.Min(p => p.Y), points.Max(p => p.Y));
-		unit = Mathf.Min((size.X - 2 * Padding) / (maxX - minX + 2f), (size.Y - 2 * Padding) / (maxY - minY + 2f));
+		var pad = labeled ? LabelPadding : Padding;
+		unit = Mathf.Min((size.X - 2 * pad) / (maxX - minX + 2f), (size.Y - 2 * pad) / (maxY - minY + 2f));
 		shift = new Vector2(size.X / 2f - (minX + maxX) / 2f * unit, size.Y / 2f - (minY + maxY) / 2f * unit);
 		foreach (var room in layout.Rooms) positions[room.Room] = Place(room.Spot);
 		Radius = labeled ? 20f : Mathf.Clamp(unit * 2.2f, 9f, 17f);
