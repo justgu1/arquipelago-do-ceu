@@ -303,12 +303,12 @@ def construir_tijolo(letra, semente):
     p = [prisma(f"{nome}_terra", 1.0, -0.5, -0.008, M["argamassa"], CHANFRO)]
     colocados = []
     tentativas = 0
-    while len(colocados) < 17 and tentativas < 400:
+    while len(colocados) < 28 and tentativas < 900:
         tentativas += 1
         ang = acaso() * 2 * math.pi; raio = 0.98 * math.sqrt(acaso())
         x, y = raio * math.cos(ang), raio * math.sin(ang)
         comp = 0.24 + acaso() * 0.12; larg = 0.12 + acaso() * 0.07
-        if any((x - cx) ** 2 + (y - cy) ** 2 < ((comp + cc) * 0.42) ** 2 for cx, cy, cc in colocados): continue
+        if any((x - cx) ** 2 + (y - cy) ** 2 < ((comp + cc) * 0.34) ** 2 for cx, cy, cc in colocados): continue
         colocados.append((x, y, comp))
         girar = (acaso() - 0.5) * 1.4 + (math.pi / 2 if acaso() > 0.67 else 0.0)
         alto = 0.014 + acaso() * 0.016

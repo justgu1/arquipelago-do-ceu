@@ -95,7 +95,7 @@ public partial class Lobby
 	{
 		if (kind is not (Kind.Grass or Kind.Flowers)) return;
 		var toward = Neighbors.Where(n => tiles.TryGetValue(cell + n, out var other) && other == Kind.Path).Select(n => (Vector2I?)n).FirstOrDefault();
-		if (toward is not { } direction || Hash01(cell.X * 53 + cell.Y * 29) > 0.8f) return;
+		if (toward is not { } direction || Hash01(cell.X * 53 + cell.Y * 29) > 0.96f) return;
 		var edge = HexToWorld(cell.X + direction.X, cell.Y + direction.Y) - center;
 		if (LoadModel("lobby/tijolos-soltos") is not { } spill) return;
 		AddChild(spill);
