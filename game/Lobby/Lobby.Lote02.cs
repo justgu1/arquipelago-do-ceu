@@ -18,10 +18,12 @@ public partial class Lobby
 
 	public float GroundHeight(Point p) => BridgeDeck.Height(bridgeDeck, p);
 
-	Node3D AddLote02(string asset, Vector3 position, Vector3? scale = null, float yaw = 0f)
+	void AddLote02(string asset, Vector3 position, Vector3? scale = null, float yaw = 0f) => AddKitModel("lote02/" + asset, position, scale, yaw);
+
+	Node3D AddKitModel(string path, Vector3 position, Vector3? scale = null, float yaw = 0f)
 	{
-		var model = LoadModel("lote02/" + asset)!;
-		model.Name = "Lote02_" + asset;
+		var model = LoadModel(path)!;
+		model.Name = "Kit_" + path.Replace('/', '_');
 		AddChild(model);
 		model.Position = position;
 		model.Scale = scale ?? Vector3.One;
@@ -35,23 +37,24 @@ public partial class Lobby
 
 	static int ToneOf(Vector2I cell) => (unchecked(cell.X * 73856093 ^ cell.Y * 19349663) >> 5 & 0x7fff) % GrassTones.Length;
 
-	void AddLote02Tile(Vector3 center, int mask, int tone = 1)
+	// O hexágono de grama do Lobby, feito no Blender como as lajes das Dungeons: encaixa nos vizinhos, sem moldura escura. Só a grama muda de tom.
+	void AddLote02Tile(Vector3 center, int tone = 1)
 	{
-		var tile = AddLote02("hex-base-v02", center);
+		var tile = AddKitModel("lobby/grama-hex", center);
 		foreach (var mesh in tile.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
 			for (var s = 0; s < mesh.Mesh.GetSurfaceCount(); s++)
-			{
-				if (mesh.Mesh.SurfaceGetMaterial(s) is not StandardMaterial3D source || !source.ResourceName.StartsWith("Terreno_Atlas64")) continue;
-				var key = mask * GrassTones.Length + tone;
-				if (!pathMaterials.TryGetValue(key, out var material))
-				{
-					var copy = (StandardMaterial3D)source.Duplicate();
-					copy.Uv1Offset = new Vector3((mask % 8) / 8f, -(mask / 8) / 8f, 0);
-					copy.AlbedoColor = GrassTones[tone];
-					pathMaterials[key] = material = copy;
-				}
-				mesh.SetSurfaceOverrideMaterial(s, material);
-			}
+				if (mesh.Mesh.SurfaceGetMaterial(s) is StandardMaterial3D { ResourceName: "grama" } source)
+					mesh.SetSurfaceOverrideMaterial(s, GrassMaterial(source, tone));
+	}
+
+	Material GrassMaterial(StandardMaterial3D source, int tone)
+	{
+		if (pathMaterials.TryGetValue(tone, out var cached)) return cached;
+		var copy = (StandardMaterial3D)source.Duplicate();
+		var color = source.AlbedoColor * GrassTones[tone];
+		copy.AlbedoColor = new Color(color.R, color.G, color.B);
+		pathMaterials[tone] = copy;
+		return copy;
 	}
 
 	void AddLote02Details()

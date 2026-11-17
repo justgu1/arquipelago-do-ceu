@@ -350,7 +350,7 @@
         "id": "bairro-leste",
         "q": 17,
         "r": 0,
-        "radius": 3,
+        "radius": 4,
         "from": [
           11,
           0
@@ -360,7 +360,7 @@
         "id": "bairro-oeste",
         "q": -17,
         "r": 0,
-        "radius": 3,
+        "radius": 4,
         "from": [
           -11,
           0
@@ -370,7 +370,7 @@
         "id": "bairro-norte",
         "q": -8,
         "r": -9,
-        "radius": 3,
+        "radius": 4,
         "from": [
           -5,
           -6
@@ -380,7 +380,7 @@
         "id": "bairro-sul",
         "q": 8,
         "r": 9,
-        "radius": 3,
+        "radius": 4,
         "from": [
           5,
           6

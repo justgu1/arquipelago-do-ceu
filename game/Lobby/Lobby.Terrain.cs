@@ -16,8 +16,8 @@ public partial class Lobby
 		{
 			var center = HexToWorld(cell.X, cell.Y);
 			if (kind == Kind.Plank) continue;
-			if (kind == Kind.Plaza) { AddPlazaTile(center, ToneOf(cell)); continue; }
-			if (kind != Kind.Water) { AddLote02Tile(center, PathMask(cell), ToneOf(cell)); continue; }
+			if (kind is Kind.Plaza or Kind.Path) { AddPlazaTile(center, ToneOf(cell), kind == Kind.Path); continue; }
+			if (kind != Kind.Water) { AddLote02Tile(center, ToneOf(cell)); continue; }
 			center.Y = -.24f;
 			var info = new Color((int)kind / 3f, PathMask(cell) / 63f, Hash01(cell.X * 7 + cell.Y * 13), 1f);
 			var corners = new Vector3[6];
@@ -50,28 +50,30 @@ public partial class Lobby
 	}
 
 	// A laje de pedra clara da praça, a mesma do piso das Dungeons, mas quente como o resto do Lobby.
-	void AddPlazaTile(Vector3 center, int tone)
+	void AddPlazaTile(Vector3 center, int tone, bool road)
 	{
 		if (LoadModel("cenario/piso-dungeon-a") is not { } tile)
 		{
-			AddLote02Tile(center, 0, tone);
+			AddLote02Tile(center, tone);
 			return;
 		}
 		AddChild(tile);
+		lote02Roots.Add(tile);
 		tile.Position = center;
 		foreach (var mesh in tile.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
 			for (var s = 0; s < mesh.Mesh.GetSurfaceCount(); s++)
 				if (mesh.Mesh.SurfaceGetMaterial(s) is StandardMaterial3D source)
-					mesh.SetSurfaceOverrideMaterial(s, PlazaMaterial(source.ResourceName, tone));
+					mesh.SetSurfaceOverrideMaterial(s, PlazaMaterial(source.ResourceName, tone, road));
 	}
 
 	static readonly System.Collections.Generic.Dictionary<string, Material> PlazaMaterials = [];
 
-	static Material PlazaMaterial(string name, int tone)
+	static Material PlazaMaterial(string name, int tone, bool road)
 	{
-		var key = $"{name}{tone}";
+		var key = $"{name}{tone}{road}";
 		if (PlazaMaterials.TryGetValue(key, out var cached) && IsInstanceValid(cached)) return cached;
-		var tint = (name == "pedra_cl" ? Color.FromHtml("#DCCBA6") : Color.FromHtml("#C9B58C")) * GrassTones[tone];
+		var stone = road ? (name == "pedra_cl" ? "#C4A878" : "#B3966A") : (name == "pedra_cl" ? "#DCCBA6" : "#C9B58C");
+		var tint = Color.FromHtml(stone) * Colors.White.Lerp(GrassTones[tone], 0.35f);
 		var material = new StandardMaterial3D { AlbedoColor = new Color(tint.R, tint.G, tint.B), Roughness = 0.9f };
 		PlazaMaterials[key] = material;
 		return material;

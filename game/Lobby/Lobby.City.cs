@@ -10,6 +10,7 @@ namespace ArquipelagoDoCeu;
 public partial class Lobby
 {
 	const string DistrictPrefix = "bairro";
+	const int MaxHousesPerDistrict = 7;
 
 	sealed record Decor(string Model, float Height, HexCell Cell, float Body, bool Tall);
 
@@ -38,21 +39,42 @@ public partial class Lobby
 		var center = new HexCell(island.Q, island.R);
 		var bridge = map.Bridges.TryGetValue(island.Id, out var cells) ? cells : [];
 		var free = Around.Select(d => center + new HexCell(d.Q * 2, d.R * 2)).Where(c => ground.Contains(c) && bridge.All(b => b.DistanceTo(c) > 2)).ToList();
-		if (island.Id.StartsWith(DistrictPrefix, System.StringComparison.Ordinal)) return District(center, free, island.Id);
+		if (IsDistrict(island)) return District(island, ground, StreetOf(island));
 		if (island.Id == "mercador") return Market(free);
 		return island.Solid ? Tower(island.Id, free) : [];
 	}
 
-	static IEnumerable<Decor> District(HexCell center, List<HexCell> free, string id)
+	static bool IsDistrict(ArquipelagoDoCeu.Rules.LobbyIsland island) => island.Id.StartsWith(DistrictPrefix, System.StringComparison.Ordinal);
+
+	// A rua do bairro: da ponte até o centro, em linha reta. A cidade cresce em volta dela, com a praça do bairro no fim.
+	IReadOnlyList<HexCell> StreetOf(ArquipelagoDoCeu.Rules.LobbyIsland island)
 	{
-		var middle = (id.Sum(c => c) % 3) switch { 0 => VillagePiece.Moinho, 1 => VillagePiece.Poco, _ => VillagePiece.Canteiro };
+		if (!map.Islands.TryGetValue(island.Id, out var ground) || !map.Bridges.TryGetValue(island.Id, out var bridge) || bridge.Count == 0) return [];
+		return [.. LobbyMap.Line(bridge[^1], new HexCell(island.Q, island.R)).Where(ground.Contains)];
+	}
+
+	// Casas dos dois lados da rua, a um hexágono de folga dela (quintal), e no centro o que o bairro tem de público: moinho, poço ou canteiro.
+	IEnumerable<Decor> District(ArquipelagoDoCeu.Rules.LobbyIsland island, IReadOnlySet<HexCell> ground, IReadOnlyList<HexCell> street)
+	{
+		var center = new HexCell(island.Q, island.R);
+		var middle = (island.Id.Sum(c => c) % 3) switch { 0 => VillagePiece.Moinho, 1 => VillagePiece.Poco, _ => VillagePiece.Canteiro };
 		var (name, height, body) = Pieces[middle];
 		yield return new Decor(name, height, center, body, middle != VillagePiece.Canteiro);
-		var houses = new[] { VillagePiece.CasaA, VillagePiece.CasaB, VillagePiece.CasaA };
-		for (var i = 0; i < houses.Length && i < free.Count; i++)
+
+		var square = center.Neighbors().Append(center).ToHashSet();
+		var along = street.Select((cell, index) => (cell, index)).ToList();
+		var lots = ground
+			.Where(c => !square.Contains(c) && street.All(s => s.DistanceTo(c) >= 2) && along.Any(s => s.cell.DistanceTo(c) == 2))
+			.OrderBy(c => along.Min(s => s.cell.DistanceTo(c) * 10 + s.index))
+			.ThenBy(c => c.Q).ThenBy(c => c.R)
+			.ToList();
+		var houses = new List<HexCell>();
+		foreach (var lot in lots.Where(l => houses.All(h => h.DistanceTo(l) >= 2)))
+			houses.Add(lot);
+		for (var k = 0; k < houses.Count && k < MaxHousesPerDistrict; k++)
 		{
-			var (model, h, b) = Pieces[houses[(i + id.Sum(c => c)) % houses.Length]];
-			yield return new Decor(model, h, free[i], b, true);
+			var (model, h, b) = Pieces[(k + island.Id.Sum(c => c)) % 2 == 0 ? VillagePiece.CasaA : VillagePiece.CasaB];
+			yield return new Decor(model, h, houses[k], b, true);
 		}
 	}
 
@@ -92,6 +114,12 @@ public partial class Lobby
 	// O chão das ilhas das torres é de pedra, em volta do centro onde a torre está.
 	void MarkTowerPaving()
 	{
+		foreach (var island in Rules.Islands.Where(IsDistrict))
+		{
+			var center = new HexCell(island.Q, island.R);
+			foreach (var cell in StreetOf(island).Concat(center.Neighbors()).Append(center))
+				if (map.Islands.TryGetValue(island.Id, out var ground) && ground.Contains(cell)) tiles[new Vector2I(cell.Q, cell.R)] = Kind.Path;
+		}
 		foreach (var island in Rules.Islands.Where(i => i.Solid && map.Islands.ContainsKey(i.Id)))
 		{
 			var center = new HexCell(island.Q, island.R);
