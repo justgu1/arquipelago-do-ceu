@@ -81,11 +81,11 @@ public class BattleExtensionTests
 	}
 
 	[Fact]
-	public void A_bolha_nao_conta_como_erro_da_resposta()
+	public void O_golpe_da_criatura_nao_conta_como_erro_da_resposta()
 	{
 		var fight = CombatSession.Start(TrainingFixtures.Rules, new Energy(5), 1, Math1, Missions, new Pcg32(1)).Value!;
 
-		fight.BubbleHit();
+		fight.CreatureHit();
 
 		Assert.Equal(0, fight.Conclude(calmed: false).Mistakes);
 	}

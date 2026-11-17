@@ -267,8 +267,8 @@ def brilho(nome, hexcol, forca):
     return m
 
 M = dict(
-    pedra=mat("pm_pedra", "#8E7BB5", 0.9), pedra_esc=mat("pm_pedra_esc", "#5B3FA0", 0.9), degrau=mat("pm_degrau", "#B9AEC9", 0.95), ouro=mat("pm_ouro", "#F2B632", 0.35, 0.6),
-    cristal=brilho("pm_cristal", "#C79BFF", 2.0), membrana=brilho("pm_membrana", "#9A78F2", 2.5), brasa=brilho("pm_brasa", "#FFB84D", 3.0), ferro=mat("pm_ferro", "#3E3550", 0.6, 0.4),
+    pedra=mat("pm_pedra", "#9A93B5", 0.9), pedra_esc=mat("pm_pedra_esc", "#6F6890", 0.95), degrau=mat("pm_degrau", "#B9B2D2", 0.95), ouro=mat("pm_ouro", "#EBC24E", 0.35, 0.6),
+    cristal=brilho("pm_cristal", "#C79BFF", 2.0), membrana=brilho("pm_membrana", "#9A78F2", 2.5), brasa=brilho("pm_brasa", "#FFB84D", 3.0), ferro=mat("pm_ferro", "#4B455E", 0.5, 0.5),
 )
 M["membrana"].use_backface_culling = False
 

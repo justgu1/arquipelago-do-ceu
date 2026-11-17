@@ -14,7 +14,7 @@ public partial class Main
 				Input.ParseInputEvent(new InputEventAction { Action = "ui_cancel", Pressed = true });
 				Input.ParseInputEvent(new InputEventAction { Action = "ui_cancel", Pressed = false });
 				break;
-			// Em segundo plano o jogo congela: a Energia não pode cair nem bolha nenhuma chegar com a criança longe.
+			// Em segundo plano o jogo congela: a Energia não pode cair nem ataque nenhum chegar com a criança longe.
 			case NotificationApplicationFocusOut when DeviceInfo.IsTouch:
 				GetTree().Paused = true;
 				break;

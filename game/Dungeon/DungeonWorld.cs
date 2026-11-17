@@ -55,6 +55,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		if (expedition.CanReturnToProgression) list.Add(new Interactable("progression", FountainSpot));
 		if (expedition.Current.Kind.Restores) list.Add(new Interactable("rest", FountainSpot));
 		if (expedition.Current.Kind.SavesPoint) list.Add(new Interactable("totem", FountainSpot));
+		list.AddRange(Props.Select(p => new Interactable(p.Id, p.Ground)));
 		return list;
 	}
 
@@ -75,14 +76,19 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			AmbientLightColor = Color.FromHtml("#C9BFDC"),
 			AmbientLightEnergy = 0.8f,
 		};
+		RoomProps.Preload();
 		AddChild(Camera);
 		Frame(System.Numerics.Vector2.Zero, 13f);
-		AddChild(new DirectionalLight3D { LightColor = Color.FromHtml("#FFE4BC"), LightEnergy = 1.1f, ShadowEnabled = true, RotationDegrees = new Vector3(-50f, -30f, 0f) });
+		AddChild(sun);
+		ApplyTheme();
+		AddChild(absolute);
 		AddChild(room);
 		AddChild(Creature);
 		AddChild(barrier);
 
+		Creature.CreatureShown += MatchCreatureTo;
 		Creature.Reacted += kind => creatureModel?.React(kind);
+		Creature.TirednessChanged += tiredness => { if (creatureModel is not null) creatureModel.Tiredness = tiredness; };
 	}
 
 	CreatureModel? creatureModel;
@@ -91,9 +97,19 @@ public partial class DungeonWorld : Node3D, ICombatStage
 	// Os modelos da torre, na ordem em que aparecem de Sala em Sala; sem eles vale o Boneco.
 	public IReadOnlyList<string> CreatureSet { get; set; } = [];
 
+	// A palavra do desafio manda no modelo: só mostra um animal ou objeto se ele for o nome escondido; sem modelo da palavra vale o Boneco.
+	string? wordImage;
+
+	public void MatchCreatureTo(string? image)
+	{
+		wordImage = image;
+		if (currentId >= 0) ShowCreatureModel(currentId);
+	}
+
 	void ShowCreatureModel(int roomId)
 	{
 		var name = CreatureSet.Count > 0 ? CreatureSet[roomId % CreatureSet.Count] : "boneco";
+		if (wordImage is { } image) name = CreatureSet.Contains($"criaturas/{image}") ? $"criaturas/{image}" : "boneco";
 		if (name == shownCreature) return;
 		if (creatureModel is not null) RemoveChild(creatureModel.Node);
 		creatureModel?.Node.QueueFree();
@@ -104,7 +120,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		AddChild(creatureModel.Node);
 		creatureModel.Fit();
 	}
-	IReadOnlyList<MeshInstance3D> walls = [];
+	IReadOnlyList<RoomWalls.Piece> walls = [];
 
 	// Onde a criança está no chão da Sala; as paredes na frente dela ou da criatura ficam transparentes.
 	public System.Func<System.Numerics.Vector2>? PlayerAt { get; set; }
@@ -115,7 +131,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var seen = new List<Vector3>();
 		if (PlayerAt?.Invoke() is { } at) seen.Add(new Vector3(at.X, 1f, at.Y));
 		if (Creature.Visible) seen.Add(Creature.Center + new Vector3(0f, 0.8f, 0f));
-		RoomWalls.Fade(walls, -Camera.GlobalTransform.Basis.Z, seen, (float)delta);
+		BuildOneAhead();
+		RoomWalls.Fade(walls, -Camera.GlobalTransform.Basis.Z, seen, (float)delta, new Vector3(SpotWorld.X, 0f, SpotWorld.Y));
 	}
 	readonly MeshInstance3D barrier = new()
 	{
@@ -161,17 +178,20 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		layout = floor.Layout!;
 		var here = layout.Room(roomId);
 		var key = (floor.Number, floor.Deep);
+		if (shownFloor != key || !ReferenceEquals(shownFloorData?.Layout, layout)) DropBuilt();
+		shownFloorData = floor;
 		var shift = currentId >= 0 && shownFloor == key ? HexGrid.ToWorld(here.Spot - spot) : System.Numerics.Vector2.Zero;
 		(shownFloor, currentId, spot) = (key, roomId, here.Spot);
+		absolute.Position = new Vector3(-SpotWorld.X, 0f, -SpotWorld.Y);
 
 		var kind = floor.Rooms[roomId].Kind;
 		ShowCreatureModel(roomId);
 		corridorDeck.Clear();
 		var walkable = new HashSet<HexCell>(here.Cells.Select(Local));
 		var blocked = new HashSet<HexCell>();
-		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
-		var corridors = new HashSet<HexCell>();
-		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId));
+		var corridorPieces = new List<RoomWalls.Piece>();
+		var active = new HashSet<int> { roomId };
+		blocked.UnionWith(Ensure(floor, roomId, FloorMap.ColorOf(kind), cleared.Contains(roomId), withFloor: true).Occupied.Select(Local));
 
 		foreach (var neighbor in floor.Neighbors(roomId).OrderBy(n => n))
 		{
@@ -188,22 +208,22 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			if (locked)
 			{
 				blocked.Add(cells[0]);
-				RoomMeshes.AddFloor(room, [(cells[0], 0f)], Color.FromHtml("#6B6578"), false);
+				RoomMeshes.AddFloor(room, [(cells[0], 0f)], Color.FromHtml("#6B6578"), false, Theme);
 				continue;
 			}
 
 			walkable.UnionWith(cells);
-			corridors.UnionWith(cells);
-			if (CorridorKit.Add(room, cells)) corridorDeck.AddRange(CorridorKit.Deck(cells));
-			else RoomMeshes.AddFloor(room, cells.Select(c => (c, 0f)), Color.FromHtml("#8A7FA6"), false);
+			AddCorridor(cells, corridorPieces);
 			walkable.UnionWith(other.Cells.Select(Local));
-			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor));
-			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
+			active.Add(neighbor);
+			blocked.UnionWith(Ensure(floor, neighbor, color, cleared.Contains(neighbor), withFloor: true).Occupied.Select(Local));
 			var entry = GroundOf(Local(other.Cells.First(c => c.DistanceTo(layout.CorridorBetween(roomId, neighbor)![^1]) == 1)));
 			entries[neighbor] = new System.Numerics.Vector2(entry.X, entry.Z);
 		}
 		Grid.Reset(walkable, blocked);
-		walls = RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet());
+		ShowBuilt(active, roomId);
+		walls = [.. active.SelectMany(id => built[id].Pieces), .. corridorPieces];
+		QueueAhead(roomId);
 
 		// Com escada na Sala o nome sobe, para os textos não ficarem um em cima do outro.
 		var hasStairs = kind.Stairs == RoomStairs.Up || stairsDown || deepStairs;
@@ -279,7 +299,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var along = way.LengthSquared() > 0.0001f ? way.Normalized() : Vector3.Forward;
 		var side = new Vector3(-along.Z, 0f, along.X) * 0.8f;
 		var across = Mathf.Atan2(side.X, side.Z) - Mathf.Pi / 2f;
-		if (RoomProps.Add(room, "cenario/porta-arco", 1.6f, door.Ground, Mathf.Atan2(along.X, along.Z)) is null)
+		if (RoomProps.Add(room, "cenario/porta-arco", 2f, door.Ground, Mathf.Atan2(along.X, along.Z)) is { } arch) Theme.Tint(arch);
+		else
 		{
 			foreach (var offset in new[] { side, -side })
 				room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.28f, PillarHeight, 0.28f) }, MaterialOverride = material, Position = door.Ground + offset + new Vector3(0f, PillarHeight / 2f, 0f) });

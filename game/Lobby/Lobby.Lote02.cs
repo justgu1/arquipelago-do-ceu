@@ -10,7 +10,7 @@ namespace ArquipelagoDoCeu;
 // Camada visual reversivel do lote 02; a grade e os objetos de interacao continuam no Lobby.
 public partial class Lobby
 {
-	readonly Dictionary<int, Material> pathMaterials = new();
+	readonly Dictionary<string, Material> pathMaterials = new();
 	readonly List<Node3D> lote02Roots = new();
 
 	// O chão do Lobby é plano; só o piso em arco das pontes sobe, e o Personagem anda sobre ele.
@@ -18,10 +18,12 @@ public partial class Lobby
 
 	public float GroundHeight(Point p) => BridgeDeck.Height(bridgeDeck, p);
 
-	Node3D AddLote02(string asset, Vector3 position, Vector3? scale = null, float yaw = 0f)
+	void AddLote02(string asset, Vector3 position, Vector3? scale = null, float yaw = 0f) => AddKitModel("lote02/" + asset, position, scale, yaw);
+
+	Node3D AddKitModel(string path, Vector3 position, Vector3? scale = null, float yaw = 0f)
 	{
-		var model = LoadModel("lote02/" + asset)!;
-		model.Name = "Lote02_" + asset;
+		var model = LoadModel(path)!;
+		model.Name = "Kit_" + path.Replace('/', '_');
 		AddChild(model);
 		model.Position = position;
 		model.Scale = scale ?? Vector3.One;
@@ -30,21 +32,30 @@ public partial class Lobby
 		return model;
 	}
 
-	void AddLote02Tile(Vector3 center, int mask)
+	// Quatro tons de grama, escolhidos pelo hexágono: o gramado deixa de parecer carimbado e continua igual a cada abertura do jogo.
+	static readonly Color[] GrassTones = [new(0.93f, 0.97f, 0.9f), Colors.White, new(1.04f, 1.04f, 0.97f), new(0.97f, 1.02f, 1.05f)];
+
+	static int ToneOf(Vector2I cell) => (unchecked(cell.X * 73856093 ^ cell.Y * 19349663) >> 5 & 0x7fff) % GrassTones.Length;
+
+	// O hexágono de grama do Lobby, feito no Blender como as lajes das Dungeons: encaixa nos vizinhos, sem moldura escura. Só a grama muda de tom.
+	void AddLote02Tile(Vector3 center, int tone = 1)
 	{
-		var tile = AddLote02("hex-base-v02", center);
+		var tile = AddKitModel("lobby/grama-hex", center);
 		foreach (var mesh in tile.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
 			for (var s = 0; s < mesh.Mesh.GetSurfaceCount(); s++)
-			{
-				if (mesh.Mesh.SurfaceGetMaterial(s) is not StandardMaterial3D source || !source.ResourceName.StartsWith("Terreno_Atlas64")) continue;
-				if (!pathMaterials.TryGetValue(mask, out var material))
-				{
-					var copy = (StandardMaterial3D)source.Duplicate();
-					copy.Uv1Offset = new Vector3((mask % 8) / 8f, -(mask / 8) / 8f, 0);
-					pathMaterials[mask] = material = copy;
-				}
-				mesh.SetSurfaceOverrideMaterial(s, material);
-			}
+				if (mesh.Mesh.SurfaceGetMaterial(s) is StandardMaterial3D source && source.ResourceName.StartsWith("grama", System.StringComparison.Ordinal))
+					mesh.SetSurfaceOverrideMaterial(s, GrassMaterial(source, tone));
+	}
+
+	Material GrassMaterial(StandardMaterial3D source, int tone)
+	{
+		var key = $"{source.ResourceName}{tone}";
+		if (pathMaterials.TryGetValue(key, out var cached)) return cached;
+		var copy = (StandardMaterial3D)source.Duplicate();
+		var color = source.AlbedoColor * GrassTones[tone];
+		copy.AlbedoColor = new Color(color.R, color.G, color.B);
+		pathMaterials[key] = copy;
+		return copy;
 	}
 
 	void AddLote02Details()

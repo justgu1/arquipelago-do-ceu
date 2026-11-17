@@ -10,7 +10,7 @@ Serve para responder, com crianças do público (6 a 10 anos), se uma mecânica 
    - (b) quer jogar mais uma rodada quando a sessão acaba.
 
    Falhou em (a): o problema é a explicação ou a interface. Falhou em (b): o problema é a mecânica. Com menos de 3 crianças o resultado é impressão, não decisão.
-3. **Duração da luta.** Para o combate em duas camadas, o alvo é de 90 a 120 s por criatura comum, sem falhas (ADR 0009). Anote o tempo real de cada luta.
+3. **Duração da luta.** Para o combate em duas camadas, o alvo é de 90 a 120 s por criatura comum, sem falhas (ADR 0009). Anote o tempo real de cada luta e quantas vezes a criança foi alcançada por um ataque da criatura.
 4. **Escopo do teste.** Só o que a pergunta exige. Para a mecânica de combate: o treino contra o Boneco, Nível 1, sem Dungeon.
 
 ## Durante (10 a 15 minutos)

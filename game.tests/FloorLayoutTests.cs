@@ -30,7 +30,28 @@ public class FloorLayoutTests
 		var spread = Average(2);
 
 		Assert.True(compact < spread * 0.7, $"corredor médio: {compact:0.0} na versão 3 contra {spread:0.0} na 2");
-		Assert.True(compact <= 8, $"corredor médio da versão 3 = {compact:0.0}");
+		Assert.True(compact <= 6, $"corredor médio da versão 3 = {compact:0.0}");
+	}
+
+	// Corredor da versão 3 em diante: trechos retos em qualquer das seis direções, no máximo duas curvas (reto, L ou U) e nenhum trecho de menos de dois hexágonos.
+	[Fact]
+	public void Corredores_da_versao_3_em_diante_sao_retos_em_L_ou_U()
+	{
+		foreach (var world in Enumerable.Range(1, 30))
+			foreach (var number in Enumerable.Range(1, 4))
+				foreach (var corridor in Laid((ulong)world, number, 3).Layout!.Corridors)
+				{
+					var runs = new List<int>();
+					for (var i = 1; i < corridor.Cells.Count; i++)
+					{
+						var step = corridor.Cells[i] - corridor.Cells[i - 1];
+						var turned = i > 1 && step != corridor.Cells[i - 1] - corridor.Cells[i - 2];
+						if (runs.Count == 0 || turned) runs.Add(1);
+						else runs[^1]++;
+					}
+					Assert.True(runs.Count <= 3, $"mundo {world}, Andar {number}: {runs.Count} trechos");
+					if (runs.Count > 1) Assert.All(runs, r => Assert.True(r >= 2, $"mundo {world}, Andar {number}: trecho de {r}"));
+				}
 	}
 
 	[Fact]

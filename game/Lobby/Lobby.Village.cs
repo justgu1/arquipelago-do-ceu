@@ -28,11 +28,8 @@ public partial class Lobby
 	internal List<Vector3> Chimneys { get; } = new();
 	internal List<(Node3D Node, Vector3 Axis, float Speed)> Spinners { get; } = new();
 
-	IReadOnlyList<VillageSpot> VillageSpots => villageSpots ??= VillagePlan.Build(
-		map.Main.Where(c => !plan.Lake.Contains(c)),
-		plan.Path,
-		plan.Trees.Concat(Rules.Islands.Select(i => new HexCell(i.FromQ, i.FromR))).Concat(LampCells),
-		Rules.Objects.Select(o => new HexCell(o.Q, o.R)));
+	// A ilha central é praça, lagoa e caminhos; as casas ficam nos bairros ao redor (Lobby.City). 
+	IReadOnlyList<VillageSpot> VillageSpots => villageSpots ??= [];
 
 	void AddVillage()
 	{

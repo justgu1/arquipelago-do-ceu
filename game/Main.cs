@@ -41,7 +41,7 @@ public partial class Main : Node3D
 	Player player = null!;
 	string? interactTarget;
 	// Entrar no portal ou na porta de uma torre a pé já as ativa; o botão e a tecla E continuam valendo.
-	readonly EntryTrigger entry = new(1.2f, 2f);
+	readonly EntryTrigger entry = new(0.7f, 1.4f);
 	float uiScale = 1f;
 	TrainingDummy dummy = null!;
 
@@ -370,7 +370,6 @@ public partial class Main : Node3D
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (FogMode.TryToggle(@event, out var fogText)) Notify(fogText);
 		if (@event.IsActionPressed(Controls.Interact)) Interact(interactTarget);
 		if (@event.IsActionPressed(Controls.Inventory) && Controls.TypingPanels == 0 && (inDungeon ? dungeon is { Player.Enabled: true } : player.Enabled)) ShowInventory();
 		if (@event.IsActionPressed(Controls.Target) && inDungeon && dungeon is { Player.Enabled: true }) dungeon.Combat.ToggleTarget();

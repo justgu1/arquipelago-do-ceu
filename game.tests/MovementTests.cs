@@ -125,14 +125,43 @@ public sealed class MovementTests
 	// --- colisão
 
 	[Fact]
-	public void Andar_para_dentro_de_um_obstaculo_fica_parado()
+	public void Andar_para_dentro_de_um_obstaculo_nao_entra_nele()
 	{
 		var grade = Ilha(new HexCell(1, 0));
 		var parede = HexGrid.ToWorld(new HexCell(1, 0)) + new Vector2(-1.2f, 0f);
 
 		var depois = grade.Move(parede, new Vector2(1f, 0f), 0.2f);
 
-		Assert.Equal(parede, depois);
+		Assert.NotEqual(new HexCell(1, 0), HexGrid.FromWorld(depois));
+	}
+
+	// O deslize em volta da parede nunca pode levar o corpo para fora do chão, em qualquer direção de empurrão.
+	[Theory]
+	[InlineData(1f, 0f)]
+	[InlineData(0f, 1f)]
+	[InlineData(-1f, 0.4f)]
+	[InlineData(0.6f, -1f)]
+	public void Empurrar_contra_a_borda_da_ilha_nunca_sai_dela(float x, float y)
+	{
+		var grade = Ilha();
+		var ponto = Vector2.Zero;
+
+		for (var i = 0; i < 400; i++) ponto = grade.Move(ponto, Vector2.Normalize(new Vector2(x, y)) * 0.05f, 0.2f);
+
+		Assert.True(grade.IsWalkable(HexGrid.FromWorld(ponto)));
+	}
+
+	// Uma ponte estreita na diagonal do mundo: empurrar na direção "quase certa" não pode prender a criança.
+	[Fact]
+	public void Ponte_diagonal_deixa_andar_sem_olhar_exatamente_para_ela()
+	{
+		var ponte = new[] { new HexCell(0, 0), new HexCell(1, -1), new HexCell(2, -2), new HexCell(3, -3) };
+		var grade = new HexGrid(ponte, []);
+		var ponto = HexGrid.ToWorld(ponte[0]);
+
+		for (var i = 0; i < 200; i++) ponto = grade.Move(ponto, new Vector2(0.05f, 0f), 0.2f);
+
+		Assert.True(ponto.X > HexGrid.ToWorld(ponte[2]).X);
 	}
 
 	[Fact]

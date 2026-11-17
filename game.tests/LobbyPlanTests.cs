@@ -71,8 +71,8 @@ public class LobbyPlanTests
 	}
 
 	[Theory]
-	[InlineData(8)]
 	[InlineData(10)]
+	[InlineData(11)]
 	[InlineData(12)]
 	public void Mudar_o_raio_da_ilha_nao_quebra_o_desenho(int radius)
 	{

@@ -181,17 +181,49 @@
     },
     "fog": {
       "stages": 2,
-      "stageFog": 30,
-      "damage": [2, 3, 4],
-      "rechargeSeconds": [2, 3, 4],
+      "stageFog": 40,
+      "damage": [
+        3,
+        4,
+        6
+      ],
+      "rechargeSeconds": [
+        0.8,
+        1.2,
+        1.8
+      ],
       "weakMultiplier": 2,
       "otherMultiplier": 0.5,
       "returnFraction": 0.5,
       "qteSeconds": 25,
-      "calmRechargeSeconds": 1,
+      "calmRechargeSeconds": 0.6,
       "shiftWarningSeconds": 2.5,
       "perfectTimeLeft": 0.3,
-      "closeTimeLeft": 0.1
+      "closeTimeLeft": 0.1,
+      "creature": {
+        "attacks": [
+          {
+            "cooldownSeconds": 6,
+            "warningSeconds": 1.5
+          },
+          {
+            "cooldownSeconds": 8,
+            "warningSeconds": 1.8
+          },
+          {
+            "cooldownSeconds": 10,
+            "warningSeconds": 2
+          }
+        ],
+        "lungeWidth": 1.6,
+        "lungeRange": 9,
+        "slamRadius": 1.6,
+        "spinRadius": 3,
+        "minGapSeconds": 3,
+        "tirednessPerStrike": 0.12,
+        "tirednessDecayPerSecond": 0.02,
+        "maxSlowdown": 1.5
+      }
     },
     "targetRange": 5,
     "operators": [
@@ -209,36 +241,12 @@
       "hit": 1,
       "perfect": 2,
       "mistake": 1,
-      "bubble": 1
-    },
-    "bubble": {
-      "intervalSeconds": 8,
-      "warningSeconds": 1.6,
-      "speed": 1.5,
-      "radius": 0.8,
-      "range": 9
+      "creatureHit": 1
     },
     "rhythm": {
       "player": {
         "rechargeSeconds": 0.8
-      },
-      "creatures": [
-        {
-          "kind": "dummy",
-          "intervalSeconds": 8,
-          "warningSeconds": 1.6
-        },
-        {
-          "kind": "wild",
-          "intervalSeconds": 7,
-          "warningSeconds": 1.6
-        },
-        {
-          "kind": "guardian",
-          "intervalSeconds": 6,
-          "warningSeconds": 1.6
-        }
-      ]
+      }
     },
     "movement": {
       "patrolSpeed": 0.6,
@@ -294,55 +302,99 @@
     "restEnergy": 2,
     "shortcutChallenges": 3,
     "masterChallenges": 4,
-    "conceptSolves": 3
+    "conceptSolves": 3,
+    "loadRadius": 24
+  },
+  "backpack": {
+    "slotsByLevel": [6, 9, 12]
   },
   "lobby": {
     "interactionReach": 2.2,
     "dayCycleSeconds": 480,
-    "islandRadius": 8,
+    "islandRadius": 11,
     "carved": [],
     "islands": [
       {
         "id": "matematica",
-        "q": -13,
-        "r": 9,
-        "radius": 2,
+        "q": -17,
+        "r": 12,
+        "radius": 3,
         "from": [
-          -8,
-          4
+          -11,
+          5
         ],
         "solid": true
       },
       {
         "id": "portugues",
-        "q": 9,
-        "r": -13,
-        "radius": 2,
+        "q": 12,
+        "r": -17,
+        "radius": 3,
         "from": [
-          4,
-          -8
+          5,
+          -11
         ],
         "solid": true
       },
       {
         "id": "mercador",
         "q": 0,
-        "r": 13,
-        "radius": 2,
+        "r": 17,
+        "radius": 3,
         "from": [
           0,
-          8
+          11
+        ]
+      },
+      {
+        "id": "bairro-leste",
+        "q": 17,
+        "r": 0,
+        "radius": 4,
+        "from": [
+          11,
+          0
+        ]
+      },
+      {
+        "id": "bairro-oeste",
+        "q": -17,
+        "r": 0,
+        "radius": 4,
+        "from": [
+          -11,
+          0
+        ]
+      },
+      {
+        "id": "bairro-norte",
+        "q": -8,
+        "r": -9,
+        "radius": 4,
+        "from": [
+          -5,
+          -6
+        ]
+      },
+      {
+        "id": "bairro-sul",
+        "q": 8,
+        "r": 9,
+        "radius": 4,
+        "from": [
+          5,
+          6
         ]
       }
     ],
     "camera": {
-      "size": 28,
+      "size": 17,
       "minSize": 8,
-      "maxSize": 44,
+      "maxSize": 52,
       "zoomStep": 3,
       "followSharpness": 4,
       "deadZone": 1.5,
-      "maxPan": 24
+      "maxPan": 34
     },
     "places": [
       {
@@ -350,16 +402,16 @@
         "name": "Torre dos Números",
         "sign": "Aberta: chegue perto e entre",
         "model": "torre-numeros",
-        "x": -19.5,
-        "z": 4.33
+        "x": -25.5,
+        "z": 6.06
       },
       {
         "id": "portugues",
         "name": "Torre das Letras",
         "sign": "Aberta: chegue perto e entre",
         "model": "torre-letras",
-        "x": 13.5,
-        "z": -14.72
+        "x": 18,
+        "z": -19.05
       },
       {
         "id": "ciencias",
@@ -403,15 +455,15 @@
         "id": "torre-matematica",
         "name": "Torre dos Números",
         "prompt": "Entrar na Torre dos Números",
-        "q": -12,
-        "r": 8
+        "q": -16,
+        "r": 11
       },
       {
         "id": "torre-portugues",
         "name": "Torre das Letras",
         "prompt": "Entrar na Torre das Letras",
-        "q": 8,
-        "r": -12
+        "q": 11,
+        "r": -16
       },
       {
         "id": "mercador",
@@ -419,7 +471,7 @@
         "prompt": "Falar com o Mercador",
         "model": "mercado",
         "q": 0,
-        "r": 12
+        "r": 16
       },
       {
         "id": "mestre",
@@ -481,10 +533,6 @@
           "z": 0.23
         },
         {
-          "x": 0.44,
-          "z": 0.76
-        },
-        {
           "x": -0.23,
           "z": 0.85
         },
@@ -519,6 +567,38 @@
         {
           "x": 0.25,
           "z": -0.43
+        },
+        {
+          "x": 0.2,
+          "z": -0.92
+        },
+        {
+          "x": 0.72,
+          "z": -0.66
+        },
+        {
+          "x": -0.52,
+          "z": -0.86
+        },
+        {
+          "x": 0.93,
+          "z": -0.12
+        },
+        {
+          "x": 0.08,
+          "z": 0.95
+        },
+        {
+          "x": 0.76,
+          "z": 0.62
+        },
+        {
+          "x": -0.92,
+          "z": 0.5
+        },
+        {
+          "x": -0.72,
+          "z": -0.72
         }
       ]
     }

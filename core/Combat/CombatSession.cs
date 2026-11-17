@@ -22,7 +22,7 @@ public sealed class CombatSession
 {
 	readonly CombatRules rules;
 
-	// As regras do ano escolhido: a bolsa e os sinais mudam com o Nível, o resto (tempo, Energia, bolha) é igual.
+	// As regras do ano escolhido: a bolsa e os sinais mudam com o Nível, o resto (tempo e Energia) é igual.
 	public CombatRules Rules => rules;
 	int hintIndex;
 
@@ -115,9 +115,9 @@ public sealed class CombatSession
 		return new MistakeOutcome(false, HintOffered, prank);
 	}
 
-	public bool BubbleHit()
+	public bool CreatureHit()
 	{
-		Energy.Lose(rules.Energy.Bubble);
+		Energy.Lose(rules.Energy.CreatureHit);
 		return Energy.IsEmpty;
 	}
 

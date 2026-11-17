@@ -83,6 +83,14 @@ $save = "$env:TEMPe2e-nivel.json"; Remove-Item $save, "$save.snapshot" -ErrorAct
 & $env:GODOT --headless --path game -- --driver=e2e-4 --save=$save --seed-do-mundo=1
 ```
 
+### Teste de ponta a ponta do combate
+
+O roteiro `e2e-nevoa` joga uma luta inteira como a criança: a Investida avisa e alcança quem fica parado, o golpe cansa a criatura, zerar a Névoa a deixa estonteada, o QTE errado devolve Névoa, a segunda Etapa e o golpe final. Os outros roteiros desligam os ataques da criatura; este os liga com `--ataques`.
+
+```powershell
+& $env:GODOT --headless --path game -- --driver=e2e-nevoa --ataques --save="$env:TEMPe2e-nevoa.json"
+```
+
 ### Teste de ponta a ponta do treino
 
 O roteiro `e2e-1` cria o Perfil, anda, treina nos dois Papéis e confere que o save não mudou; o `e2e-2`, num segundo processo, reabre o jogo e confere que o Perfil e o progresso são os mesmos. Uma verificação que falha faz o jogo sair com código 1. A CI roda os dois no executável de depuração exportado (job `e2e-windows`). Para rodar aqui, sem janela:

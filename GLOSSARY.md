@@ -26,20 +26,20 @@ Espaço do Lobby onde a criança pratica Conceitos num Boneco de treino, no mesm
 _Avoid_: Sala de treinamento (Sala é de Andar)
 
 **Boneco de treino**:
-Criatura de treino da Área de treino. Luta como uma criatura das Dungeons, com bolhas e travessuras, e propõe Desafios sorteados conforme a dificuldade escolhida.
+Criatura de treino da Área de treino. Luta como uma criatura das Dungeons, com Névoa, Ataques da criatura e travessuras, e propõe Desafios sorteados conforme a dificuldade escolhida.
 _Avoid_: Dummy
 
 **Travessura**:
 A reação da criatura quando a criança erra: ela só faz graça, sem tirar nada da criança (no desenho livre não há peças para embaralhar ou esconder). Nunca é violenta.
 _Avoid_: Castigo, punição, ataque
 
-**Bolha de névoa**:
-O ataque lento das criaturas hoje, sempre avisado antes por uma faixa no chão, texto e som. A criança desvia andando; ser atingida tira 1 de Energia. Com o Modo calmo ligado ela não aparece. O Lance (#189) a substitui.
-_Avoid_: Tiro, projétil
+**Ataque da criatura**:
+Cada criatura tem três ataques básicos, cada um com Recarga e aviso próprios, e escolhe entre os que estão prontos: a Investida (uma faixa no chão até a criança), o Pulo (um círculo onde a criança estava) e o Giro (um anel em volta da criatura). A mira trava quando o aviso começa, por forma, texto e som; a criança desvia andando, e ser alcançada tira 1 de Energia. Não há Ataque da criatura no Modo calmo, no QTE (a criatura está estonteada), no Puzzle nem no Atalho de Nível.
+_Avoid_: Bolha, Lance, Tiro, projétil, dano
 
-**Lance**:
-O ataque da criatura decidido para o lugar da Bolha de névoa (#189): um anel enche sobre ela até o próximo lance, num intervalo próprio em dados. Se a criança não responde a tempo, custa 1 de Energia e o anel recomeça; o contato físico nunca custa. O anel muda de cor e também de espessura ou pulso perto do fim. Não há Lance no Modo calmo, e o Boneco do Treino não lança.
-_Avoid_: Golpe da criatura, dano
+**Cansaço**:
+O quanto a criatura se cansou na Etapa, de 0 a 1: sobe a cada Ataque básico que ela leva, passa com o tempo e zera quando a Etapa acaba. Cansada, ela espera mais para atacar de novo e se move mais devagar e mais baixa. A HUD diz em texto.
+_Avoid_: Estamina, barra de vida
 
 **Modo calmo**:
 Opção de acessibilidade que deixa o tempo em 0,3× a luta toda, sem nenhum Lance. O Personagem segue no tempo normal.
@@ -74,7 +74,7 @@ A criança escreve números, sinais e letras em qualquer lugar da tela, com a ce
 _Avoid_: Traçado guiado, reconhecimento de escrita (sugere IA)
 
 **Névoa**:
-A vida da criatura no combate em duas camadas (ADR 0009, a validar num protótipo). Os Ataques básicos a dissolvem, sem violência. Fica dividida em Etapas. Não é a Bolha de névoa (o ataque lento da criatura) nem o escudo numérico dos Autômatos da Matemática.
+A vida da criatura no combate em duas camadas (ADR 0009). Os Ataques básicos a dissolvem, sem violência. Fica dividida em Etapas. Não é o escudo numérico dos Autômatos da Matemática.
 _Avoid_: Vida, HP, Guarda, Escudo (escudo é o número da criatura)
 
 **Etapa**:
@@ -162,7 +162,7 @@ Sala de combate ou de Puzzle cujo prêmio é o Item de troca do Nível.
 _Avoid_: Baú
 
 **Puzzle**:
-Sala em que a Missão é a mesma do combate, mas o alvo é uma porta ou uma ponte, sem criatura e sem Bolha de névoa. A porta abre quando o Desafio é resolvido; não existe chave. Erro tira 1 de Energia e o Desafio recomeça com outros números.
+Sala em que a Missão é a mesma do combate, mas o alvo é uma porta ou uma ponte, sem criatura e sem Ataque da criatura. A porta abre quando o Desafio é resolvido; não existe chave. Erro tira 1 de Energia e o Desafio recomeça com outros números.
 _Avoid_: Quebra-cabeça
 
 **Guardião do Nível**:

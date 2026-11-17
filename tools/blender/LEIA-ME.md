@@ -40,7 +40,7 @@ cd tools/blender
 blender -b --factory-startup --python lobby/vilarejo.py --python lobby/mercado.py --python lobby/portal_mestre.py --python lobby/adornos_torres.py --python lobby/torre_numeros.py --python lobby/torre_letras.py --python lobby/portal.py --python lobby/atril.py --python lobby/arvore.py --python lobby/ciencias.py --python lobby/historia.py --python lobby/geografia.py --python exportar_lobby.py -- ../../game/assets/modelos
 ```
 
-Todos olham para -Y no Blender (a frente vira +Z no jogo). Os modelos não levam textura: o jogo lê a cor do material (`albedo_color` no shader do portal, `leaf_color` no das folhas). O cenário das Dungeons, os itens e os obstáculos ainda são do Meshy.
+Todos olham para -Y no Blender (a frente vira +Z no jogo). Os modelos não levam textura: o jogo lê a cor do material (`albedo_color` no shader do portal, `leaf_color` no das folhas). 
 
 ## O Personagem
 
@@ -113,3 +113,30 @@ A pasta de saída é `game/assets/modelos/criaturas`. Depois, o Godot reimporta 
 Triângulos com `LOD = 0.4` (limite do guia: 2.500 por criatura): Sapo 3.184, Pato 3.980, Besouro 5.560, Tartaruga 6.116, Coruja 6.308 e Mapa 8.376; com `LOD = 1.0` eram de 14 mil a 100 mil. Ainda estão acima do limite, que é uma proposta a confirmar em tablet real: cada Sala tem 100 a 150 mil triângulos no total e há uma criatura por vez. Para chegar a 2.500 falta decidir o que sai do desenho (por exemplo os olhos em espiral viram textura).
 
 Cada criatura exporta com uma malha por peça e um material por cor, não o material único do guia; juntar por material e assar a cor em textura é o próximo passo.
+
+## Cenário, itens e obstáculos das Dungeons
+
+Os scripts de `cenario/` seguem o mesmo molde dos do Lobby e saem pelo `exportar_lobby.py`, em `game/assets/modelos/cenario/`. O jogo escala cada um pela altura (`RoomProps`), então só a proporção importa:
+
+| Script | Modelo no jogo | Observação |
+| --- | --- | --- |
+| `cenario/porta_arco.py` | `cenario/porta-arco` | pilares, arco de aduelas e pedra-chave dourada; a passagem atravessa o eixo Y e o jogo a gira para o corredor |
+| `cenario/fonte_descanso.py` | `cenario/fonte-descanso` | bacia, taça e gota dourada; o jogo a escurece depois de usada |
+| `cenario/escada_pedra.py` | `cenario/escada-pedra` | cinco degraus com muretas e lampiões; sobe para +Y |
+| `cenario/piso_dungeon.py` | `cenario/piso-dungeon-a`, `piso-dungeon-b` | laje hexagonal (raio 0,96, topo em z = 0) com anel `faixa` e miolo claro; a B leva rachaduras. O jogo alterna as duas pelas coordenadas |
+| `cenario/coluna_dungeon.py` | `cenario/coluna-dungeon`, `coluna-braseiro` | coluna de seis faces de 1,5; a de braseiro tem 1,85 e a brasa no material `chama` (emissivo) |
+| `cenario/pilar_torre.py` | `cenario/pilar-torre` | pilar curto com faixas douradas, 1,5 de altura |
+| `cenario/parede_baixa.py` | `cenario/parede-baixa` | um lado de hexágono (1 de comprimento no eixo X, 0,75 de altura), de blocos em duas fileiras |
+| `cenario/pedestal_mestre.py` | `cenario/pedestal-mestre` | três degraus redondos e anéis de luz; centrado na origem |
+| `cenario/caixote_madeira.py` | `obstaculos/caixote-madeira` | cantos de latão e engrenagem estampada em -Y |
+| `cenario/pilha_livros.py` | `obstaculos/pilha-de-livros` | livros coloridos inclinados e folhas soltas |
+| `cenario/pilha_engrenagens.py` | `obstaculos/pilha-de-engrenagens` | monte de engrenagens de latão |
+| `cenario/orbe_numero.py` | `itens/orbe-de-numero` | esfera dourada com halo, sem algarismo |
+| `cenario/medalhao_engrenagem.py` | `itens/medalhao-engrenagem` | engrenagem com corrente, miolo liso |
+| `cenario/placa_letra.py` | `itens/placa-de-letra` | ladrilho com rosto em branco |
+
+```text
+blender -b --factory-startup --python cenario/porta_arco.py --python cenario/fonte_descanso.py --python cenario/escada_pedra.py --python cenario/pilar_torre.py --python cenario/parede_baixa.py --python cenario/pedestal_mestre.py --python cenario/caixote_madeira.py --python cenario/pilha_livros.py --python cenario/pilha_engrenagens.py --python cenario/orbe_numero.py --python cenario/medalhao_engrenagem.py --python cenario/placa_letra.py --python exportar_lobby.py -- ../../game/assets/modelos
+```
+
+O chão, as paredes e as colunas usam materiais de **nome fixo** (`pedra`, `pedra_cl`, `pedra_esc`, `faixa`, `chama`): o jogo troca a cor de cada um pelo tema da torre (`DungeonTheme`) e pinta a `faixa` do chão com a cor da função da Sala. `ModelosTests` confere esses nomes.

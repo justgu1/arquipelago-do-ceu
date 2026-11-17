@@ -259,8 +259,8 @@ def fundir(nome, pecas):
 LOD = 0.8
 # O shader do portal (portal_energy.gdshader) lê a abertura em coordenadas do modelo: meia-largura 0,5, centro do arco em z = 0,015 e chão em z = -0,9. O modelo fica centrado na origem, com 1,9 de altura.
 M = dict(
-    pedra=mat("p_pedra", "#9A8F8A", 0.9), pedra_cl=mat("p_pedra_cl", "#B8AEA8", 0.9), pedra_esc=mat("p_pedra_esc", "#6F6661", 0.95), musgo=mat("p_musgo", "#62B83A", 0.9),
-    cristal=mat("p_cristal", "#6FD3F2", 0.2, 0.1), ouro=mat("p_ouro", "#F2B632", 0.4, 0.5), membrana=mat("p_membrana", "#BDE8FF", 0.4),
+    pedra=mat("p_pedra", "#9A93B5", 0.9), pedra_cl=mat("p_pedra_cl", "#B9B2D2", 0.9), pedra_esc=mat("p_pedra_esc", "#6F6890", 0.95), musgo=mat("p_musgo", "#5E9C4A", 0.9),
+    cristal=mat("p_cristal", "#6FD3F2", 0.2, 0.1), ouro=mat("p_ouro", "#EBC24E", 0.35, 0.6), membrana=mat("p_membrana", "#BDE8FF", 0.4),
 )
 CZ = 0.015
 ABERTURA = 0.5

@@ -32,6 +32,11 @@ public sealed class InventoryHost
 
 	public required Func<IReadOnlyList<string>> OwnedGear { get; init; }
 
+	// Quantos lugares a mochila tem agora e o Nível que os define.
+	public required Func<int> BackpackSlots { get; init; }
+
+	public required Func<int> BackpackLevel { get; init; }
+
 	public required Func<IReadOnlyList<HeldItem>> HeldItems { get; init; }
 
 	// Troca o Papel (só no Lobby); nulo quando não dá para trocar.

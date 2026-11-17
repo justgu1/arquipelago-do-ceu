@@ -49,9 +49,13 @@ public partial class FloorMap : Control
 		set { here = value; QueueRedraw(); }
 	}
 
-	public FloorMap(Floor floor, Vector2 size)
+	// No mapa em tela cheia cada Sala leva o nome escrito embaixo e uma marca maior; o do HUD continua só com a letra.
+	readonly bool labeled;
+
+	public FloorMap(Floor floor, Vector2 size, bool labeled = false)
 	{
 		this.floor = floor;
+		this.labeled = labeled;
 		CustomMinimumSize = size;
 		Size = size;
 		if (floor.Layout is null) Layout(size);
@@ -105,6 +109,7 @@ public partial class FloorMap : Control
 			if (sight == Sight.Fog)
 			{
 				DrawFog(font, positions[room.Id], source!.IsLocked(room.Id));
+				if (labeled) DrawName(font, positions[room.Id], source!.IsLocked(room.Id) ? "Trancada" : "Sala nova");
 				continue;
 			}
 
@@ -112,9 +117,11 @@ public partial class FloorMap : Control
 			var color = ColorOf(room.Kind);
 			var at = positions[room.Id];
 			var done = Cleared.Contains(room.Id);
-			Shape(room.Kind, at, new Color(color.R, color.G, color.B, done ? 0.55f : 1f));
+			Shape(room.Kind, at, Colors.Black, 3f);
+			Shape(room.Kind, at, new Color(color.R, color.G, color.B, done ? 0.75f : 1f));
 			var width = font.GetStringSize(letter, HorizontalAlignment.Left, -1, 20).X;
 			DrawString(font, at + new Vector2(-width / 2, 7), letter, HorizontalAlignment.Left, -1, 20, Colors.Black);
+			if (labeled) DrawName(font, at, room.Kind.Name);
 			if (room.HoldsItem)
 				DrawString(font, at + new Vector2(Radius - 4, -Radius + 6), "★", HorizontalAlignment.Left, -1, 18, Color.FromHtml("#FFEB3B"));
 			// Cada estado tem forma própria: visto (vencida), arco (Fast travel) e boneco (onde a criança está).
@@ -240,22 +247,36 @@ public partial class FloorMap : Control
 	}
 
 	// A forma vem da definição da Sala: a forma diz a função, para a cor nunca ser a única informação.
-	void Shape(RoomType kind, Vector2 at, Color fill)
+	void Shape(RoomType kind, Vector2 at, Color fill, float grow = 0f) => Badge(this, kind, at, Radius + grow, fill);
+
+	// A marca de um tipo de Sala, também usada na legenda do mapa em tela cheia.
+	public static void Badge(CanvasItem canvas, RoomType kind, Vector2 at, float radius, Color fill)
 	{
 		switch (kind.Shape)
 		{
 			case RoomShape.Circle:
-				DrawCircle(at, Radius, fill);
+				canvas.DrawCircle(at, radius, fill);
 				break;
 			case RoomShape.Square:
-				DrawRect(new Rect2(at - new Vector2(Radius, Radius), new Vector2(Radius * 2, Radius * 2)), fill);
+				canvas.DrawRect(new Rect2(at - new Vector2(radius, radius), new Vector2(radius * 2, radius * 2)), fill);
 				break;
 			case RoomShape.Diamond:
-				DrawColoredPolygon([at + new Vector2(0, -Radius - 4), at + new Vector2(Radius + 4, 0), at + new Vector2(0, Radius + 4), at + new Vector2(-Radius - 4, 0)], fill);
+				canvas.DrawColoredPolygon([at + new Vector2(0, -radius - 4), at + new Vector2(radius + 4, 0), at + new Vector2(0, radius + 4), at + new Vector2(-radius - 4, 0)], fill);
 				break;
 			default:
-				DrawColoredPolygon(Enumerable.Range(0, 6).Select(i => at + Radius * new Vector2(Mathf.Cos(i * Mathf.Tau / 6), Mathf.Sin(i * Mathf.Tau / 6))).ToArray(), fill);
+				canvas.DrawColoredPolygon(Enumerable.Range(0, 6).Select(i => at + radius * new Vector2(Mathf.Cos(i * Mathf.Tau / 6), Mathf.Sin(i * Mathf.Tau / 6))).ToArray(), fill);
 				break;
 		}
+	}
+
+	// O nome da Sala numa etiqueta clara embaixo da marca, para ninguém precisar decorar as letras.
+	void DrawName(Font font, Vector2 at, string name)
+	{
+		const int size = 17;
+		var width = font.GetStringSize(name, HorizontalAlignment.Left, -1, size).X;
+		var top = at + new Vector2(-width / 2 - 6, Radius + 6);
+		DrawRect(new Rect2(top, new Vector2(width + 12, size + 8)), new Color(0.98f, 0.94f, 0.84f, 0.95f));
+		DrawRect(new Rect2(top, new Vector2(width + 12, size + 8)), Color.FromHtml("#4A3B2A"), false, 1.5f);
+		DrawString(font, top + new Vector2(6, size + 1), name, HorizontalAlignment.Left, -1, size, Color.FromHtml("#2E2418"));
 	}
 }

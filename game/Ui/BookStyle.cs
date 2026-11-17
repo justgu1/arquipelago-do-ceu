@@ -29,7 +29,7 @@ public static class BookStyle
 	public static PanelContainer Panel(Control child)
 	{
 		var panel = new PanelContainer();
-		panel.AddThemeStyleboxOverride("panel", Box());
+		panel.AddThemeStyleboxOverride("panel", PaperTexture.Style());
 		panel.AddChild(child);
 		return panel;
 	}

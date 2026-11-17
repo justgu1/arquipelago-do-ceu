@@ -33,7 +33,7 @@ public partial class TrainingArea : Node
 	readonly CombatTime time;
 	readonly AttackRhythm rhythm;
 	readonly CreatureMotion motion;
-	readonly BubbleDirector bubbles;
+	readonly CreatureDirector creatureAttacks;
 	readonly AnswerReactions reactions;
 	readonly IReadOnlyList<Mission> missions;
 	readonly IRandomSource random;
@@ -67,8 +67,8 @@ public partial class TrainingArea : Node
 		this.showOverlay = showOverlay;
 		this.notify = notify;
 		time = new CombatTime(rules.Combat);
-		rhythm = new AttackRhythm(rules.Combat, time);
-		bubbles = new BubbleDirector(rules.Combat.Bubble, rhythm, () => motion!.Ground, dummy, player, voice);
+		rhythm = new AttackRhythm(rules.Combat);
+		creatureAttacks = new CreatureDirector(new CreatureAttacks(rules.Combat.Fog.Creature, random.NewStream()), time, () => motion!.Ground, dummy, player, voice);
 		reactions = new AnswerReactions(this, dummy, player);
 		missions = MissionSource.Load().Missions;
 
@@ -85,8 +85,18 @@ public partial class TrainingArea : Node
 	// As Mecânicas de luta que o jogo conhece (a de dinheiro entra quando o catálogo do Real carrega).
 	public BattleMechanics Mechanics { get; set; } = BattleMechanics.Default;
 
-	// Sem bolhas, como no Puzzle: a porta não ataca, só espera a resposta.
-	public bool Bubbles { get; set; } = true;
+	// A luta de Névoa e QTE (ADR 0009) vale para toda criatura. No Puzzle a porta não ataca e no Atalho de Nível o primeiro erro encerra a tentativa:
+	// nos dois só se responde ao Desafio.
+	public bool UsesFog { get; set; } = true;
+
+	// Quantas Etapas tem a luta de Sala; sem valor valem as dos dados. O Desafio épico e o Guardião têm uma a mais.
+	public int? FogStages { get; set; }
+
+	// O Desafio épico e o Guardião têm uma Etapa a mais que a luta comum, qualquer que seja o valor dos dados.
+	public int BossStages => rules.Combat.Fog.Stages + 1;
+
+	// O piloto de testes liga isto para a criatura não tirar Energia no meio de um roteiro; só o roteiro dos ataques o desliga.
+	internal static bool PilotPeace { get; set; }
 
 	// No Atalho de Nível o primeiro erro encerra a tentativa, sem tirar Energia.
 	public Action? StopOnMistake { get; set; }
@@ -111,7 +121,7 @@ public partial class TrainingArea : Node
 		else Select();
 	}
 
-	// Solta o alvo sem responder; o treino continua (com bolhas e Energia) até a criança sair ou a Energia zerar.
+	// Solta o alvo sem responder; o treino continua (com a criatura e a Energia) até a criança sair ou a Energia zerar.
 	public void DropTarget() => AnswerPanels.Abandon(panel);
 
 	// Se a criança se afasta demais, o alvo se perde.
@@ -159,11 +169,12 @@ public partial class TrainingArea : Node
 		fightWon = won;
 		fightLost = lost;
 		reacting = false;
-		bubbles.Reset();
+		creatureAttacks.Reset();
 		rhythm.Reset();
 		StartTime();
 		UpdateEnergy();
 		dummy.ShowChallenge(session);
+		if (UsesFog) StartFogFight();
 	}
 
 	// O Modo calmo deixa o tempo lento a luta toda.
@@ -184,7 +195,8 @@ public partial class TrainingArea : Node
 		fightLost = null;
 		energyView = null;
 		ownsEnergyView = true;
-		bubbles.Clear();
+		EndFog();
+		creatureAttacks.Clear();
 		time.End();
 		time.Calm(false);
 		Engine.TimeScale = time.Scale;
@@ -215,7 +227,7 @@ public partial class TrainingArea : Node
 
 		RoleChosen?.Invoke(setup.Discipline);
 		session = started.Value!;
-		bubbles.Reset();
+		creatureAttacks.Reset();
 		rhythm.Reset();
 		StartTime();
 		energyView = new EnergyView();
@@ -223,7 +235,7 @@ public partial class TrainingArea : Node
 		uiRoot.AddChild(energyView);
 		UpdateEnergy();
 		dummy.ShowChallenge(session);
-		if (!BeginFog()) OpenPanel();
+		StartFogFight();
 		return null;
 	}
 
@@ -306,41 +318,6 @@ public partial class TrainingArea : Node
 		};
 	}
 
-	// Num treino vem logo o próximo Desafio; numa Sala, vencer o Desafio vence a Sala.
-	internal void Won()
-	{
-		if (session is not null) BattleEnded?.Invoke(session.Conclude(calmed: true));
-		if (fightWon is null) { TrainingWon(); return; }
-		reacting = true;
-		bubbles.Clear();
-		var mine = ++epoch;
-		GetTree().CreateTimer(ReactionSeconds, true, false, true).Timeout += () =>
-		{
-			if (epoch != mine || session is null) return;
-			var won = fightWon;
-			var solved = session.Mission;
-			EndFight();
-			ChallengeSolved?.Invoke(solved);
-			won();
-		};
-	}
-
-	void NextChallengeSoon()
-	{
-		reacting = true;
-		bubbles.Clear();
-		var mine = epoch;
-		GetTree().CreateTimer(ReactionSeconds, true, false, true).Timeout += () =>
-		{
-			if (epoch != mine || session is null) return;
-			reacting = false;
-			session.NextChallenge();
-			dummy.ShowChallenge(session);
-			AnswerPanels.Refresh(panel);
-			Tell($"Novo Desafio: {session.Mission.Prompt}");
-		};
-	}
-
 	// Mostra na cena e no painel; o painel também fala. Sem painel aberto, só o Boneco e a voz.
 	internal void Say(string headline, string text, bool good = true)
 	{
@@ -349,10 +326,7 @@ public partial class TrainingArea : Node
 		else Tell(text);
 	}
 
-	internal void AttackAnimation()
-	{
-		player.Attack(motion.Ground);
-	}
+	internal void AttackAnimation(BasicAttack? attack = null) => player.Attack(motion.Ground, attack);
 
 	// Energia zerada, "Sair do treino" ou troca de Perfil: a criança só sai da Área de treino, sem perder nada.
 	void Finish(string message)
@@ -369,7 +343,7 @@ public partial class TrainingArea : Node
 		DropTarget();
 		session = null;
 		reacting = false;
-		bubbles.Reset();
+		creatureAttacks.Clear();
 		if (ownsEnergyView) energyView?.QueueFree();
 		energyView = null;
 		EndFog();
@@ -382,16 +356,22 @@ public partial class TrainingArea : Node
 		dummy.Say("Fim do treino por hoje.", good: false);
 	}
 
-	// --- Bolhas
+	// --- Quadro a quadro
+
+	// Um quadro longo (janela parada) não pode recarregar tudo de uma vez, como o CreatureDirector também limita.
+	const float MaxFrameSeconds = 0.1f;
 
 	public override void _Process(double delta)
 	{
 		if (canAct()) motion.Tick((float)delta, player.GroundPosition, Creature.Moves, panel is not null, settings.Current.CalmMode);
 		if (session is null || reacting || !canAct()) return;
-		rhythm.UseCreature(Creature.Kind);
-		// Modo calmo e Puzzle: o Boneco não lança bolhas e só reage a erros.
-		if (!bubbles.Tick(delta, stopped: settings.Current.CalmMode || !Bubbles || fog is not null)) return;
-		session.BubbleHit();
+		rhythm.Tick(Engine.TimeScale > 0.0 ? Math.Min((float)(delta / Engine.TimeScale), MaxFrameSeconds) : 0f);
+		if (fog is null) return;
+		dummy.SetTired(fog.Tiredness);
+		// Modo calmo, QTE e pausas entre Etapas: a criatura só espera. Fora deles ela escolhe um ataque quando a Recarga deixa.
+		var stopped = settings.Current.CalmMode || fog.Stunned || fogBusy || PilotPeace;
+		if (!creatureAttacks.Tick(delta, stopped, fog.Tiredness)) return;
+		session.CreatureHit();
 		UpdateEnergy();
 		if (session.IsOver) Finish("A névoa ficou forte demais desta vez. Vamos recarregar a energia?");
 	}

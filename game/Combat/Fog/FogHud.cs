@@ -17,6 +17,7 @@ public partial class FogHud : Control
 	readonly Label weakness = BookStyle.Text("", 18);
 	readonly Label warning = BookStyle.Text("", 20);
 	readonly Label clock = BookStyle.Text("", 18);
+	readonly Label tired = BookStyle.Text("", 18);
 	readonly ProgressBar fogBar = new() { ShowPercentage = false, CustomMinimumSize = new Vector2(320, 22) };
 	readonly ProgressBar clockBar = new() { ShowPercentage = false, CustomMinimumSize = new Vector2(320, 14) };
 	readonly AudioStreamPlayer sound = new();
@@ -73,7 +74,7 @@ public partial class FogHud : Control
 		weaknessRow.AddChild(weakness);
 		var column = new VBoxContainer();
 		column.AddThemeConstantOverride("separation", 4);
-		foreach (var child in new Control[] { stage, fogBar, fogText, weaknessRow, warning, clockBar, clock }) column.AddChild(child);
+		foreach (var child in new Control[] { stage, fogBar, fogText, tired, weaknessRow, warning, clockBar, clock }) column.AddChild(child);
 		var panel = BookStyle.Panel(column);
 		panel.Name = "FogPanel";
 		panel.CustomMinimumSize = new Vector2(380, 0);
@@ -147,6 +148,7 @@ public partial class FogHud : Control
 		fogBar.MaxValue = fight.StageFog;
 		fogBar.Value = fight.Fog;
 		fogText.Text = inFog ? $"Névoa: {fight.Fog} de {fight.StageFog}" : "Névoa zerada! Hora do desafio.";
+		tired.Text = fight.Tiredness switch { >= 0.6f => "Criatura muito cansada: ataca mais devagar.", >= 0.25f => "Criatura cansada: ataca mais devagar.", _ => "Criatura descansada." };
 		ShowWeaknessIcon();
 		weakness.Text = $"Fraqueza: ataque {Label(fight.Weakness)}";
 		warning.Visible = fight.ShiftingTo is not null;

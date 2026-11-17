@@ -150,8 +150,12 @@ public partial class FreeDrawLayer : Control
 		if (guide is not null || drawing.IsActive || typed.Length > 0) QueueRedraw();
 	}
 
+	// A última leitura, para o piloto de testes saber se o desenho foi entendido.
+	internal TextGuess? LastGuess { get; private set; }
+
 	void Emit(TextGuess guess)
 	{
+		LastGuess = guess;
 		GD.Print($"Desenho lido: {guess.Kind} '{guess.Text}'");
 		Read?.Invoke(guess);
 	}

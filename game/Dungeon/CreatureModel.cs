@@ -27,6 +27,8 @@ public sealed class CreatureModel
 	double clock;
 	double since = ReactionSeconds;
 	string reaction = "";
+	// A criatura estonteada balança até o QTE acabar, em vez de reagir só um instante.
+	bool stunned;
 
 	CreatureModel(Node3D model, string name)
 	{
@@ -38,6 +40,9 @@ public sealed class CreatureModel
 	public Node3D Node => model;
 
 	public bool ReduceMotion { get; set; }
+
+	// De 0 a 1: cansada, ela respira mais devagar e fica mais baixa e curvada.
+	public float Tiredness { get; set; }
 
 	// O modelo pelo nome combinado (por exemplo "criaturas/sapo"); nulo se não carregar.
 	public static CreatureModel? Load(string name) => Lobby.LoadModel(name) is { } node ? new CreatureModel(node, name) : null;
@@ -53,6 +58,7 @@ public sealed class CreatureModel
 	// acerto, erro, libertada ou travessura.
 	public void React(string kind)
 	{
+		if (kind is "stunned" or "recovered") stunned = kind == "stunned";
 		reaction = kind;
 		since = 0;
 	}
@@ -68,9 +74,9 @@ public sealed class CreatureModel
 			model.Rotation = Vector3.Zero;
 			return;
 		}
-		var breath = (float)System.Math.Sin(clock * 2.2);
-		var lift = 0.05f * breath;
-		var squash = 1f + 0.03f * breath;
+		var breath = (float)System.Math.Sin(clock * (2.2 - 1.2 * Tiredness));
+		var lift = 0.05f * breath - 0.08f * Tiredness;
+		var squash = 1f + 0.03f * breath - 0.08f * Tiredness;
 		var turn = 0f;
 		var sway = 0f;
 		var t = (float)System.Math.Min(since / ReactionSeconds, 1.0);
@@ -79,6 +85,15 @@ public sealed class CreatureModel
 		else if (live && reaction == "miss") sway = 0.12f * Mathf.Sin(t * 6f * Mathf.Pi) * (1f - t);
 		else if (live && reaction == "prank") turn = 0.2f * Mathf.Sin(t * 4f * Mathf.Pi) * (1f - t);
 		else if (live && reaction == "freed") (lift, turn) = (0.6f * Mathf.Sin(t * Mathf.Pi), Mathf.Tau * t);
+		else if (live && reaction == "lunge") lift = 0.15f * Mathf.Sin(t * Mathf.Pi);
+		else if (live && reaction == "slam") squash = 1f + 0.18f * Mathf.Sin(t * Mathf.Pi);
+		else if (live && reaction == "spin") turn = Mathf.Tau * t;
+		if (stunned)
+		{
+			sway = 0.18f * (float)System.Math.Sin(clock * 5.0);
+			turn = 0.25f * (float)System.Math.Cos(clock * 3.5);
+			lift -= 0.05f;
+		}
 		model.Scale = new Vector3(baseScale.X / Mathf.Sqrt(squash), baseScale.Y * squash, baseScale.Z / Mathf.Sqrt(squash));
 		model.Position = basePosition + anchor + new Vector3(sway, lift, 0f);
 		model.Rotation = new Vector3(0f, turn, 0f);

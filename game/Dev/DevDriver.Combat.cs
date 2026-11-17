@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ArquipelagoDoCeu.Combat;
 using Godot;
 
 namespace ArquipelagoDoCeu;
@@ -15,6 +16,28 @@ public partial class DevDriver
 
 	// A luta aberta (a do Treino ou a da Sala da Dungeon): o piloto lê dela a resposta certa, como um professor leria.
 	TrainingArea? Fighting => GetTree().Root.FindChildren("*", "", true, false).OfType<TrainingArea>().FirstOrDefault(a => a.HasTarget);
+
+	// A luta de Névoa em andamento (a do Treino ou a da Sala), em qualquer fase.
+	public FogFight? Fog => GetTree().Root.FindChildren("*", "", true, false).OfType<TrainingArea>().Select(a => a.Fight).FirstOrDefault(f => f is not null);
+
+	// Tira a Névoa com o ataque da fraqueza, como a criança faz, até abrir o QTE; sem Névoa (Puzzle, Atalho) não faz nada.
+	public async Task OpenChallenge()
+	{
+		for (var i = 0; i < 200 && Fog is { Phase: FogPhase.Fog } fight; i++)
+		{
+			await PressKey(Key.Key1 + (int)fight.Weakness);
+			await Wait(0.3);
+		}
+		await Wait(0.2);
+	}
+
+	// O golpe final para o jogo numa cutscene; o piloto a pula como a criança pode fazer.
+	public async Task SkipCutscene()
+	{
+		if (GetTree().Root.FindChild("FogCutscene", true, false) is null) return;
+		await PressKey(Key.Escape);
+		await Wait(0.4);
+	}
 
 	// Toca na peça (o dinheiro e as frases ainda escolhem peças).
 	public async Task PlayPiece(int index)
@@ -37,7 +60,20 @@ public partial class DevDriver
 	}
 
 	// Desenha de verdade, com o mouse, os glifos de `text` lado a lado no meio da tela, pelas trilhas, e espera o jogo ler.
+	// Um engasgo do quadro no meio do desenho passa da pausa que separa os símbolos e parte o `+` em dois; então desenha de novo, até 3 vezes.
 	public async Task DrawText(string text)
+	{
+		var layer = GetTree().Root.FindChildren("*", "FreeDrawLayer", true, false).OfType<FreeDrawLayer>().FirstOrDefault();
+		for (var attempt = 0; attempt < 3; attempt++)
+		{
+			if (layer is not null) layer.Clear();
+			await DrawOnce(text);
+			if (layer?.LastGuess is not { Kind: not GuessKind.Unknown }) continue;
+			return;
+		}
+	}
+
+	async Task DrawOnce(string text)
 	{
 		var size = GetViewport().GetVisibleRect().Size;
 		var area = new System.Numerics.Vector2(size.X * 0.5f, size.Y * 0.4f);
@@ -61,6 +97,7 @@ public partial class DevDriver
 	// Joga o nome certo; com `wrong`, escreve uma sílaba que não é do nome. Frases ainda escolhem as peças.
 	public async Task PlayName(bool wrong = false)
 	{
+		await OpenChallenge();
 		if (Fighting?.Session?.Name is not { } name) { GD.PushError("Piloto: não há montagem de nome na tela."); return; }
 		if (name.Kind == ArquipelagoDoCeu.Combat.NameKind.Syllables)
 		{
@@ -76,6 +113,7 @@ public partial class DevDriver
 	// Escreve a palavra do Desafio inteira.
 	public async Task PlayWord()
 	{
+		await OpenChallenge();
 		if (Fighting?.Session?.Word is not { } word) { GD.PushError("Piloto: não há escrita de palavra na tela."); return; }
 		await Write(word.Word);
 	}
@@ -83,6 +121,7 @@ public partial class DevDriver
 	// Uma resposta de Matemática: a conta de exemplo (ou o número, na conta pronta) e, com `wrong`, uma resposta que não dá o pedido.
 	public async Task PlayMath(bool wrong = false)
 	{
+		await OpenChallenge();
 		if (Fighting is not { Session.Math: { } math } area) { GD.PushError("Piloto: não há luta de Matemática na tela."); return; }
 		var target = math.StartingShield;
 		if (math.Ask == ArquipelagoDoCeu.Combat.MathAsk.Answer) await Write((wrong ? target + 1 : target).ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -92,6 +131,7 @@ public partial class DevDriver
 	// Monta o valor do desafio de dinheiro seguindo as sugestões do jogo e confere; com `wrong`, põe a maior nota e confere.
 	public async Task PlayMoney(bool wrong = false)
 	{
+		await OpenChallenge();
 		if (Fighting?.Session?.Change is not { } battle) { GD.PushError("Piloto: não há desafio de dinheiro na tela."); return; }
 		if (wrong)
 		{

@@ -143,7 +143,7 @@ public partial class DungeonHud : Node
 
 	public void RefreshDock() => dock.SetNewCount(ctx.NewInventoryItems?.Invoke() ?? 0);
 
-	// No celular o direcional fica na luta, para a criança desviar das bolhas; só os botões em volta somem.
+	// No celular o direcional fica na luta, para a criança desviar dos ataques da criatura; só os botões em volta somem.
 	public override void _Process(double delta)
 	{
 		var combat = InCombat();

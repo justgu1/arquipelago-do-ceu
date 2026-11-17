@@ -10,9 +10,9 @@ public sealed record YearBag(int Year, IReadOnlyList<int> BagNumbers, IReadOnlyL
 // O que o Nível libera numa conta desenhada: os sinais e quantas parcelas cabem. Os dois vêm de dados.
 public sealed record MathLevel(IReadOnlyList<string> Operators, int MaxTerms);
 
-// Bolsa do Matemático, sinais da calculadora, tempo da montagem, traçado, Energia, travessura, dica e bolha; todo valor vem de dados.
+// Bolsa do Matemático, sinais da calculadora, tempo da montagem, traçado, Energia, travessura e dica; todo valor vem de dados.
 // `BagNumbers` e `Operators` são os do 1º ano; `Years` traz os dos anos seguintes.
-public sealed record CombatRules(int HandSize, IReadOnlyList<int> BagNumbers, int BagCopies, float SlowTimeScale, float TargetRange, IReadOnlyList<string> Operators, TracingRules Tracing, int MistakesForHint, float PrankSeconds, EnergyRules Energy, BubbleRules Bubble, RhythmRules Rhythm, MovementRules Movement, IReadOnlyList<YearBag> Years)
+public sealed record CombatRules(int HandSize, IReadOnlyList<int> BagNumbers, int BagCopies, float SlowTimeScale, float TargetRange, IReadOnlyList<string> Operators, TracingRules Tracing, int MistakesForHint, float PrankSeconds, EnergyRules Energy, RhythmRules Rhythm, MovementRules Movement, IReadOnlyList<YearBag> Years)
 {
 	// A Energia máxima de uma batalha quando ninguém de fora (equipamento, Expedição) diz outra; vem de `maxEnergy` nos dados.
 	public int DefaultMaxEnergy { get; init; } = 5;
@@ -22,7 +22,7 @@ public sealed record CombatRules(int HandSize, IReadOnlyList<int> BagNumbers, in
 
 	public FreeDrawRules FreeDraw { get; init; } = FreeDrawRules.Default;
 
-	// O combate em duas camadas (ADR 0009), em protótipo: só vale com a chave de desenvolvimento ligada.
+	// O combate em duas camadas (ADR 0009), e os ataques da criatura.
 	public FogRules Fog { get; init; } = FogRules.Default;
 
 	// O que o desenho de uma conta pode usar neste Nível: os sinais e o número de parcelas.
@@ -38,19 +38,14 @@ public sealed record CombatRules(int HandSize, IReadOnlyList<int> BagNumbers, in
 
 sealed record YearBagDto(int? Year, int[]? BagNumbers, string[]? Operators, int? MaxTerms);
 
-// Quanto cada acontecimento muda a Energia: acerto, golpe perfeito, erro e bolha de névoa.
-public sealed record EnergyRules(int Hit, int Perfect, int Mistake, int Bubble);
+// Quanto cada acontecimento muda a Energia: acerto, golpe perfeito, erro e golpe da criatura.
+public sealed record EnergyRules(int Hit, int Perfect, int Mistake, int CreatureHit);
 
-// A bolha de névoa: de quanto em quanto tempo sai, quanto dura o aviso antes, a velocidade, o raio que atinge e até onde voa.
-public sealed record BubbleRules(float IntervalSeconds, float WarningSeconds, float Speed, float Radius, float Range);
-
-sealed record EnergyDto(int? Hit, int? Perfect, int? Mistake, int? Bubble);
-
-sealed record BubbleDto(float? IntervalSeconds, float? WarningSeconds, float? Speed, float? Radius, float? Range);
+sealed record EnergyDto(int? Hit, int? Perfect, int? Mistake, int? CreatureHit);
 
 sealed record TracingDto(int? DotSpacing, float? Tolerance, float? MinCoverage, float? MaxStray);
 
-sealed record CombatDto(int? HandSize, int[]? BagNumbers, int? BagCopies, float? SlowTimeScale, float? TargetRange, string[]? Operators, TracingDto? Tracing, int? MistakesForHint, float? PrankSeconds, EnergyDto? Energy, BubbleDto? Bubble, RhythmDto? Rhythm, MovementDto? Movement, YearBagDto[]? Years, int? MaxTerms, FreeDrawDto? FreeDraw, FogDto? Fog = null);
+sealed record CombatDto(int? HandSize, int[]? BagNumbers, int? BagCopies, float? SlowTimeScale, float? TargetRange, string[]? Operators, TracingDto? Tracing, int? MistakesForHint, float? PrankSeconds, EnergyDto? Energy, RhythmDto? Rhythm, MovementDto? Movement, YearBagDto[]? Years, int? MaxTerms, FreeDrawDto? FreeDraw, FogDto? Fog = null);
 
 static class CombatChecks
 {
@@ -82,7 +77,7 @@ static class CombatChecks
 		if (combat.Operators.Length == 0) return "Regras inválidas: 'combat.operators' precisa de ao menos um sinal.";
 		if (combat.Operators.Any(o => !SupportedOperators.Contains(o)))
 			return $"Regras inválidas: 'combat.operators' só aceita {string.Join(", ", SupportedOperators)} por enquanto (veio {string.Join(", ", combat.Operators)}).";
-		return CheckTracing(combat.Tracing) ?? CheckFeedback(combat) ?? CheckEnergy(combat.Energy) ?? CheckBubble(combat.Bubble) ?? RhythmChecks.Check(combat.Rhythm) ?? MovementChecks.Check(combat.Movement) ?? CheckYears(combat) ?? CheckTerms(combat.MaxTerms, "combat.maxTerms") ?? FreeDrawChecks.Check(combat.FreeDraw) ?? FogChecks.Check(combat.Fog);
+		return CheckTracing(combat.Tracing) ?? CheckFeedback(combat) ?? CheckEnergy(combat.Energy) ?? RhythmChecks.Check(combat.Rhythm) ?? MovementChecks.Check(combat.Movement) ?? CheckYears(combat) ?? CheckTerms(combat.MaxTerms, "combat.maxTerms") ?? FreeDrawChecks.Check(combat.FreeDraw) ?? FogChecks.Check(combat.Fog);
 	}
 
 
@@ -119,27 +114,11 @@ static class CombatChecks
 	static string? CheckEnergy(EnergyDto? energy)
 	{
 		if (energy is null) return Required("combat.energy");
-		foreach (var (field, value) in new[] { ("hit", energy.Hit), ("perfect", energy.Perfect), ("mistake", energy.Mistake), ("bubble", energy.Bubble) })
+		foreach (var (field, value) in new[] { ("hit", energy.Hit), ("perfect", energy.Perfect), ("mistake", energy.Mistake), ("creatureHit", energy.CreatureHit) })
 		{
 			if (value is null) return Required($"combat.energy.{field}");
 			if (value < 1 || value > 9) return OutOfRange($"combat.energy.{field}", "1 e 9", value);
 		}
-		return null;
-	}
-
-	static string? CheckBubble(BubbleDto? bubble)
-	{
-		if (bubble is null) return Required("combat.bubble");
-		if (bubble.IntervalSeconds is null) return Required("combat.bubble.intervalSeconds");
-		if (bubble.IntervalSeconds < 2f || bubble.IntervalSeconds > 60f) return OutOfRange("combat.bubble.intervalSeconds", "2 e 60", bubble.IntervalSeconds);
-		if (bubble.WarningSeconds is null) return Required("combat.bubble.warningSeconds");
-		if (bubble.WarningSeconds < 0.5f || bubble.WarningSeconds > 5f) return OutOfRange("combat.bubble.warningSeconds", "0,5 e 5", bubble.WarningSeconds);
-		if (bubble.Speed is null) return Required("combat.bubble.speed");
-		if (bubble.Speed < 0.3f || bubble.Speed > 4f) return OutOfRange("combat.bubble.speed", "0,3 e 4", bubble.Speed);
-		if (bubble.Radius is null) return Required("combat.bubble.radius");
-		if (bubble.Radius < 0.2f || bubble.Radius > 2f) return OutOfRange("combat.bubble.radius", "0,2 e 2", bubble.Radius);
-		if (bubble.Range is null) return Required("combat.bubble.range");
-		if (bubble.Range < 3f || bubble.Range > 30f) return OutOfRange("combat.bubble.range", "3 e 30", bubble.Range);
 		return null;
 	}
 
@@ -161,8 +140,7 @@ static class CombatChecks
 		new(combat.HandSize!.Value, [.. combat.BagNumbers!], combat.BagCopies!.Value, combat.SlowTimeScale!.Value, combat.TargetRange!.Value, [.. combat.Operators!],
 			new TracingRules(combat.Tracing!.DotSpacing!.Value, combat.Tracing.Tolerance!.Value, combat.Tracing.MinCoverage!.Value, combat.Tracing.MaxStray!.Value),
 			combat.MistakesForHint!.Value, combat.PrankSeconds!.Value,
-			new EnergyRules(combat.Energy!.Hit!.Value, combat.Energy.Perfect!.Value, combat.Energy.Mistake!.Value, combat.Energy.Bubble!.Value),
-			new BubbleRules(combat.Bubble!.IntervalSeconds!.Value, combat.Bubble.WarningSeconds!.Value, combat.Bubble.Speed!.Value, combat.Bubble.Radius!.Value, combat.Bubble.Range!.Value),
+			new EnergyRules(combat.Energy!.Hit!.Value, combat.Energy.Perfect!.Value, combat.Energy.Mistake!.Value, combat.Energy.CreatureHit!.Value),
 			RhythmChecks.Build(combat.Rhythm!),
 			MovementChecks.Build(combat.Movement!),
 			[.. (combat.Years ?? []).Select(y => new YearBag(y.Year!.Value, [.. y.BagNumbers!], [.. y.Operators!], y.MaxTerms ?? combat.MaxTerms ?? 2))])

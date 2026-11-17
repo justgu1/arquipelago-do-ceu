@@ -11,9 +11,9 @@ public class RoomFormTests
 		RoomForms.Parse(File.ReadAllText(Path.Combine(MissionFiles.RepositoryRoot(), "game", "data", "formas-de-sala.json"))).Value!;
 
 	[Fact]
-	public void O_catalogo_traz_pequena_media_grande_alongada_em_L_anel_e_desnivel()
+	public void O_catalogo_traz_camara_sala_salao_galeria_cruz_L_poco_e_degraus()
 	{
-		Assert.Equal(["pequena", "media", "grande", "alongada", "em-l", "anel", "desnivel"], Forms.All.Select(f => f.Id));
+		Assert.Equal(["pequena", "media", "grande", "alongada", "salao-largo", "cruz", "em-l", "anel", "desnivel"], Forms.All.Select(f => f.Id));
 	}
 
 	[Fact]

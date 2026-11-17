@@ -12,6 +12,7 @@ public partial class CameraController : Node
 {
 	// A câmera olha de cima, de um canto da ilha: este é o afastamento fixo entre o ponto focado e a câmera.
 	static readonly Vector3 Offset = new(12f, 12f, 12f);
+	const float TurnPerPixel = 0.008f;
 	public const string LabelGroup = "zoom_labels";
 
 	readonly Camera3D camera;
@@ -21,6 +22,7 @@ public partial class CameraController : Node
 	readonly System.Func<bool> reduceMotion;
 	readonly Dictionary<int, Godot.Vector2> touches = new();
 	ulong lastTicks;
+	bool turning;
 	float lastSize;
 	int lastLabels;
 
@@ -34,6 +36,9 @@ public partial class CameraController : Node
 	}
 
 	public float Size => rig.Size;
+
+	// O quanto a câmera girou em volta do Personagem (botão direito do mouse); o teclado anda relativo a isto.
+	public float Yaw { get; private set; }
 
 	// Onde está a criatura em luta, se há; a câmera centra a luta.
 	public System.Func<Vector2?>? Battle { get; set; }
@@ -55,7 +60,7 @@ public partial class CameraController : Node
 	{
 		var focus = new Vector3(rig.Focus.X, 2f, rig.Focus.Y);
 		camera.Size = rig.Size;
-		camera.LookAtFromPosition(focus + Offset, focus, Vector3.Up);
+		camera.LookAtFromPosition(focus + Offset.Rotated(Vector3.Up, Yaw), focus, Vector3.Up);
 		// O texto 3D só muda de escala quando o zoom muda, e rótulos novos (popup, criatura) entram na escala certa na hora.
 		if (Mathf.IsEqualApprox(rig.Size, lastSize) && GetTree().GetNodeCountInGroup(LabelGroup) == lastLabels) return;
 		lastSize = rig.Size;
@@ -77,6 +82,12 @@ public partial class CameraController : Node
 				break;
 			case InputEventMagnifyGesture magnify:
 				rig.Pinch(magnify.Factor);
+				break;
+			case InputEventMouseButton { ButtonIndex: MouseButton.Right } button:
+				turning = button.Pressed;
+				break;
+			case InputEventMouseMotion motion when turning:
+				Yaw -= motion.Relative.X * TurnPerPixel;
 				break;
 		}
 	}
@@ -118,7 +129,11 @@ public partial class CameraController : Node
 			default:
 				if (@event.IsActionPressed(Controls.ZoomIn)) rig.ZoomSteps(1f);
 				else if (@event.IsActionPressed(Controls.ZoomOut)) rig.ZoomSteps(-1f);
-				else if (@event.IsActionPressed(Controls.ZoomReset)) rig.ResetZoom();
+				else if (@event.IsActionPressed(Controls.ZoomReset))
+				{
+					rig.ResetZoom();
+					Yaw = 0f;
+				}
 				break;
 		}
 	}

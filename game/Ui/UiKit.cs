@@ -10,7 +10,7 @@ public static partial class UiKit
 	public static int MinTouch => DeviceInfo.IsTouch ? 64 : 44;
 	public static int BodyFont => 20;
 	public static Color TextColor => BookStyle.Ink;
-	public static StyleBoxFlat Surface() => BookStyle.Box();
+	public static StyleBox Surface() => PaperTexture.Style();
 
 	static Color PanelFill => BookStyle.Page;
 	static Color Soft => TextColor;

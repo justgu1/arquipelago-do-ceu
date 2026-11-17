@@ -218,6 +218,28 @@ static partial class DungeonScenarios
 		await d.Wait(0.3);
 	}
 
+	// Leva o Perfil ao Nível pedido pelo Desafio mestre, como a criança faria: marca os dois épicos do Nível e vence as quatro rodadas.
+	static async Task ReachLevel(DevDriver d, int wanted)
+	{
+		var main = d.Port;
+		while (main.Level < wanted)
+		{
+			var level = main.Level;
+			main.Progress.Levels.MarkEpicDone(main.ProfileId, new LevelKey("matematica", level));
+			main.Progress.Levels.MarkEpicDone(main.ProfileId, new LevelKey("portugues", level));
+			await WalkTo(d, d.NearObject("mestre").Q, d.NearObject("mestre").R);
+			await d.Tap(Controls.Interact);
+			await d.Press("Começar o Desafio mestre");
+			for (var i = 0; i < 4; i++)
+			{
+				main.WinMasterRound();
+				await d.Wait(0.3);
+			}
+			d.Expect(main.Level == level + 1, $"o Desafio mestre levou o Perfil ao Nível {level + 1}");
+			if (main.Level == level) return;
+		}
+	}
+
 	static async Task EnsureProfile(DevDriver d)
 	{
 		await DismissCoins(d);

@@ -164,6 +164,30 @@ public sealed class HexGrid
 		if (delta.X != 0f && Fits(alongX)) return alongX;
 		var alongY = new Vector2(from.X, full.Y);
 		if (delta.Y != 0f && Fits(alongY)) return alongY;
+		return SlideAlongWall(from, delta, Fits);
+	}
+
+	// Ponte e corredor são estreitos e correm na diagonal do mundo; deslizar só pelos eixos prendia a criança que não olhava
+	// exatamente para o caminho. Aqui o passo gira até caber, do menor desvio para o maior, e rende o que o desvio deixa.
+	static readonly float[] Signs = [1f, -1f];
+
+	static Vector2 SlideAlongWall(Vector2 from, Vector2 delta, Func<Vector2, bool> fits)
+	{
+		for (var degrees = 15; degrees <= 85; degrees += 10)
+		{
+			var radians = degrees * MathF.PI / 180f;
+			foreach (var sign in Signs)
+			{
+				var turned = Rotate(delta, sign * radians) * MathF.Cos(radians);
+				if (fits(from + turned)) return from + turned;
+			}
+		}
 		return from;
+	}
+
+	static Vector2 Rotate(Vector2 v, float radians)
+	{
+		var (sin, cos) = MathF.SinCos(radians);
+		return new Vector2(v.X * cos - v.Y * sin, v.X * sin + v.Y * cos);
 	}
 }

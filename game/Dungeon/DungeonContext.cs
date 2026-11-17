@@ -49,10 +49,11 @@ public sealed record DungeonContext(
 {
 	// Muda quando o gerador muda de jeito, para os Andares antigos não valerem para os novos (ADR 0003).
 	// A 2 sorteia a forma de cada Sala (ADR 0008); a 3 aproxima as Salas. Andares salvos numa versão antiga seguem nela.
-	public const int GeneratorVersion = 3;
+	public const int GeneratorVersion = 4;
 
 	// A versão deste Nível para esta criança: a em que ela já explorou, ou a atual.
-	public int Version => Progress.Explored.VersionFor(ProfileId, LevelKey, GeneratorVersion);
+	// Só a versão atual vale: o que foi explorado em versões antigas do gerador não bate com os Andares de agora e fica de lado.
+	public int Version => GeneratorVersion;
 
 	public LevelKey LevelKey => new(Discipline, Level);
 

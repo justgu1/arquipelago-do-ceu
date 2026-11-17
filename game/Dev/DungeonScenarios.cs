@@ -36,9 +36,10 @@ static partial class DungeonScenarios
 			if (NeedsFight(expedition) && !shotFight)
 			{
 				shotFight = true;
-				run.Player.PlaceAt(new Vector2(0f, 1.5f));
+				run.Player.PlaceAt(NearCreature(run));
 				await d.Wait(0.3);
 				await d.Tap(Controls.Target);
+				await d.OpenChallenge();
 				d.Expect(run.Combat.HasTarget, "escolher a criatura abriu a montagem da resposta");
 				await d.Shot("02-luta-na-sala");
 				await d.PressKey(Key.Escape);
@@ -77,16 +78,27 @@ static partial class DungeonScenarios
 		await d.Tap(Controls.Interact);
 		d.Expect(expedition.Energy.Current == before + 2, "o Descanso devolveu 2 de Energia");
 		await d.Shot("01-descanso");
+		if (run.World.Props.Count > 0 && run.World.Props[0] is { } prop)
+		{
+			var toCenter = Vector2.Normalize(-prop.Ground);
+			run.Player.PlaceAt(prop.Ground + toCenter * 1.6f);
+			await d.Wait(0.4);
+			await d.Tap(Controls.Interact);
+			await d.Wait(0.3);
+			d.Expect(d.HasVisible(prop.Line[..15]), "interagir com a mobília da Sala mostra o que ela é");
+			await d.Shot("01b-mobilia");
+		}
 		await d.Tap(Controls.Interact);
 		d.Expect(expedition.Energy.Current == before + 2, "o Descanso só vale uma vez");
 
 		await GoTo(d, run, r => r.Kind == RoomTypes.Puzzle && !expedition.IsCleared(r.Id));
 		d.Expect(expedition.Current.Kind == RoomTypes.Puzzle, "chegou a uma Sala de Puzzle");
-		d.Expect(!run.Combat.Bubbles, "o Puzzle não lança bolhas");
+		d.Expect(!run.Combat.UsesFog, "o Puzzle não tem Névoa nem ataques da criatura");
 		d.Expect(run.World.Creature.Visible, "a porta mostra o escudo a resolver");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget, "escolher a porta abriu a montagem da resposta");
 		await d.Shot("02-puzzle");
 		await d.PressKey(Key.Escape);
@@ -96,6 +108,10 @@ static partial class DungeonScenarios
 		await d.Wait(0.3);
 		d.Expect(expedition.IsCleared(expedition.CurrentRoom) && expedition.Energy.Current == energy, "resolver o Puzzle abre a porta");
 		await d.Shot("03-porta-aberta");
+		var open = run.World.Doors.First(door => !door.Locked);
+		run.Player.PlaceAt(new Vector2(open.Ground.X, open.Ground.Z));
+		await d.Wait(1.5);
+		await d.Shot("04-boca-do-corredor");
 	}
 
 	// A troca de Itens: o Marco barra sem o Item da outra torre; vencer a Sala do Item o dá, e então o Marco abre.
@@ -165,9 +181,10 @@ static partial class DungeonScenarios
 		var expedition = run.Expedition;
 		d.Expect(expedition.Current.Kind == RoomTypes.Epic && expedition.Floor.Number == expedition.Plan.Floors.Count, "o Atalho começa direto no Desafio épico");
 		d.Expect(run.Progress.Levels.ShortcutTried(run.ProfileId, new LevelKey("matematica", 1)), "a tentativa do Atalho foi gravada ao começar");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget, "escolher a criatura abriu a montagem da resposta");
 		await d.Shot("01-atalho");
 
@@ -275,6 +292,14 @@ static partial class DungeonScenarios
 			}
 			if (!await Step(d, run, path[1])) return;
 		}
+	}
+
+	// O hexágono pisável mais perto da criatura (que fica no centro da Sala), seja qual for a forma da Sala: um anel tem poço ali.
+	static Vector2 NearCreature(DungeonRun run)
+	{
+		var cell = run.World.Grid.NearestWalkable(new ArquipelagoDoCeu.World.HexCell(0, 1)) ?? new ArquipelagoDoCeu.World.HexCell(0, 0);
+		var at = ArquipelagoDoCeu.World.HexGrid.ToWorld(cell);
+		return new Vector2(at.X, at.Y);
 	}
 
 	// O caminho mais curto da Sala atual até a primeira que atende ao pedido, sem olhar trancas; vazio se não houver.

@@ -23,9 +23,10 @@ static partial class DungeonScenarios
 
 		await GoTo(d, run, RoomTypes.Combat);
 		d.Expect(expedition.Current.Kind == RoomTypes.Combat, "há uma luta no caminho");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(run.Combat.HasTarget, "escolher a criatura abriu a montagem do Escriba");
 		var level = expedition.Plan.Level;
 		d.Expect(level == 2 ? d.Hud?.Presenter is WordPresenter : d.Hud?.Presenter is NamePresenter, $"o Escriba do {level}º ano abriu a HUD certa");
@@ -67,9 +68,10 @@ static partial class DungeonScenarios
 		await d.Press("Voltar");
 		await d.Wait(0.3);
 		d.Expect(!d.GetTree().Paused && !d.HasVisible("Vencida"), "Voltar fecha o mapa e o jogo segue");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		await d.Tap(Controls.Map);
 		await d.Wait(0.3);
 		d.Expect(run.Combat.HasTarget && !d.HasVisible("Vencida"), "durante o combate o mapa não abre");
@@ -144,12 +146,15 @@ static partial class DungeonScenarios
 		var visited = expedition.Visited.Order().ToList();
 		var cleared = expedition.Cleared.Order().ToList();
 		var floor = expedition.Floor.Number;
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		expedition.Energy.Lose(expedition.Energy.Max - 1);
 		await d.OvershootWithKeys();
 		await d.Wait(1.0);
+		await d.Press("Voltar ao Lobby");
+		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "Energia zerada encerrou a Expedição");
 
 		var again = await Enter(d);
@@ -195,9 +200,10 @@ static partial class DungeonScenarios
 		await d.Shot("01-exploracao");
 
 		await GoTo(d, run, RoomTypes.Combat);
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		d.Expect(d.Hud?.Presenter is MathPresenter, "em combate a bolsa de números aparece");
 		await d.Shot("02-combate");
 		var concept = run.Combat.CurrentMission!.Concept;
@@ -288,16 +294,21 @@ static partial class DungeonScenarios
 		await GoTo(d, run, RoomTypes.Combat);
 		d.Expect(expedition.Current.Kind == RoomTypes.Combat, "há uma luta no caminho");
 
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
+		await d.OpenChallenge();
 		await d.Shot("01-luta");
 		expedition.Energy.Lose(expedition.Energy.Max - 1);
 		await d.OvershootWithKeys();
 		await d.Wait(1.0);
 
+		d.Expect(d.Button("Voltar ao Lobby") is not null, "a tela de derrota apareceu, com o botão de voltar");
+		await d.Shot("02-tela-de-derrota");
+		await d.Press("Voltar ao Lobby");
+		await d.Wait(0.5);
 		d.Expect(Runs(d).Count == 0, "Energia zerada encerrou a Expedição");
 		d.Expect(d.Player is { Visible: true }, "a criança voltou ao Lobby");
-		await d.Shot("02-de-volta-ao-lobby");
+		await d.Shot("03-de-volta-ao-lobby");
 	}
 }
