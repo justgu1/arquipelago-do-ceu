@@ -5,16 +5,20 @@ using Godot;
 
 namespace ArquipelagoDoCeu;
 
-// As paredes baixas e as colunas na borda das Salas, do kit de Dungeon feito no Blender, para a Dungeon parecer uma Dungeon.
-// Baixas de propósito: a câmera isométrica vê a criança por cima delas. Uma coluna em cada sete é um braseiro aceso.
+// As paredes e as colunas na borda das Salas, do kit de Dungeon feito no Blender. A câmera olha de um canto: os lados de trás levam parede alta (a Sala parece
+// fechada), os da frente parede baixa, para não esconder a criança. Parte das paredes altas tem tocha acesa e uma coluna em sete é um braseiro, e cada um deles ilumina.
 public static class RoomWalls
 {
-	const float WallHeight = 0.75f;
-	const float PillarHeight = 1.5f;
+	const float LowWall = 0.75f;
+	const float HighWall = 2f;
+	const float LowPillar = 1f;
+	const float HighPillar = 2.2f;
 	const float BrazierHeight = 1.85f;
 	const float Edge = 1f;
 	const float Apothem = 0.866f;
 	const float HideRadius = 1.6f;
+	const float FrontFacing = 0.35f;
+	const int MaxLights = 8;
 
 	// Uma peça do cenário que some quando esconde alguém. A transparência é do próprio modelo (dithering), então os materiais do tema não mudam.
 	public sealed class Piece(Node3D root)
@@ -29,34 +33,48 @@ public static class RoomWalls
 	{
 		var pieces = new List<Piece>();
 		var pillars = new HashSet<(int, int)>();
+		var lights = 0;
 		foreach (var (cell, height) in floor)
 		{
 			var center = HexGrid.ToWorld(cell);
 			foreach (var next in cell.Neighbors().Where(n => !floor.ContainsKey(n) && !open.Contains(n)))
 			{
 				var way = System.Numerics.Vector2.Normalize(HexGrid.ToWorld(next) - center);
+				var front = (way.X + way.Y) / 1.4142f > FrontFacing;
 				var mid = new Vector3(center.X + way.X * Apothem, height, center.Y + way.Y * Apothem);
 				var along = new Vector3(-way.Y, 0f, way.X);
 				var angle = Mathf.Atan2(along.X, along.Z) - Mathf.Pi / 2f;
-				Place(parent, pieces, theme, "cenario/parede-baixa", WallHeight, mid, angle);
+				var torch = !front && Hash(cell, next) % 4 == 0 && lights < MaxLights;
+				Place(parent, pieces, theme, front ? "cenario/parede-baixa" : torch ? "cenario/parede-tocha" : "cenario/parede-alta", front ? LowWall : HighWall, mid, angle);
+				if (torch) { Light(parent, theme, mid + new Vector3(-way.X * 0.5f, 1.6f, -way.Y * 0.5f)); lights++; }
 				foreach (var end in new[] { mid + along * (Edge / 2f), mid - along * (Edge / 2f) })
 				{
 					var key = (Mathf.RoundToInt(end.X * 20f), Mathf.RoundToInt(end.Z * 20f));
 					if (!pillars.Add(key)) continue;
-					var lit = Mathf.PosMod(key.Item1 / 7 + key.Item2 / 5, 7) == 0;
-					Place(parent, pieces, theme, lit ? "cenario/coluna-braseiro" : "cenario/coluna-dungeon", lit ? BrazierHeight : PillarHeight, end, 0f);
+					var lit = front && Mathf.PosMod(key.Item1 / 7 + key.Item2 / 5, 5) == 0 && lights < MaxLights;
+					Place(parent, pieces, theme, lit ? "cenario/coluna-braseiro" : "cenario/coluna-dungeon", lit ? BrazierHeight : front ? LowPillar : HighPillar, end, 0f);
+					if (lit) { Light(parent, theme, end + new Vector3(0f, 2.3f, 0f)); lights++; }
 				}
 			}
 		}
 		return pieces;
 	}
 
-	static void Place(Node3D parent, List<Piece> pieces, DungeonTheme theme, string model, float height, Vector3 at, float yaw)
+	// Pilares do meio da Sala (e a mobília): entram na lista que some quando esconde alguém.
+	public static Piece? Place(Node3D parent, IList<Piece> pieces, DungeonTheme theme, string model, float height, Vector3 at, float yaw, bool themed = true)
 	{
-		if (RoomProps.Add(parent, model, height, at, yaw) is not { } node) return;
-		theme.Tint(node);
-		pieces.Add(new Piece(node));
+		if (RoomProps.Add(parent, model, height, at, yaw) is not { } node) return null;
+		if (themed) theme.Tint(node);
+		var piece = new Piece(node);
+		pieces.Add(piece);
+		return piece;
 	}
+
+	// Uma luz quente de tocha ou braseiro: sem sombra, para custar pouco no celular.
+	static void Light(Node3D parent, DungeonTheme theme, Vector3 at) =>
+		parent.AddChild(new OmniLight3D { LightColor = Color.FromHtml(theme.Flame), LightEnergy = 1.3f, OmniRange = 5.5f, ShadowEnabled = false, Position = at });
+
+	static int Hash(HexCell a, HexCell b) => unchecked(a.Q * 73856093 ^ a.R * 19349663 ^ b.Q * 83492791 ^ b.R * 2654435) & int.MaxValue;
 
 	// Só as peças que escondem alguém (na linha de visão da câmera, entre ela e a criança ou a criatura) somem; as outras voltam.
 	public static void Fade(IReadOnlyList<Piece> pieces, Vector3 forward, IReadOnlyList<Vector3> seen, float delta)

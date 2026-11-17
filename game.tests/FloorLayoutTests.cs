@@ -30,7 +30,7 @@ public class FloorLayoutTests
 		var spread = Average(2);
 
 		Assert.True(compact < spread * 0.7, $"corredor médio: {compact:0.0} na versão 3 contra {spread:0.0} na 2");
-		Assert.True(compact <= 8, $"corredor médio da versão 3 = {compact:0.0}");
+		Assert.True(compact <= 7, $"corredor médio da versão 3 = {compact:0.0}");
 	}
 
 	[Fact]

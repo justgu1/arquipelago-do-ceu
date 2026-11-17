@@ -13,7 +13,8 @@ public static class FloorLayouts
 	// Distância entre os centros dos espaços onde as Salas podem cair; com o desvio, os corredores saem curtos, longos, retos ou com curva.
 	const int Pitch = 20;
 	const int Jitter = 2;
-	const int CompactPitch = 11;
+	// Na versão compacta a distância entre duas Salas vem do tamanho delas mais um corredor curto, e não de um número fixo.
+	const int CorridorLength = 1;
 	const int CompactJitter = 0;
 	// Hexágonos vazios que separam uma Sala de qualquer outra coisa: sem isso a criança passaria de uma para outra sem cruzar a porta.
 	const int Gap = 2;
@@ -63,7 +64,7 @@ public static class FloorLayouts
 	static PlacedRoom? TryPlace(int id, IEnumerable<PlacedRoom> others, PlacedRoom parent, RoomForms forms, Pcg32 rng, LayoutStyle style)
 	{
 		var form = style != LayoutStyle.Legacy ? forms.Pick(rng) : forms.Legacy;
-		var (pitch, jitter) = style == LayoutStyle.Compact ? (CompactPitch, CompactJitter) : (Pitch, Jitter);
+		var (pitch, jitter) = style == LayoutStyle.Compact ? (Extent(parent.Form) + Extent(form) + Gap + CorridorLength, CompactJitter) : (Pitch, Jitter);
 		var order = Enumerable.Range(0, Directions.Length).ToList();
 		rng.Shuffle(order);
 		var taken = others.ToList();
@@ -78,6 +79,9 @@ public static class FloorLayouts
 		}
 		return null;
 	}
+
+	// O quanto a forma se estende a partir do centro dela, em hexágonos.
+	static int Extent(RoomForm form) => form.Cells.Max(c => c.DistanceTo(new HexCell(0, 0)));
 
 	static bool Apart(PlacedRoom a, PlacedRoom b)
 	{

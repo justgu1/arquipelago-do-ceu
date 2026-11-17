@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using ArquipelagoDoCeu.Generation;
+using ArquipelagoDoCeu.World;
 using Godot;
 
 namespace ArquipelagoDoCeu;
@@ -5,7 +9,7 @@ namespace ArquipelagoDoCeu;
 // A ambientação da Sala: as cores do tema da torre (fundo, luz), o brilho das brasas e a poeira que flutua no ar.
 public partial class DungeonWorld
 {
-	readonly DirectionalLight3D sun = new() { LightEnergy = 1.1f, ShadowEnabled = true, RotationDegrees = new Vector3(-50f, -30f, 0f) };
+	readonly DirectionalLight3D sun = new() { LightEnergy = 0.6f, ShadowEnabled = true, RotationDegrees = new Vector3(-50f, -30f, 0f) };
 	DungeonTheme theme = DungeonTheme.Numbers;
 	CpuParticles3D? dust;
 
@@ -26,12 +30,26 @@ public partial class DungeonWorld
 		{
 			environment.BackgroundColor = Color.FromHtml(theme.Void);
 			environment.AmbientLightColor = Color.FromHtml(theme.Ambient);
+			environment.AmbientLightEnergy = 0.5f;
 			// O brilho das brasas e do anel de ouro: leve, para não cansar a vista de quem tem sensibilidade à luz.
 			environment.GlowEnabled = !ReduceMotion;
 			environment.GlowIntensity = 0.5f;
 			environment.GlowBloom = 0.05f;
 		}
 		AddDust();
+	}
+
+	// Sorteia a mobília da Sala sem fechar nenhum caminho: o que ela ocupa sai da grade de passagem. As portas, o centro e a escada lateral ficam livres.
+	IReadOnlyList<RoomWalls.Piece> Furnish(PlacedRoom here, int floorNumber, HashSet<HexCell> walkable, HashSet<HexCell> blocked, Dictionary<HexCell, float> heights)
+	{
+		var cells = here.Cells.Select(Local).ToHashSet();
+		var keep = doors.Select(d => HexGrid.FromWorld(new System.Numerics.Vector2(d.Ground.X, d.Ground.Z))).ToHashSet();
+		keep.UnionWith(keep.SelectMany(c => c.Neighbors()).ToList());
+		keep.Add(Local(here.SideSpot));
+		var seed = Seed.Mix((ulong)(here.Origin.Q * 7919 + here.Origin.R), here.Form.Id, floorNumber, currentId, 1);
+		var plan = RoomFurnishing.Plan(cells, walkable, keep, Local(here.Spot), seed);
+		blocked.UnionWith(plan.Select(f => f.Cell));
+		return RoomFurniture.Add(room, plan, walkable, heights, theme, theme == DungeonTheme.Letters);
 	}
 
 	// Poucos grãos de luz subindo devagar em volta da Sala; sem eles com "reduzir animações".

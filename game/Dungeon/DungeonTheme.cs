@@ -17,32 +17,40 @@ public sealed record DungeonTheme(string Void, string Ambient, string Sun, strin
 
 	static readonly Dictionary<string, Material> Cache = [];
 
-	// Troca a cor dos materiais do modelo pelas do tema; `trim` pinta a faixa (o chão passa a cor da função da Sala).
-	public void Tint(Node3D model, Color? trim = null)
+	// Troca a cor dos materiais do modelo pelas do tema; `trim` pinta a faixa e `wash` (a cor da função da Sala) tinge de leve a pedra do chão.
+	// `tone` clareia ou escurece a pedra, para as lajes não saírem todas iguais.
+	public void Tint(Node3D model, Color? trim = null, Color? wash = null, float tone = 1f)
 	{
 		foreach (var node in model.FindChildren("*", "MeshInstance3D", true, false))
 		{
 			var mesh = (MeshInstance3D)node;
 			if (mesh.Mesh is null) continue;
 			for (var surface = 0; surface < mesh.Mesh.GetSurfaceCount(); surface++)
-				if (mesh.Mesh.SurfaceGetMaterial(surface) is StandardMaterial3D source && Colored(source, trim ?? Color.FromHtml(Trim)) is { } material)
+				if (mesh.Mesh.SurfaceGetMaterial(surface) is StandardMaterial3D source && Colored(source, trim ?? Color.FromHtml(Trim), wash, tone) is { } material)
 					mesh.SetSurfaceOverrideMaterial(surface, material);
 		}
 	}
 
-	Material? Colored(StandardMaterial3D source, Color trim)
+	Color Washed(string html, Color? wash, float tone)
+	{
+		var stone = Color.FromHtml(html);
+		if (wash is { } hue) stone = stone.Lerp(hue, 0.22f);
+		return new Color(stone.R * tone, stone.G * tone, stone.B * tone);
+	}
+
+	Material? Colored(StandardMaterial3D source, Color trim, Color? wash, float tone)
 	{
 		var color = source.ResourceName switch
 		{
-			"pedra" => Color.FromHtml(Stone),
-			"pedra_cl" => Color.FromHtml(StoneLight),
-			"pedra_esc" => Color.FromHtml(StoneDark),
+			"pedra" => Washed(Stone, wash, tone),
+			"pedra_cl" => Washed(StoneLight, wash, tone),
+			"pedra_esc" => Washed(StoneDark, wash, tone),
 			"faixa" => trim,
 			"chama" => Color.FromHtml(Flame),
 			_ => (Color?)null,
 		};
 		if (color is not { } tint) return null;
-		var key = $"{Void}|{source.ResourceName}|{tint.ToHtml()}";
+		var key = $"{Void}|{source.ResourceName}|{tint.ToHtml()}|{trim.ToHtml()}";
 		if (Cache.TryGetValue(key, out var cached) && GodotObject.IsInstanceValid(cached)) return cached;
 		var copy = (StandardMaterial3D)source.Duplicate();
 		copy.AlbedoColor = tint;

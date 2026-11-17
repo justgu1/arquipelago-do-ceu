@@ -23,7 +23,7 @@ static partial class DungeonScenarios
 
 		await GoTo(d, run, RoomTypes.Combat);
 		d.Expect(expedition.Current.Kind == RoomTypes.Combat, "há uma luta no caminho");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();
@@ -68,7 +68,7 @@ static partial class DungeonScenarios
 		await d.Press("Voltar");
 		await d.Wait(0.3);
 		d.Expect(!d.GetTree().Paused && !d.HasVisible("Vencida"), "Voltar fecha o mapa e o jogo segue");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();
@@ -146,7 +146,7 @@ static partial class DungeonScenarios
 		var visited = expedition.Visited.Order().ToList();
 		var cleared = expedition.Cleared.Order().ToList();
 		var floor = expedition.Floor.Number;
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();
@@ -200,7 +200,7 @@ static partial class DungeonScenarios
 		await d.Shot("01-exploracao");
 
 		await GoTo(d, run, RoomTypes.Combat);
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();
@@ -294,7 +294,7 @@ static partial class DungeonScenarios
 		await GoTo(d, run, RoomTypes.Combat);
 		d.Expect(expedition.Current.Kind == RoomTypes.Combat, "há uma luta no caminho");
 
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();

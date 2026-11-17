@@ -55,7 +55,7 @@ static partial class DungeonScenarios
 				await GoTo(d, run, r => run.Expedition.NeedsClearing(r) && r.Id % run.World.CreatureSet.Count == wanted);
 				if (!run.Expedition.NeedsClearing(run.Expedition.Current) || run.Expedition.CurrentRoom % run.World.CreatureSet.Count != wanted) continue;
 				var name = run.World.CreatureSet[wanted].Replace("criaturas/", "");
-				run.Player.PlaceAt(new Vector2(0f, 1.5f));
+				run.Player.PlaceAt(NearCreature(run));
 				await d.Wait(0.5);
 				await d.Tap(Controls.Target);
 				if (done.Add(name)) scenes.Add(await Measure(d, probe, $"{tower}-{name}", () => d.Wait(4.0)));

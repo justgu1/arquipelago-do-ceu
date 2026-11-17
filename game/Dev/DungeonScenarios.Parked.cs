@@ -20,7 +20,7 @@ static partial class DungeonScenarios
 		var run = await Enter(d, letters: d.Arg("letras") == "sim");
 		if (run is null) return;
 		await GoTo(d, run, r => run.Expedition.NeedsClearing(r));
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		// Com --bolhas=nao a Energia não cai enquanto quem testa olha a luta.
 		if (d.Arg("bolhas") == "nao") TrainingArea.PilotPeace = true;
 		await d.Wait(900);

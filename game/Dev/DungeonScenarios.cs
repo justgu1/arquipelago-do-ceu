@@ -36,7 +36,7 @@ static partial class DungeonScenarios
 			if (NeedsFight(expedition) && !shotFight)
 			{
 				shotFight = true;
-				run.Player.PlaceAt(new Vector2(0f, 1.5f));
+				run.Player.PlaceAt(NearCreature(run));
 				await d.Wait(0.3);
 				await d.Tap(Controls.Target);
 				await d.OpenChallenge();
@@ -85,7 +85,7 @@ static partial class DungeonScenarios
 		d.Expect(expedition.Current.Kind == RoomTypes.Puzzle, "chegou a uma Sala de Puzzle");
 		d.Expect(!run.Combat.UsesFog, "o Puzzle não tem Névoa nem ataques da criatura");
 		d.Expect(run.World.Creature.Visible, "a porta mostra o escudo a resolver");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();
@@ -167,7 +167,7 @@ static partial class DungeonScenarios
 		var expedition = run.Expedition;
 		d.Expect(expedition.Current.Kind == RoomTypes.Epic && expedition.Floor.Number == expedition.Plan.Floors.Count, "o Atalho começa direto no Desafio épico");
 		d.Expect(run.Progress.Levels.ShortcutTried(run.ProfileId, new LevelKey("matematica", 1)), "a tentativa do Atalho foi gravada ao começar");
-		run.Player.PlaceAt(new Vector2(0f, 1.5f));
+		run.Player.PlaceAt(NearCreature(run));
 		await d.Wait(0.3);
 		await d.Tap(Controls.Target);
 		await d.OpenChallenge();
@@ -278,6 +278,14 @@ static partial class DungeonScenarios
 			}
 			if (!await Step(d, run, path[1])) return;
 		}
+	}
+
+	// O hexágono pisável mais perto da criatura (que fica no centro da Sala), seja qual for a forma da Sala: um anel tem poço ali.
+	static Vector2 NearCreature(DungeonRun run)
+	{
+		var cell = run.World.Grid.NearestWalkable(new ArquipelagoDoCeu.World.HexCell(0, 1)) ?? new ArquipelagoDoCeu.World.HexCell(0, 0);
+		var at = ArquipelagoDoCeu.World.HexGrid.ToWorld(cell);
+		return new Vector2(at.X, at.Y);
 	}
 
 	// O caminho mais curto da Sala atual até a primeira que atende ao pedido, sem olhar trancas; vazio se não houver.

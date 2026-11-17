@@ -1,6 +1,6 @@
-# Piso hexagonal das Salas das Dungeons, em duas variações (PisoA e PisoB): laje de pedra com chanfro, anel de ouro (material faixa, tingido pela função da Sala) e miolo mais claro.
-# A variação A leva pontas douradas nos cantos e a B leva rachaduras e três marcas, para o chão não parecer carimbado. Hexágono flat-top de raio 0,96, topo em z = 0 e 0,5 de espessura.
-# Os materiais pedra, pedra_cl, pedra_esc e faixa têm nome fixo: o jogo troca a cor de cada um por tema (DungeonTheme).
+# Piso hexagonal das Salas das Dungeons (PisoA): laje de pedra lisa com chanfro e um miolo apenas mais claro, sem rachaduras nem desenho, para o chão não parecer carimbado.
+# O jogo varia o tom de cada laje e mistura nela a cor da função da Sala. Hexágono flat-top de raio 0,96, topo em z = 0 e 0,5 de espessura.
+# Os materiais pedra e pedra_cl têm nome fixo: o jogo troca a cor de cada um por tema (DungeonTheme).
 # >>> comum (copiado de tools/blender/comum.py por sincronizar.mjs; não edite aqui)
 import bpy, bmesh, math
 from mathutils import Vector, Matrix
@@ -270,21 +270,9 @@ def prisma(name, raio, z0, z1, material, chanfro=0.0):
     if chanfro > 0: bmesh.ops.bevel(bm, geom=list(bm.edges), offset=chanfro, segments=1, affect="EDGES")
     return objeto(name, bm, [material], None, False)
 
-def piso(nome, variacao):
+def piso(nome):
     apagar(nome)
-    p = [prisma(f"{nome}_laje", R, -0.5, 0.0, M["pedra"], 0.045)]
-    p.append(prisma(f"{nome}_anel", R * 0.82, 0.0, 0.03, M["faixa"]))
-    p.append(prisma(f"{nome}_miolo", R * 0.74, 0.0, 0.05, M["pedra_cl"]))
-    if variacao == "A":
-        for k in range(6):
-            a = k * math.pi / 3
-            p.append(cubo(f"{nome}_ponta{k}", (R * 0.9 * math.cos(a), R * 0.9 * math.sin(a), 0.03), (0.09, 0.09, 0.06), M["faixa"], None, 0.015, (0, 0, a)))
-    else:
-        for k, (x, y, g, c) in enumerate(((-0.25, 0.1, 0.5, 0.4), (0.2, -0.15, -0.7, 0.34), (0.05, 0.3, 1.2, 0.24))):
-            p.append(cubo(f"{nome}_fenda{k}", (x, y, 0.052), (c, 0.03, 0.012), M["pedra_esc"], None, 0.004, (0, 0, g)))
-        for k, x in enumerate((-0.12, 0.0, 0.12)):
-            p.append(cubo(f"{nome}_marca{k}", (x, -0.42, 0.052), (0.06, 0.06, 0.012), M["faixa"], None, 0.005))
+    p = [prisma(f"{nome}_laje", R, -0.5, 0.0, M["pedra"], 0.05), prisma(f"{nome}_miolo", R * 0.86, 0.0, 0.025, M["pedra_cl"], 0.012)]
     fundir(nome, p)
 
-piso("PisoA", "A")
-piso("PisoB", "B")
+piso("PisoA")

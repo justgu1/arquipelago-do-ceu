@@ -1,28 +1,34 @@
 {
   "forms": [
-    { "id": "pequena", "name": "Sala pequena", "parts": [{ "a": 2, "b": 2, "c": 2 }] },
+    { "id": "pequena", "name": "Câmara", "parts": [{ "a": 2, "b": 2, "c": 2 }] },
     { "id": "media", "name": "Sala média", "parts": [{ "a": 3, "b": 3, "c": 3 }] },
-    { "id": "grande", "name": "Sala grande", "parts": [{ "a": 4, "b": 4, "c": 4 }] },
-    { "id": "alongada", "name": "Sala alongada", "parts": [{ "a": 2, "b": 5, "c": 5 }] },
+    { "id": "grande", "name": "Salão", "parts": [{ "a": 4, "b": 4, "c": 4 }] },
+    { "id": "alongada", "name": "Galeria", "parts": [{ "a": 2, "b": 5, "c": 5 }] },
+    { "id": "salao-largo", "name": "Salão largo", "parts": [{ "a": 5, "b": 2, "c": 5 }] },
+    {
+      "id": "cruz",
+      "name": "Capela em cruz",
+      "parts": [{ "a": 2, "b": 5, "c": 5 }, { "a": 5, "b": 2, "c": 5 }]
+    },
     {
       "id": "em-l",
       "name": "Sala em L",
-      "parts": [{ "a": 1, "b": 4, "c": 4 }, { "a": 4, "b": 1, "c": 4, "q": 3, "r": 2 }]
+      "parts": [{ "a": 2, "b": 5, "c": 5 }, { "a": 5, "b": 2, "c": 5, "q": 3, "r": 3 }]
     },
     {
       "id": "anel",
-      "name": "Sala em anel",
+      "name": "Salão com poço",
       "parts": [{ "a": 4, "b": 4, "c": 4 }],
       "holes": [{ "a": 1, "b": 1, "c": 1 }],
       "center": [0, 3]
     },
     {
       "id": "desnivel",
-      "name": "Sala com desnível",
-      "parts": [{ "a": 3, "b": 3, "c": 3 }],
+      "name": "Salão com degraus",
+      "parts": [{ "a": 4, "b": 4, "c": 4 }],
       "heights": [
-        { "a": 3, "b": 3, "c": 3, "height": 0.4 },
-        { "a": 2, "b": 2, "c": 2, "height": 0.2 },
+        { "a": 4, "b": 4, "c": 4, "height": 0.4 },
+        { "a": 3, "b": 3, "c": 3, "height": 0.2 },
         { "a": 1, "b": 1, "c": 1, "height": 0 }
       ]
     }

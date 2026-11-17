@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dh8phtyfwjcg"
-path="res://.godot/imported/piso-dungeon-b.glb-438fba99ad7c2fef55b3b0eaee410f97.scn"
+uid="uid://ccnonpdb1oldm"
+path="res://.godot/imported/parede-tocha.glb-8a398ce19db06d0a749031318d60cfbd.scn"
 
 [deps]
 
-source_file="res://assets/modelos/cenario/piso-dungeon-b.glb"
-dest_files=["res://.godot/imported/piso-dungeon-b.glb-438fba99ad7c2fef55b3b0eaee410f97.scn"]
+source_file="res://assets/modelos/cenario/parede-tocha.glb"
+dest_files=["res://.godot/imported/parede-tocha.glb-8a398ce19db06d0a749031318d60cfbd.scn"]
 
 [params]
 
