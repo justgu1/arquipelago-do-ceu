@@ -52,7 +52,8 @@ public sealed record DungeonContext(
 	public const int GeneratorVersion = 4;
 
 	// A versão deste Nível para esta criança: a em que ela já explorou, ou a atual.
-	public int Version => Progress.Explored.VersionFor(ProfileId, LevelKey, GeneratorVersion);
+	// Só a versão atual vale: o que foi explorado em versões antigas do gerador não bate com os Andares de agora e fica de lado.
+	public int Version => GeneratorVersion;
 
 	public LevelKey LevelKey => new(Discipline, Level);
 

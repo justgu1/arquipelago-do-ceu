@@ -23,11 +23,13 @@ public static class PaperTexture
 	static Image Build()
 	{
 		var blotch = new FastNoiseLite { Frequency = 0.012f, Seed = 3, NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth };
+		var stain = new FastNoiseLite { Frequency = 0.03f, Seed = 21, NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth };
 		var fibre = new FastNoiseLite { Frequency = 0.09f, Seed = 11, NoiseType = FastNoiseLite.NoiseTypeEnum.Cellular };
 		var rough = new FastNoiseLite { Frequency = 0.4f, Seed = 5 };
+		var torn = new FastNoiseLite { Frequency = 0.16f, Seed = 8, NoiseType = FastNoiseLite.NoiseTypeEnum.SimplexSmooth };
 		var light = Color.FromHtml("#F2E4C0");
 		var dark = Color.FromHtml("#D9BE8A");
-		var burnt = Color.FromHtml("#8A5A2E");
+		var aged = Color.FromHtml("#B98F58");
 		var image = Image.CreateEmpty(Size, Size, false, Image.Format.Rgba8);
 		for (var y = 0; y < Size; y++)
 			for (var x = 0; x < Size; x++)
@@ -35,9 +37,15 @@ public static class PaperTexture
 				var t = 0.5f + 0.5f * blotch.GetNoise2D(x, y);
 				t = Mathf.Clamp(t * 0.7f + 0.25f * (0.5f + 0.5f * fibre.GetNoise2D(x * 0.5f, y * 2.2f)) + 0.05f * rough.GetNoise2D(x, y), 0f, 1f);
 				var color = dark.Lerp(light, t);
-				var fromEdge = Mathf.Min(Mathf.Min(x, Size - 1 - x), Mathf.Min(y, Size - 1 - y)) + 3f * rough.GetNoise2D(x * 2f, y * 2f);
-				var burn = Mathf.Clamp(1f - fromEdge / Edge, 0f, 1f);
-				image.SetPixel(x, y, color.Lerp(burnt, burn * burn * 0.85f));
+				// Manchas de tempo pelo miolo, e a borda mais velha, mas só um tom: nada de moldura escura.
+				color = color.Lerp(aged, Mathf.Clamp(0.5f + 0.5f * stain.GetNoise2D(x, y), 0f, 1f) * 0.22f);
+				var fromEdge = Mathf.Min(Mathf.Min(x, Size - 1 - x), Mathf.Min(y, Size - 1 - y));
+				var wear = Mathf.Clamp(1f - (fromEdge + 4f * torn.GetNoise2D(x, y)) / Edge, 0f, 1f);
+				color = color.Lerp(aged, wear * 0.55f);
+				// A beirada é rasgada: o contorno oscila e some aos poucos, em vez de uma linha reta.
+				var cut = fromEdge + 5f * torn.GetNoise2D(x * 1.7f, y * 1.7f) + 2f * rough.GetNoise2D(x * 2f, y * 2f);
+				color.A = Mathf.Clamp((cut - 1.5f) / 3f, 0f, 1f);
+				image.SetPixel(x, y, color);
 			}
 		return image;
 	}

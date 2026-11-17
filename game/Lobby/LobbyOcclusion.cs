@@ -6,11 +6,12 @@ using Godot;
 namespace ArquipelagoDoCeu;
 
 // Árvores, torres e prédios ficam translúcidos quando escondem o Personagem da câmera, como as paredes da Dungeon (RoomWalls.Fade).
-// Cada instância ganha cópias dos próprios materiais; só vira translúcida enquanto some, e volta ao material original quando inteira.
+// O esmaecer usa a transparência pontilhada da própria malha, sem trocar os materiais, e volta ao normal quando inteira.
 public partial class LobbyOcclusion : Node
 {
-	const float HiddenAlpha = 0.2f;
-	const float Speed = 8f;
+	// Só esmaece um pouco, devagar: o que esconde a criança continua à vista, e não some como uma mancha.
+	const float HiddenAlpha = 0.55f;
+	const float Speed = 2.5f;
 	// Altura do peito do Personagem: o raio parte dali, para um galho baixo ou a base da torre também contarem.
 	const float ChestHeight = 0.8f;
 
@@ -23,7 +24,7 @@ public partial class LobbyOcclusion : Node
 	sealed class Fadeable
 	{
 		public required Aabb Box;
-		public required List<(StandardMaterial3D Material, BaseMaterial3D.TransparencyEnum Original, Color Color)> Materials;
+		public required List<MeshInstance3D> Meshes;
 		public float Alpha = 1f;
 	}
 
@@ -42,28 +43,8 @@ public partial class LobbyOcclusion : Node
 		foreach (var model in models) fadeables.Add(Prepare(model));
 	}
 
-	static Fadeable Prepare(Node3D model)
-	{
-		var materials = new List<(StandardMaterial3D, BaseMaterial3D.TransparencyEnum, Color)>();
-		foreach (var mesh in model.FindChildren("*", "MeshInstance3D", true, false).OfType<MeshInstance3D>())
-		{
-			if (mesh.MaterialOverride is StandardMaterial3D shared)
-			{
-				var copy = (StandardMaterial3D)shared.Duplicate();
-				mesh.MaterialOverride = copy;
-				materials.Add((copy, copy.Transparency, copy.AlbedoColor));
-				continue;
-			}
-			for (var s = 0; s < mesh.GetSurfaceOverrideMaterialCount(); s++)
-			{
-				if (mesh.GetActiveMaterial(s) is not StandardMaterial3D source) continue;
-				var copy = (StandardMaterial3D)source.Duplicate();
-				mesh.SetSurfaceOverrideMaterial(s, copy);
-				materials.Add((copy, copy.Transparency, copy.AlbedoColor));
-			}
-		}
-		return new Fadeable { Box = Lobby.WorldBox(model), Materials = materials };
-	}
+	static Fadeable Prepare(Node3D model) =>
+		new() { Box = Lobby.WorldBox(model), Meshes = [.. model.FindChildren("*", "MeshInstance3D", true, false).OfType<MeshInstance3D>()] };
 
 	public override void _Process(double delta)
 	{
@@ -83,11 +64,6 @@ public partial class LobbyOcclusion : Node
 
 	static void Apply(Fadeable item)
 	{
-		var whole = item.Alpha >= 0.999f;
-		foreach (var (material, original, color) in item.Materials)
-		{
-			material.Transparency = whole ? original : BaseMaterial3D.TransparencyEnum.AlphaDepthPrePass;
-			material.AlbedoColor = new Color(color, color.A * item.Alpha);
-		}
+		foreach (var mesh in item.Meshes) mesh.Transparency = 1f - item.Alpha;
 	}
 }

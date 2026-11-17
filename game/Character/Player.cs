@@ -102,7 +102,7 @@ public partial class Player : Node3D
 
 	public override void _Process(double delta)
 	{
-		var steer = Enabled ? MovementController.FromScreen(ToCore(Controls.Direction())) : Vector2.Zero;
+		var steer = Enabled ? FromCamera(Controls.Direction()) : Vector2.Zero;
 		// A câmera lenta do combate vale para o mundo, não para o Personagem: ele anda no tempo normal.
 		var dt = (float)(Engine.TimeScale > 0.0 ? delta / Engine.TimeScale : delta);
 		var running = Enabled && Godot.Input.IsActionPressed(Controls.Run);
@@ -144,5 +144,14 @@ public partial class Player : Node3D
 		Rotation = new Vector3(0f, Mathf.LerpAngle(Rotation.Y, target, 1f - Mathf.Exp(-TurnSharpness * delta)), 0f);
 	}
 
-	static Vector2 ToCore(Godot.Vector2 value) => new(value.X, value.Y);
+	// O teclado anda em relação ao que se vê: para cima é para onde a câmera olha, mesmo depois de ela girar.
+	Vector2 FromCamera(Godot.Vector2 input)
+	{
+		if (input == Godot.Vector2.Zero) return Vector2.Zero;
+		var basis = camera.GlobalTransform.Basis;
+		var right = new Vector3(basis.X.X, 0f, basis.X.Z).Normalized();
+		var forward = new Vector3(-basis.Z.X, 0f, -basis.Z.Z).Normalized();
+		var world = right * input.X + forward * input.Y;
+		return Vector2.Normalize(new Vector2(world.X, world.Z));
+	}
 }

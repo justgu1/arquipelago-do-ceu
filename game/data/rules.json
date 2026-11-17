@@ -388,7 +388,7 @@
       }
     ],
     "camera": {
-      "size": 34,
+      "size": 17,
       "minSize": 8,
       "maxSize": 52,
       "zoomStep": 3,
