@@ -259,8 +259,8 @@ def fundir(nome, pecas):
 
 LOD = 0.8
 M = dict(
-    pedra=mat("d_pedra", "#9A93B5", 0.85), pedra_cl=mat("d_pedra_cl", "#B9B2D2", 0.85), pedra_esc=mat("d_pedra_esc", "#6F6890", 0.9),
-    ouro=mat("d_ouro", "#EBC24E", 0.35, 0.6), musgo=mat("d_musgo", "#5E9C4A", 0.9),
+    pedra=mat("pedra", "#9A93B5", 0.9), pedra_cl=mat("pedra_cl", "#B9B2D2", 0.9), pedra_esc=mat("pedra_esc", "#6F6890", 0.95),
+    ouro=mat("faixa", "#EBC24E", 0.5, 0.3), musgo=mat("d_musgo", "#5E9C4A", 0.9),
 )
 RI, RO, ZC = 1.0, 1.3, 0.9
 DEPTH = 0.5

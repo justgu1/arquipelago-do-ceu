@@ -6,6 +6,17 @@ namespace ArquipelagoDoCeu;
 // Se o modelo não carregar, quem chama segue com o desenho simples.
 public static class RoomProps
 {
+	static readonly string[] Kit = ["cenario/porta-arco", "cenario/piso-dungeon-a", "cenario/parede-baixa", "cenario/parede-alta", "cenario/parede-tocha", "cenario/coluna-dungeon", "cenario/coluna-braseiro",
+		"cenario/bau", "cenario/barril", "cenario/bancada", "cenario/estante", "cenario/mesa-leitura", "cenario/fonte-descanso", "cenario/escada-pedra",
+		"obstaculos/pilha-de-engrenagens", "obstaculos/caixote-madeira", "obstaculos/pilha-de-livros"];
+
+	// Pede os modelos do kit em segundo plano ao entrar na torre: a primeira Sala não trava para lê-los do disco.
+	public static void Preload()
+	{
+		foreach (var name in Kit)
+			ResourceLoader.LoadThreadedRequest($"res://assets/modelos/{name}.glb");
+	}
+
 	// `yaw` gira em volta do eixo vertical; o modelo fica com a base em `at` e a altura pedida. Devolve nulo se não carregou.
 	public static Node3D? Add(Node3D parent, string name, float height, Vector3 at, float yaw = 0f)
 	{

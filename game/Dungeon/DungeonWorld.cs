@@ -75,6 +75,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			AmbientLightColor = Color.FromHtml("#C9BFDC"),
 			AmbientLightEnergy = 0.8f,
 		};
+		RoomProps.Preload();
 		AddChild(Camera);
 		Frame(System.Numerics.Vector2.Zero, 13f);
 		AddChild(sun);
@@ -294,7 +295,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var along = way.LengthSquared() > 0.0001f ? way.Normalized() : Vector3.Forward;
 		var side = new Vector3(-along.Z, 0f, along.X) * 0.8f;
 		var across = Mathf.Atan2(side.X, side.Z) - Mathf.Pi / 2f;
-		if (RoomProps.Add(room, "cenario/porta-arco", 1.6f, door.Ground, Mathf.Atan2(along.X, along.Z)) is null)
+		if (RoomProps.Add(room, "cenario/porta-arco", 2.1f, door.Ground, Mathf.Atan2(along.X, along.Z)) is { } arch) Theme.Tint(arch);
+		else
 		{
 			foreach (var offset in new[] { side, -side })
 				room.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = new Vector3(0.28f, PillarHeight, 0.28f) }, MaterialOverride = material, Position = door.Ground + offset + new Vector3(0f, PillarHeight / 2f, 0f) });

@@ -28,6 +28,7 @@ public partial class LobbyHud : Control
 		Dock.InventoryRequested += () => InventoryRequested?.Invoke();
 		Dock.RoleSwitchRequested += () => RoleSwitchRequested?.Invoke();
 		context = BuildContext();
+		context.Visible = false;
 		AddChild(card);
 		topRight = BuildTopRight();
 		AddChild(topRight);

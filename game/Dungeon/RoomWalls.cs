@@ -16,14 +16,16 @@ public static class RoomWalls
 	const float BrazierHeight = 1.85f;
 	const float Edge = 1f;
 	const float Apothem = 0.866f;
-	const float HideRadius = 1.6f;
+	const float HideRadius = 2f;
 	const float FrontFacing = 0.35f;
 	const int MaxLights = 8;
 
 	// Uma peça do cenário que some quando esconde alguém. A transparência é do próprio modelo (dithering), então os materiais do tema não mudam.
-	public sealed class Piece(Node3D root)
+	public sealed class Piece(Node3D root, float height)
 	{
 		public Node3D Root { get; } = root;
+		// O meio do corpo da peça: a parede tem 2 de altura, e medir pela base a deixava de fora da linha de visão.
+		public Vector3 Center { get; } = root.Position + new Vector3(0f, height / 2f, 0f);
 		public IReadOnlyList<MeshInstance3D> Meshes { get; } = [.. root.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>()];
 		public float Alpha { get; set; } = 1f;
 	}
@@ -65,7 +67,7 @@ public static class RoomWalls
 	{
 		if (RoomProps.Add(parent, model, height, at, yaw) is not { } node) return null;
 		if (themed) theme.Tint(node);
-		var piece = new Piece(node);
+		var piece = new Piece(node, height);
 		pieces.Add(piece);
 		return piece;
 	}
@@ -82,7 +84,7 @@ public static class RoomWalls
 		foreach (var piece in pieces)
 		{
 			if (!GodotObject.IsInstanceValid(piece.Root)) continue;
-			var hides = seen.Any(target => Hides(piece.Root.Position, target, forward));
+			var hides = seen.Any(target => Hides(piece.Center, target, forward));
 			var alpha = Mathf.MoveToward(piece.Alpha, hides ? 0.05f : 1f, delta * 8f);
 			if (Mathf.IsEqualApprox(alpha, piece.Alpha)) continue;
 			piece.Alpha = alpha;
