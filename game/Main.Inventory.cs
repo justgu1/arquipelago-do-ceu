@@ -164,6 +164,8 @@ public partial class Main
 		Mastery = () => progress.Mastery.Of(current.Id, role),
 		OwnedCosmetics = () => rewardService.Cosmetics(current.Id),
 		OwnedGear = () => inventory.OwnedGear(current.Id),
+		BackpackSlots = () => rules.Backpack.Slots(UnlockedLevel()),
+		BackpackLevel = UnlockedLevel,
 		HeldItems = HeldItems,
 		Portrait = portrait,
 		SwitchRole = canChangeGear ? SwitchRoleFromInventory : null,

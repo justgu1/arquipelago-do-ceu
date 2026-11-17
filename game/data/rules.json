@@ -305,6 +305,9 @@
     "conceptSolves": 3,
     "loadRadius": 24
   },
+  "backpack": {
+    "slotsByLevel": [6, 9, 12]
+  },
   "lobby": {
     "interactionReach": 2.2,
     "dayCycleSeconds": 480,

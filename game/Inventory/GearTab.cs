@@ -97,13 +97,38 @@ public sealed partial class GearTab : Node
 	{
 		Clear(library);
 		entryButtons.Clear();
-		library.AddChild(Header("Equipamentos", "os usados primeiro"));
+		var entries = host.Library.Entries(worn, mastery, host.OwnedGear()).ToDictionary(e => e.Item.Id);
+		var wornIds = entries.Values.Where(e => e.Equipped).Select(e => e.Item.Id).ToHashSet();
+		var pack = Backpack.Fill(host.OwnedGear(), wornIds, host.BackpackSlots());
+		inChest = [.. pack.InChest];
+		library.AddChild(Header("Mochila", $"{pack.InPack.Count} de {pack.Slots} lugares · Nível {host.BackpackLevel()}"));
 		var grid = Grid();
-		foreach (var entry in host.Library.Entries(worn, mastery, host.OwnedGear()))
-			grid.AddChild(EntryButton(entry));
+		foreach (var id in pack.InPack.Where(entries.ContainsKey))
+			grid.AddChild(EntryButton(entries[id]));
+		for (var free = 0; free < pack.Free; free++)
+			grid.AddChild(EmptySlot());
 		library.AddChild(grid);
+		if (pack.InChest.Count > 0)
+		{
+			library.AddChild(Header("Baú do Lobby", "guardados: venda algo para abrir lugar"));
+			var chest = Grid();
+			foreach (var id in pack.InChest.Where(entries.ContainsKey))
+				chest.AddChild(EntryButton(entries[id]));
+			library.AddChild(chest);
+		}
 		AddHeldItems();
-		library.AddChild(BookStyle.Text("Passe o mouse ou toque num equipamento para ver o que ele muda. O Personagem já aparece com ele. O cadeado mostra a Maestria que falta e impede de equipar.", 16));
+		library.AddChild(BookStyle.Text("O que você veste fica no Personagem e não ocupa lugar. Passe o mouse ou toque num equipamento para ver o que ele muda. O cadeado mostra a Maestria que falta. Cada Nível aumenta a mochila.", 16));
+	}
+
+	// Equipamentos sem lugar na mochila: ficam guardados e só voltam a valer quando abrir espaço.
+	HashSet<string> inChest = [];
+
+	static Button EmptySlot()
+	{
+		var slot = ItemToken.Create("lugar livre", () => { }, "EmptySlot", 78, dim: true);
+		slot.Disabled = true;
+		slot.FocusMode = Control.FocusModeEnum.None;
+		return slot;
 	}
 
 	internal static Control Header(string title, string note)
@@ -229,7 +254,7 @@ public sealed partial class GearTab : Node
 		row.AddThemeConstantOverride("separation", 8);
 		var equipped = IsEquipped(item);
 		var equip = BookStyle.Button(equipped ? "Tirar" : "Equipar", () => { if (equipped) Remove(item); else Equip(item); }, "EquipButton", TargetHeight);
-		equip.Disabled = !host.CanChangeGear || (!equipped && mastery < item.MinMastery);
+		equip.Disabled = !host.CanChangeGear || (!equipped && (mastery < item.MinMastery || inChest.Contains(item.Id)));
 		equip.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 		var listen = BookStyle.Button("Ouvir", () => host.Say(Spoken(item)), "ListenButton", TargetHeight);
 		listen.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
@@ -242,6 +267,7 @@ public sealed partial class GearTab : Node
 	{
 		if (IsEquipped(item)) return;
 		if (!host.CanChangeGear) { host.Say("Troque o equipamento no Lobby."); return; }
+		if (inChest.Contains(item.Id)) { host.Say("Esse equipamento está no Baú do Lobby. Venda algo da mochila para abrir lugar."); return; }
 		var result = host.Gear.Equip(host.ProfileId, host.RoleId, item.Id, mastery);
 		if (!result.IsOk) { host.Say(result.Error!); return; }
 		host.Say($"{item.Name} equipado.");
