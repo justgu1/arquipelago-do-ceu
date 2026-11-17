@@ -57,11 +57,20 @@ public static class BookStyle
 	// O foco e o mouse por cima engrossam a borda, para a seleção nunca depender só da cor.
 	static void StyleStates(Button button)
 	{
-		button.AddThemeStyleboxOverride("normal", Box());
+		button.AddThemeStyleboxOverride("normal", Paper(Colors.White));
 		button.AddThemeStyleboxOverride("hover", Emphasized(Page));
 		button.AddThemeStyleboxOverride("focus", Emphasized(Page));
 		button.AddThemeStyleboxOverride("pressed", Emphasized(Selected));
-		button.AddThemeStyleboxOverride("disabled", Box(Disabled));
+		button.AddThemeStyleboxOverride("disabled", Paper(new Color(0.7f, 0.68f, 0.64f)));
+	}
+
+	// O papiro do botão: a mesma folha das telas, escurecida quando desligado.
+	static StyleBoxTexture Paper(Color tint)
+	{
+		var style = PaperTexture.Style();
+		style.ModulateColor = tint;
+		style.SetContentMarginAll(Margin);
+		return style;
 	}
 
 	public static StyleBoxFlat Emphasized(Color fill)

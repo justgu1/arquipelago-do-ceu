@@ -78,6 +78,16 @@ static partial class DungeonScenarios
 		await d.Tap(Controls.Interact);
 		d.Expect(expedition.Energy.Current == before + 2, "o Descanso devolveu 2 de Energia");
 		await d.Shot("01-descanso");
+		if (run.World.Props.Count > 0 && run.World.Props[0] is { } prop)
+		{
+			var toCenter = Vector2.Normalize(-prop.Ground);
+			run.Player.PlaceAt(prop.Ground + toCenter * 1.6f);
+			await d.Wait(0.4);
+			await d.Tap(Controls.Interact);
+			await d.Wait(0.3);
+			d.Expect(d.HasVisible(prop.Line[..15]), "interagir com a mobília da Sala mostra o que ela é");
+			await d.Shot("01b-mobilia");
+		}
 		await d.Tap(Controls.Interact);
 		d.Expect(expedition.Energy.Current == before + 2, "o Descanso só vale uma vez");
 

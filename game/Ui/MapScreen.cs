@@ -210,14 +210,14 @@ public partial class MapScreen : OverlayScreen
 		}
 	}
 
-	// As mãos do Personagem seguram os cantos de cima da folha: o braço sobe pelas laterais, a palma fica por fora da borda,
-	// os quatro dedos se fecham por cima dela e o polegar apoia no alto.
+	// As mãos do Personagem seguram os cantos de cima da folha: a palma fica atrás da borda, quatro dedos caem sobre a folha e o braço sobe pela lateral.
 	sealed partial class Hands : Control
 	{
 		static readonly Color Skin = Color.FromHtml("#F0BE94");
 		static readonly Color SkinShade = Color.FromHtml("#D99A70");
 		static readonly Color Sleeve = Color.FromHtml("#7A5AA8");
 		static readonly Color Cuff = Color.FromHtml("#F4EBD6");
+		static readonly float[] FingerLength = [34f, 42f, 40f, 30f];
 
 		readonly Control sheet;
 
@@ -233,43 +233,30 @@ public partial class MapScreen : OverlayScreen
 		public override void _Draw()
 		{
 			var rect = sheet.GetGlobalRect();
-			foreach (var left in new[] { true, false })
-			{
-				var inward = left ? 1f : -1f;
-				var corner = new Vector2(left ? rect.Position.X + 2f : rect.End.X - 2f, rect.Position.Y + 10f);
-				DrawArm(corner, inward);
-				DrawHand(corner, inward);
-			}
+			DrawHand(new Vector2(rect.Position.X + 18f, rect.Position.Y), 1f);
+			DrawHand(new Vector2(rect.End.X - 18f, rect.Position.Y), -1f);
 		}
 
-		void DrawArm(Vector2 corner, float inward)
-		{
-			var wrist = corner + new Vector2(-inward * 20f, 52f);
-			var foot = new Vector2(wrist.X - inward * 60f, Size.Y + 30f);
-			Capsule(foot, wrist, 46f, Colors.Black);
-			Capsule(foot, wrist, 38f, Sleeve);
-			var toward = (foot - wrist).Normalized();
-			Capsule(wrist + toward * 12f, wrist + toward * 22f, 48f, Colors.Black);
-			Capsule(wrist + toward * 12f, wrist + toward * 22f, 40f, Cuff);
-		}
-
+		// `corner` é o ponto na borda de cima onde os dedos pegam; `inward` é +1 na mão esquerda (os dedos se espalham para a direita).
 		void DrawHand(Vector2 corner, float inward)
 		{
-			var palm = corner + new Vector2(-inward * 12f, 26f);
-			DrawCircle(palm, 27f, Colors.Black);
-			DrawCircle(palm, 24f, Skin);
+			var wrist = corner + new Vector2(-inward * 30f, -26f);
+			var foot = new Vector2(wrist.X - inward * 110f, Size.Y + 30f);
+			Capsule(foot, wrist, 50f, Colors.Black);
+			Capsule(foot, wrist, 42f, Sleeve);
+			var cuffTo = wrist + (foot - wrist).Normalized() * -6f;
+			Capsule(wrist + (foot - wrist).Normalized() * 10f, cuffTo, 52f, Colors.Black);
+			Capsule(wrist + (foot - wrist).Normalized() * 10f, cuffTo, 44f, Cuff);
+			DrawCircle(corner + new Vector2(inward * 22f, -20f), 36f, Colors.Black);
+			DrawCircle(corner + new Vector2(inward * 22f, -20f), 33f, Skin);
 			for (var i = 0; i < 4; i++)
 			{
-				var start = corner + new Vector2(-inward * 8f, 8f + i * 12f);
-				var end = corner + new Vector2(inward * (18f - (i == 3 ? 5f : 0f)), 8f + i * 12f);
-				Capsule(start, end, 15f, Colors.Black);
-				Capsule(start, end, 11f, Skin);
-				DrawLine(start + new Vector2(inward * 12f, 5f), end + new Vector2(0f, 5f), SkinShade, 1.5f);
+				var top = corner + new Vector2(inward * (i * 15f - 2f), -8f);
+				var tip = top + new Vector2(0f, FingerLength[i]);
+				Capsule(top, tip, 17f, Colors.Black);
+				Capsule(top, tip, 13f, Skin);
+				DrawLine(tip + new Vector2(-3f, -9f), tip + new Vector2(3f, -9f), SkinShade, 1.5f);
 			}
-			var thumbBase = palm + new Vector2(inward * 4f, -14f);
-			var thumbTip = corner + new Vector2(inward * 12f, -14f);
-			Capsule(thumbBase, thumbTip, 17f, Colors.Black);
-			Capsule(thumbBase, thumbTip, 13f, Skin);
 		}
 
 		void Capsule(Vector2 from, Vector2 to, float width, Color color)

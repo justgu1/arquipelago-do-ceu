@@ -55,6 +55,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		if (expedition.CanReturnToProgression) list.Add(new Interactable("progression", FountainSpot));
 		if (expedition.Current.Kind.Restores) list.Add(new Interactable("rest", FountainSpot));
 		if (expedition.Current.Kind.SavesPoint) list.Add(new Interactable("totem", FountainSpot));
+		list.AddRange(props.Select(p => new Interactable(p.Id, p.Ground)));
 		return list;
 	}
 

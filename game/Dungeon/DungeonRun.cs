@@ -292,7 +292,7 @@ public partial class DungeonRun : Node
 		var near = enabled ? InteractionFinder.Nearest(player.GroundPosition, world.Interactables(expedition), ctx.Rules.Lobby.InteractionReach + ctx.ExtraReach) : null;
 		if (near?.Id == target) return;
 		target = near?.Id;
-		hud.ShowPrompt(target is null ? null : narration.PromptFor(target));
+		hud.ShowPrompt(target is null ? null : target.StartsWith("prop:", System.StringComparison.Ordinal) ? world.PropPrompt(target) : narration.PromptFor(target));
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -306,6 +306,11 @@ public partial class DungeonRun : Node
 	void Activate()
 	{
 		if (left || !enabled || target is null) return;
+		if (target.StartsWith("prop:", System.StringComparison.Ordinal))
+		{
+			if (world.UseProp(target) is { } line) Say(line);
+			return;
+		}
 		if (target == "rest") { Rest(); return; }
 		if (target == "totem") { Leave(""); return; }
 		if (InShortcut)

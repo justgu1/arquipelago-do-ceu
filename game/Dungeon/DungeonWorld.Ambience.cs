@@ -11,6 +11,7 @@ public partial class DungeonWorld
 {
 	readonly DirectionalLight3D sun = new() { LightEnergy = 0.6f, ShadowEnabled = true, RotationDegrees = new Vector3(-50f, -30f, 0f) };
 	DungeonTheme theme = DungeonTheme.Numbers;
+	readonly List<RoomFurniture.Prop> props = [];
 	CpuParticles3D? dust;
 
 	public DungeonTheme Theme
@@ -49,7 +50,26 @@ public partial class DungeonWorld
 		var seed = Seed.Mix((ulong)(here.Origin.Q * 7919 + here.Origin.R), here.Form.Id, floorNumber, currentId, 1);
 		var plan = RoomFurnishing.Plan(cells, walkable, keep, Local(here.Spot), seed);
 		blocked.UnionWith(plan.Select(f => f.Cell));
-		return RoomFurniture.Add(room, plan, walkable, heights, theme, theme == DungeonTheme.Letters);
+		props.Clear();
+		return RoomFurniture.Add(room, plan, walkable, heights, theme, theme == DungeonTheme.Letters, props);
+	}
+
+	public IReadOnlyList<RoomFurniture.Prop> Props => props;
+
+	public string PropPrompt(string id) => props.FirstOrDefault(p => p.Id == id)?.Prompt + " [E]";
+
+	// A peça dá um pulinho e a criança ouve o que ela é; sem "reduzir animações" só a frase.
+	public string? UseProp(string id)
+	{
+		if (props.FirstOrDefault(p => p.Id == id) is not { } prop) return null;
+		if (!ReduceMotion && GodotObject.IsInstanceValid(prop.Model))
+		{
+			var scale = prop.Model.Scale;
+			var bounce = CreateTween();
+			bounce.TweenProperty(prop.Model, "scale", scale * 1.12f, 0.12);
+			bounce.TweenProperty(prop.Model, "scale", scale, 0.18);
+		}
+		return prop.Line;
 	}
 
 	// Poucos grãos de luz subindo devagar em volta da Sala; sem eles com "reduzir animações".
