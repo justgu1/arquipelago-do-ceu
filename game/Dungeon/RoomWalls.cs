@@ -28,14 +28,16 @@ public static class RoomWalls
 		public Vector3 Center { get; } = root.Position + new Vector3(0f, height / 2f, 0f);
 		public IReadOnlyList<MeshInstance3D> Meshes { get; } = [.. root.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>()];
 		public float Alpha { get; set; } = 1f;
+		// As peças das Salas guardadas estão em coordenadas do Andar, e as dos corredores nas da Sala de agora.
+		public bool Absolute { get; set; }
 	}
 
 	// Uma parede em cada lado de hexágono do chão que dá para o vazio; os corredores e as portas ficam abertos.
-	public static IReadOnlyList<Piece> Add(Node3D parent, IReadOnlyDictionary<HexCell, float> floor, IReadOnlySet<HexCell> open, DungeonTheme theme)
+	public static IReadOnlyList<Piece> Add(Node3D parent, IReadOnlyDictionary<HexCell, float> floor, IReadOnlySet<HexCell> open, DungeonTheme theme, IList<Light3D> lights)
 	{
 		var pieces = new List<Piece>();
 		var pillars = new HashSet<(int, int)>();
-		var lights = 0;
+		var count = 0;
 		foreach (var (cell, height) in floor)
 		{
 			var center = HexGrid.ToWorld(cell);
@@ -46,16 +48,16 @@ public static class RoomWalls
 				var mid = new Vector3(center.X + way.X * Apothem, height, center.Y + way.Y * Apothem);
 				var along = new Vector3(-way.Y, 0f, way.X);
 				var angle = Mathf.Atan2(along.X, along.Z) - Mathf.Pi / 2f;
-				var torch = !front && Hash(cell, next) % 4 == 0 && lights < MaxLights;
+				var torch = !front && Hash(cell, next) % 4 == 0 && count < MaxLights;
 				Place(parent, pieces, theme, front ? "cenario/parede-baixa" : torch ? "cenario/parede-tocha" : "cenario/parede-alta", front ? LowWall : HighWall, mid, angle);
-				if (torch) { Light(parent, theme, mid + new Vector3(-way.X * 0.5f, 1.6f, -way.Y * 0.5f)); lights++; }
+				if (torch) { lights.Add(Light(parent, theme, mid + new Vector3(-way.X * 0.5f, 1.6f, -way.Y * 0.5f))); count++; }
 				foreach (var end in new[] { mid + along * (Edge / 2f), mid - along * (Edge / 2f) })
 				{
 					var key = (Mathf.RoundToInt(end.X * 20f), Mathf.RoundToInt(end.Z * 20f));
 					if (!pillars.Add(key)) continue;
-					var lit = front && Mathf.PosMod(key.Item1 / 7 + key.Item2 / 5, 5) == 0 && lights < MaxLights;
+					var lit = front && Mathf.PosMod(key.Item1 / 7 + key.Item2 / 5, 5) == 0 && count < MaxLights;
 					Place(parent, pieces, theme, lit ? "cenario/coluna-braseiro" : "cenario/coluna-dungeon", lit ? BrazierHeight : front ? LowPillar : HighPillar, end, 0f);
-					if (lit) { Light(parent, theme, end + new Vector3(0f, 2.3f, 0f)); lights++; }
+					if (lit) { lights.Add(Light(parent, theme, end + new Vector3(0f, 2.3f, 0f))); count++; }
 				}
 			}
 		}
@@ -73,18 +75,22 @@ public static class RoomWalls
 	}
 
 	// Uma luz quente de tocha ou braseiro: sem sombra, para custar pouco no celular.
-	static void Light(Node3D parent, DungeonTheme theme, Vector3 at) =>
-		parent.AddChild(new OmniLight3D { LightColor = Color.FromHtml(theme.Flame), LightEnergy = 1.3f, OmniRange = 5.5f, ShadowEnabled = false, Position = at });
+	static OmniLight3D Light(Node3D parent, DungeonTheme theme, Vector3 at)
+	{
+		var light = new OmniLight3D { LightColor = Color.FromHtml(theme.Flame), LightEnergy = 1.3f, OmniRange = 5.5f, ShadowEnabled = false, Position = at };
+		parent.AddChild(light);
+		return light;
+	}
 
 	static int Hash(HexCell a, HexCell b) => unchecked(a.Q * 73856093 ^ a.R * 19349663 ^ b.Q * 83492791 ^ b.R * 2654435) & int.MaxValue;
 
 	// Só as peças que escondem alguém (na linha de visão da câmera, entre ela e a criança ou a criatura) somem; as outras voltam.
-	public static void Fade(IReadOnlyList<Piece> pieces, Vector3 forward, IReadOnlyList<Vector3> seen, float delta)
+	public static void Fade(IReadOnlyList<Piece> pieces, Vector3 forward, IReadOnlyList<Vector3> seen, float delta, Vector3 offset)
 	{
 		foreach (var piece in pieces)
 		{
 			if (!GodotObject.IsInstanceValid(piece.Root)) continue;
-			var hides = seen.Any(target => Hides(piece.Center, target, forward));
+			var hides = seen.Any(target => Hides(piece.Absolute ? piece.Center - offset : piece.Center, target, forward));
 			var alpha = Mathf.MoveToward(piece.Alpha, hides ? 0.05f : 1f, delta * 8f);
 			if (Mathf.IsEqualApprox(alpha, piece.Alpha)) continue;
 			piece.Alpha = alpha;

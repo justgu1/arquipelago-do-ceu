@@ -101,7 +101,7 @@ public partial class DungeonRun : Node
 		ctx.ConfigurePlayer(player);
 		AddChild(player);
 
-		world.ReduceMotion = player.ReduceMotion; world.Theme = DungeonTheme.For(ctx.Discipline);
+		world.ReduceMotion = player.ReduceMotion; world.Theme = DungeonTheme.For(ctx.Discipline); world.LoadRadius = ctx.Rules.Dungeon.LoadRadius;
 		combat = new TrainingArea(ctx.Rules, world, player, world.Creature, ctx.Voice, ctx.Settings, ctx.UiRoot,
 			() => ctx.Level, () => player.Enabled && !left, _ => { }, Say, ctx.Random, ctx.Towers);
 		combat.InDungeon = true;
@@ -306,11 +306,7 @@ public partial class DungeonRun : Node
 	void Activate()
 	{
 		if (left || !enabled || target is null) return;
-		if (target.StartsWith("prop:", System.StringComparison.Ordinal))
-		{
-			if (world.UseProp(target) is { } line) Say(line);
-			return;
-		}
+		if (target.StartsWith("prop:", System.StringComparison.Ordinal)) { UseProp(target); return; }
 		if (target == "rest") { Rest(); return; }
 		if (target == "totem") { Leave(""); return; }
 		if (InShortcut)

@@ -302,7 +302,8 @@
     "restEnergy": 2,
     "shortcutChallenges": 3,
     "masterChallenges": 4,
-    "conceptSolves": 3
+    "conceptSolves": 3,
+    "loadRadius": 24
   },
   "lobby": {
     "interactionReach": 2.2,

@@ -55,7 +55,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		if (expedition.CanReturnToProgression) list.Add(new Interactable("progression", FountainSpot));
 		if (expedition.Current.Kind.Restores) list.Add(new Interactable("rest", FountainSpot));
 		if (expedition.Current.Kind.SavesPoint) list.Add(new Interactable("totem", FountainSpot));
-		list.AddRange(props.Select(p => new Interactable(p.Id, p.Ground)));
+		list.AddRange(Props.Select(p => new Interactable(p.Id, p.Ground)));
 		return list;
 	}
 
@@ -81,6 +81,7 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		Frame(System.Numerics.Vector2.Zero, 13f);
 		AddChild(sun);
 		ApplyTheme();
+		AddChild(absolute);
 		AddChild(room);
 		AddChild(Creature);
 		AddChild(barrier);
@@ -130,7 +131,8 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		var seen = new List<Vector3>();
 		if (PlayerAt?.Invoke() is { } at) seen.Add(new Vector3(at.X, 1f, at.Y));
 		if (Creature.Visible) seen.Add(Creature.Center + new Vector3(0f, 0.8f, 0f));
-		RoomWalls.Fade(walls, -Camera.GlobalTransform.Basis.Z, seen, (float)delta);
+		BuildOneAhead();
+		RoomWalls.Fade(walls, -Camera.GlobalTransform.Basis.Z, seen, (float)delta, new Vector3(SpotWorld.X, 0f, SpotWorld.Y));
 	}
 	readonly MeshInstance3D barrier = new()
 	{
@@ -176,18 +178,20 @@ public partial class DungeonWorld : Node3D, ICombatStage
 		layout = floor.Layout!;
 		var here = layout.Room(roomId);
 		var key = (floor.Number, floor.Deep);
+		if (shownFloor != key || !ReferenceEquals(shownFloorData?.Layout, layout)) DropBuilt();
+		shownFloorData = floor;
 		var shift = currentId >= 0 && shownFloor == key ? HexGrid.ToWorld(here.Spot - spot) : System.Numerics.Vector2.Zero;
 		(shownFloor, currentId, spot) = (key, roomId, here.Spot);
+		absolute.Position = new Vector3(-SpotWorld.X, 0f, -SpotWorld.Y);
 
 		var kind = floor.Rooms[roomId].Kind;
 		ShowCreatureModel(roomId);
 		corridorDeck.Clear();
 		var walkable = new HashSet<HexCell>(here.Cells.Select(Local));
 		var blocked = new HashSet<HexCell>();
-		var floorHeights = here.Cells.ToDictionary(Local, here.HeightAt);
-		var corridors = new HashSet<HexCell>();
 		var corridorPieces = new List<RoomWalls.Piece>();
-		RoomMeshes.AddFloor(room, here.Cells.Select(c => (Local(c), here.HeightAt(c))), FloorMap.ColorOf(kind), cleared.Contains(roomId), Theme);
+		var active = new HashSet<int> { roomId };
+		blocked.UnionWith(Ensure(floor, roomId, FloorMap.ColorOf(kind), cleared.Contains(roomId), withFloor: true).Occupied.Select(Local));
 
 		foreach (var neighbor in floor.Neighbors(roomId).OrderBy(n => n))
 		{
@@ -209,17 +213,17 @@ public partial class DungeonWorld : Node3D, ICombatStage
 			}
 
 			walkable.UnionWith(cells);
-			corridors.UnionWith(cells);
 			AddCorridor(cells, corridorPieces);
 			walkable.UnionWith(other.Cells.Select(Local));
-			RoomMeshes.AddFloor(room, other.Cells.Select(c => (Local(c), other.HeightAt(c))), color, cleared.Contains(neighbor), Theme);
-			foreach (var c in other.Cells) floorHeights[Local(c)] = other.HeightAt(c);
+			active.Add(neighbor);
+			blocked.UnionWith(Ensure(floor, neighbor, color, cleared.Contains(neighbor), withFloor: true).Occupied.Select(Local));
 			var entry = GroundOf(Local(other.Cells.First(c => c.DistanceTo(layout.CorridorBetween(roomId, neighbor)![^1]) == 1)));
 			entries[neighbor] = new System.Numerics.Vector2(entry.X, entry.Z);
 		}
-		var furniture = Furnish(here, floor.Number, walkable, blocked, floorHeights);
 		Grid.Reset(walkable, blocked);
-		walls = [.. RoomWalls.Add(room, floorHeights, corridors.Concat(blocked).ToHashSet(), Theme), .. furniture, .. corridorPieces];
+		ShowBuilt(active, roomId);
+		walls = [.. active.SelectMany(id => built[id].Pieces), .. corridorPieces];
+		QueueAhead(roomId);
 
 		// Com escada na Sala o nome sobe, para os textos não ficarem um em cima do outro.
 		var hasStairs = kind.Stairs == RoomStairs.Up || stairsDown || deepStairs;

@@ -19,6 +19,12 @@ public partial class DungeonRun
 	}
 
 	// A criança atravessou o corredor e pisou numa Sala nova ou já conhecida: é nela que a Expedição passa a estar.
+	// A mobília da Sala só mostra o que é, sem prêmio.
+	void UseProp(string id)
+	{
+		if (world.UseProp(id) is { } line) Say(line);
+	}
+
 	void Arrive(int room)
 	{
 		var from = expedition.CurrentRoom;
