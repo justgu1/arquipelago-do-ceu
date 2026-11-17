@@ -23,6 +23,7 @@ MODELOS = {
     "torre-engrenagem": (("TorreEngrenagem", None),),
     "torre-livro": (("TorreLivro", None),),
     "lote02/hex-base-v02": (("Hex", None),),
+    "lobby/grama-hex": (("GramaHex", None),),
     "lote02/margem-reta": (("MargemReta", None),),
     "lote02/margem-convexa": (("MargemConvexa", None),),
     "lote02/margem-ponta-d": (("MargemPontaD", None),),
