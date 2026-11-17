@@ -42,7 +42,7 @@ function conferirContrato(arquivo, texto, origens) {
 let ok = true;
 const origens = new Map();
 const lista = (pasta, bloco) => fs.readdirSync(path.join(aqui, pasta)).filter((f) => f.endsWith(".py")).sort().map((arquivo) => ({ pasta, arquivo, bloco }));
-for (const { pasta, arquivo, bloco } of [...lista("criaturas", comum), ...lista("personagem", comumPersonagem), ...lista("lobby", comum)]) {
+for (const { pasta, arquivo, bloco } of [...lista("criaturas", comum), ...lista("personagem", comumPersonagem), ...lista("lobby", comum), ...lista("cenario", comum)]) {
 	const caminho = path.join(aqui, pasta, arquivo);
 	const texto = fs.readFileSync(caminho, "utf8").replace(/\r\n/g, "\n");
 	if (pasta === "criaturas" && !conferirContrato(arquivo, texto, origens)) ok = false;

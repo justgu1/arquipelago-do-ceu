@@ -151,7 +151,7 @@ public class ArquiteturaTests
 					&& !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"));
 
 	// .git pode ser pasta ou arquivo (worktree), por isso os dois testes.
-	static string RaizDoRepositorio()
+	internal static string RaizDoRepositorio()
 	{
 		var dir = new DirectoryInfo(AppContext.BaseDirectory);
 		while (dir != null && !Directory.Exists(Path.Combine(dir.FullName, ".git")) && !File.Exists(Path.Combine(dir.FullName, ".git")))
