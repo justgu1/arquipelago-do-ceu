@@ -22,7 +22,7 @@ public class LobbyIslandsTests
 	[Fact]
 	public void Cada_torre_e_o_Mercador_ficam_em_ilha_propria()
 	{
-		Assert.Equal(["matematica", "portugues", "mercador"], Rules.Islands.Select(i => i.Id));
+		Assert.Equal(["matematica", "portugues", "mercador", "bairro-leste", "bairro-oeste", "bairro-norte", "bairro-sul"], Rules.Islands.Select(i => i.Id));
 		Assert.All(Rules.Islands, i => Assert.True(Map.Islands[i.Id].Count >= 7));
 	}
 
@@ -33,8 +33,9 @@ public class LobbyIslandsTests
 
 		foreach (var island in Rules.Islands)
 		{
-			var gate = Rules.Objects.First(o => o.Id == (island.Id == "mercador" ? "mercador" : "torre-" + island.Id));
-			var near = HexCell(gate.Q, gate.R).Neighbors().First(grid.IsWalkable);
+			var gate = Rules.Objects.FirstOrDefault(o => o.Id == (island.Id == "mercador" ? "mercador" : "torre-" + island.Id));
+			var target = gate is null ? HexCell(island.Q, island.R) : HexCell(gate.Q, gate.R);
+			var near = target.Neighbors().First(grid.IsWalkable);
 			Assert.NotNull(grid.FindPath(new HexCell(0, 0), near));
 			Assert.NotEmpty(Map.Bridges[island.Id]);
 			Assert.All(Map.Bridges[island.Id], c => Assert.True(grid.IsWalkable(c)));

@@ -79,6 +79,7 @@ public partial class Lobby : Node3D, ICombatStage
 		AddLote02Details();
 		Startup.Mark("  Lobby: pontes e detalhes");
 		AddVillage();
+		AddCity();
 		AddTrees();
 		Startup.Mark("  Lobby: árvores");
 		AddObjects();
@@ -103,7 +104,7 @@ public partial class Lobby : Node3D, ICombatStage
 
 	IEnumerable<HexCell> BlockedCells() =>
 		tiles.Where(t => t.Value == Kind.Water).Select(t => t.Key).Concat(TreeSpots).Select(c => new HexCell(c.X, c.Y))
-			.Concat(Rules.Objects.Select(o => new HexCell(o.Q, o.R))).Concat(IslandCenters()).Concat(VillageSpots.Select(s => s.Cell));
+			.Concat(Rules.Objects.Select(o => new HexCell(o.Q, o.R))).Concat(IslandCenters()).Concat(VillageSpots.Select(s => s.Cell)).Concat(CityDecor.Select(d => d.Cell));
 
 	// Árvores, objetos e torres bloqueiam o hexágono para o caminho, mas só o círculo deles é parede: dá para encostar.
 	Dictionary<HexCell, float> RoundObstacles()
@@ -112,6 +113,7 @@ public partial class Lobby : Node3D, ICombatStage
 		foreach (var c in TreeSpots) props[new HexCell(c.X, c.Y)] = TreeBody;
 		foreach (var o in Rules.Objects) props[new HexCell(o.Q, o.R)] = o.Id is "mestre" or "mercador" ? WideBody : ObjectBody;
 		foreach (var (cell, radius) in VillageObstacles()) props[cell] = radius;
+		foreach (var decor in CityDecor) props[decor.Cell] = decor.Body;
 		foreach (var c in IslandCenters()) props[c] = TowerBody;
 		return props;
 	}

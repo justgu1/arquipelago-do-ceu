@@ -27,6 +27,7 @@ public partial class Lobby
 		foreach (var cell in map.Main) tiles[new Vector2I(cell.Q, cell.R)] = TileFor(cell);
 		MarkPlaza();
 		foreach (var cell in map.Islands.Values.SelectMany(c => c)) tiles[new Vector2I(cell.Q, cell.R)] = Hash01(cell.Q * 31 + cell.R * 17) < 0.2f ? Kind.Flowers : Kind.Grass;
+		MarkTowerPaving();
 		foreach (var cell in map.Bridges.Values.SelectMany(c => c))
 		{
 			tiles[new Vector2I(cell.Q, cell.R)] = Kind.Plank;
