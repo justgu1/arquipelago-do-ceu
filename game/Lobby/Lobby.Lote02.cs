@@ -30,18 +30,25 @@ public partial class Lobby
 		return model;
 	}
 
-	void AddLote02Tile(Vector3 center, int mask)
+	// Quatro tons de grama, escolhidos pelo hexágono: o gramado deixa de parecer carimbado e continua igual a cada abertura do jogo.
+	static readonly Color[] GrassTones = [new(0.93f, 0.97f, 0.9f), Colors.White, new(1.04f, 1.04f, 0.97f), new(0.97f, 1.02f, 1.05f)];
+
+	static int ToneOf(Vector2I cell) => (unchecked(cell.X * 73856093 ^ cell.Y * 19349663) >> 5 & 0x7fff) % GrassTones.Length;
+
+	void AddLote02Tile(Vector3 center, int mask, int tone = 1)
 	{
 		var tile = AddLote02("hex-base-v02", center);
 		foreach (var mesh in tile.FindChildren("*", "MeshInstance3D", true, false).Cast<MeshInstance3D>())
 			for (var s = 0; s < mesh.Mesh.GetSurfaceCount(); s++)
 			{
 				if (mesh.Mesh.SurfaceGetMaterial(s) is not StandardMaterial3D source || !source.ResourceName.StartsWith("Terreno_Atlas64")) continue;
-				if (!pathMaterials.TryGetValue(mask, out var material))
+				var key = mask * GrassTones.Length + tone;
+				if (!pathMaterials.TryGetValue(key, out var material))
 				{
 					var copy = (StandardMaterial3D)source.Duplicate();
 					copy.Uv1Offset = new Vector3((mask % 8) / 8f, -(mask / 8) / 8f, 0);
-					pathMaterials[mask] = material = copy;
+					copy.AlbedoColor = GrassTones[tone];
+					pathMaterials[key] = material = copy;
 				}
 				mesh.SetSurfaceOverrideMaterial(s, material);
 			}

@@ -17,7 +17,20 @@ public partial class Lobby
 
 	IReadOnlyList<Decor>? cityDecor;
 
-	IReadOnlyList<Decor> CityDecor => cityDecor ??= [.. Rules.Islands.SelectMany(DecorOf)];
+	IReadOnlyList<Decor> CityDecor => cityDecor ??= [.. Rules.Islands.SelectMany(DecorOf), .. Fountain()];
+
+	IEnumerable<HexCell> PlazaCells => tiles.Where(t => t.Value == Kind.Plaza && map.Main.Contains(new HexCell(t.Key.X, t.Key.Y))).Select(t => new HexCell(t.Key.X, t.Key.Y));
+
+	// A fonte no meio da praça, entre o Guia e o Álbum, no hexágono de praça livre mais perto do ponto médio.
+	IEnumerable<Decor> Fountain()
+	{
+		var anchors = Rules.Objects.Where(o => o.Id is "guia" or "album").Select(o => new HexCell(o.Q, o.R)).ToList();
+		if (anchors.Count < 2) yield break;
+		var middle = HexGrid.FromWorld((HexGrid.ToWorld(anchors[0]) + HexGrid.ToWorld(anchors[1])) / 2f);
+		var taken = Rules.Objects.Select(o => new HexCell(o.Q, o.R)).ToHashSet();
+		var spot = PlazaCells.Where(c => !taken.Contains(c) && taken.All(t => t.DistanceTo(c) > 1)).OrderBy(c => c.DistanceTo(middle)).Cast<HexCell?>().FirstOrDefault();
+		if (spot is { } cell) yield return new Decor("cenario/fonte-descanso", 1.5f, cell, 0.95f, false);
+	}
 
 	IEnumerable<Decor> DecorOf(ArquipelagoDoCeu.Rules.LobbyIsland island)
 	{
@@ -26,6 +39,7 @@ public partial class Lobby
 		var bridge = map.Bridges.TryGetValue(island.Id, out var cells) ? cells : [];
 		var free = Around.Select(d => center + new HexCell(d.Q * 2, d.R * 2)).Where(c => ground.Contains(c) && bridge.All(b => b.DistanceTo(c) > 2)).ToList();
 		if (island.Id.StartsWith(DistrictPrefix, System.StringComparison.Ordinal)) return District(center, free, island.Id);
+		if (island.Id == "mercador") return Market(free);
 		return island.Solid ? Tower(island.Id, free) : [];
 	}
 
@@ -40,6 +54,14 @@ public partial class Lobby
 			var (model, h, b) = Pieces[houses[(i + id.Sum(c => c)) % houses.Length]];
 			yield return new Decor(model, h, free[i], b, true);
 		}
+	}
+
+	// O estoque do Mercador em volta da barraca: barris, caixotes e um baú.
+	static IEnumerable<Decor> Market(List<HexCell> free)
+	{
+		(string Model, float Height, float Body)[] props = [("cenario/barril", 0.75f, 0.35f), ("obstaculos/caixote-madeira", 1f, 0.5f), ("cenario/bau", 0.62f, 0.45f), ("cenario/barril", 0.75f, 0.35f)];
+		for (var i = 0; i < props.Length && i < free.Count; i++)
+			yield return new Decor(props[i].Model, props[i].Height, free[i], props[i].Body, false);
 	}
 
 	// A mobília da torre em volta da base, no estilo das Salas da Dungeon dela.

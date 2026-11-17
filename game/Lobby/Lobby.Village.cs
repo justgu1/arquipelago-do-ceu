@@ -31,7 +31,7 @@ public partial class Lobby
 	IReadOnlyList<VillageSpot> VillageSpots => villageSpots ??= VillagePlan.Build(
 		map.Main.Where(c => !plan.Lake.Contains(c)),
 		plan.Path,
-		plan.Trees.Concat(Rules.Islands.Select(i => new HexCell(i.FromQ, i.FromR))).Concat(LampCells),
+		plan.Trees.Concat(Rules.Islands.Select(i => new HexCell(i.FromQ, i.FromR))).Concat(LampCells).Concat(PlazaCells),
 		Rules.Objects.Select(o => new HexCell(o.Q, o.R)));
 
 	void AddVillage()
